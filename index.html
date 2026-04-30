@@ -480,7 +480,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
           <div style="font-size:1.5rem; margin-bottom:8px;">✅</div>
           <div style="font-size:0.9rem; font-weight:600; color:var(--green); margin-bottom:4px;">Metas cadastradas com sucesso!</div>
           <div style="font-size:0.78rem; color:var(--text3); margin-bottom:16px;" id="adminSucessoMsg"></div>
-          <button class="btn btn-ghost" style="width:auto; padding:8px 20px;" onclick="novoAdminUpload()">+ Cadastrar outra obra</button>
+          <button class="btn btn-ghost" id="btnNovoAdminUpload" style="width:auto; padding:8px 20px;" onclick="novoAdminUpload()">+ Cadastrar outra obra</button>
         </div>
 
       </div>
@@ -861,6 +861,8 @@ function processFileAdmin(file) {
   }
   const obraAdmin = document.getElementById('selObraAdmin').value;
   if (!obraAdmin) { alert('Selecione a obra antes de carregar a planilha.'); return; }
+  document.getElementById('adminSucesso').style.display = 'none';
+  resetBtnConfirmarAdmin();
 
   const reader = new FileReader();
   reader.onload = function(ev) {
@@ -957,7 +959,7 @@ function cancelarAdminUpload() {
   document.getElementById('adminPreview').style.display = 'none';
   document.getElementById('adminFileInput').value = '';
   window._adminPayload = null;
-  document.getElementById('btnConfirmarAdmin').style.display = 'none';
+  resetBtnConfirmarAdmin();
 }
 
 function confirmarCadastroMetas() {
@@ -986,19 +988,40 @@ function confirmarCadastroMetas() {
 function _adminSucesso(nItens, obra, periodo) {
   window._adminPayload = null;
   document.getElementById('adminPreview').style.display = 'none';
-  document.getElementById('btnConfirmarAdmin').style.display = 'none';
+  document.getElementById('adminUploadZone').style.display = 'none';
+  document.getElementById('adminFileInput').value = '';
+  resetBtnConfirmarAdmin();
   document.getElementById('adminSucesso').style.display = 'block';
   document.getElementById('adminSucessoMsg').textContent =
-    `${nItens} serviços enviados para ${obra} — ${periodo}. Confirme no log do Sheets.`;
+    `${nItens} serviços enviados para ${obra} — ${periodo}. Aguarde alguns segundos antes de cadastrar a próxima obra.`;
+
+  const btnNovo = document.getElementById('btnNovoAdminUpload');
+  if (btnNovo) {
+    btnNovo.disabled = true;
+    btnNovo.textContent = 'Aguarde...';
+    setTimeout(function() {
+      btnNovo.disabled = false;
+      btnNovo.textContent = '+ Cadastrar outra obra';
+    }, 4000);
+  }
 }
 
 function novoAdminUpload() {
   window._adminPayload = null;
   document.getElementById('adminUploadZone').style.display = 'flex';
+  document.getElementById('adminPreview').style.display = 'none';
   document.getElementById('adminSucesso').style.display = 'none';
-  document.getElementById('btnConfirmarAdmin').style.display = 'none';
   document.getElementById('adminFileInput').value = '';
   document.getElementById('selObraAdmin').value = '';
+  resetBtnConfirmarAdmin();
+}
+
+function resetBtnConfirmarAdmin() {
+  const btn = document.getElementById('btnConfirmarAdmin');
+  if (!btn) return;
+  btn.disabled = false;
+  btn.textContent = '✓ Confirmar Cadastro das Metas';
+  btn.style.display = 'none';
 }
 
 // ─── MÓDULO METAS: SELEÇÃO DE SEMANA E FORM ───────────────────────────────────
