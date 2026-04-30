@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0054)file:///C:/Users/weber/Downloads/custo-obras-v5_2.html -->
+<!-- saved from url=(0043)file:///C:/Users/weber/Downloads/index.html -->
 <html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CustoObra · Gestão de Obras</title>
-<link href="./custo-obras-v5_3_files/css2" rel="stylesheet">
+<link href="./index_files/css2" rel="stylesheet">
 <style>
 :root {
   --bg: #F2F5FA;
@@ -902,21 +902,17 @@ function confirmarCadastroMetas() {
   fetch(SCRIPT_URL_METAS, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    mode: 'no-cors'
   })
-  .then(r => r.json())
-  .then(data => {
-    if (data.status === 'ok') {
-      document.getElementById('adminPreview').style.display = 'none';
-      document.getElementById('adminSucesso').style.display = 'block';
-      document.getElementById('adminSucessoMsg').textContent =
-        `${data.registros} serviços cadastrados para ${payload.obra} — ${periodo}`;
-      window._adminPayload = null;
-    } else {
-      alert('Erro: ' + (data.message || 'Falha no servidor.'));
-      btn.disabled = false;
-      btn.textContent = '✓ Confirmar Cadastro';
-    }
+  .then(function() {
+    // no-cors: resposta opaca — assumimos sucesso se chegou aqui
+    document.getElementById('adminPreview').style.display = 'none';
+    document.getElementById('btnConfirmarAdmin').style.display = 'none';
+    document.getElementById('adminSucesso').style.display = 'block';
+    document.getElementById('adminSucessoMsg').textContent =
+      `${payload.itens.length} serviços cadastrados para ${payload.obra} — ${periodo}`;
+    window._adminPayload = null;
   })
   .catch(() => {
     alert('Erro de conexão. Verifique sua internet.');
@@ -1097,9 +1093,9 @@ function enviarMetas() {
   fetch(SCRIPT_URL_METAS, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    mode: 'no-cors'
   })
-  .then(r => r.json())
   .then(function() {
     document.getElementById('confirmMetasContent').innerHTML = `
       <div class="success-wrap">
