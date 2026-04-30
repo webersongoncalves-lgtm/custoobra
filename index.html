@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///C:/Users/weber/Downloads/index_3.html -->
+<!-- saved from url=(0045)file:///C:/Users/weber/Downloads/index_5.html -->
 <html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CustoObra · Gestão de Obras</title>
-<link href="./index_4_files/css2" rel="stylesheet">
+<link href="./index_6_files/css2" rel="stylesheet">
 <style>
 :root {
   --bg: #F2F5FA;
@@ -844,6 +844,12 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
     const row = data[i];
     const nome = String(row[0] || '').trim();
     if (!nome || nome.length < 3) continue;
+    // Filtrar linhas de legenda/rodapé que não são serviços reais
+    const nomeLower = nome.toLowerCase();
+    if (nomeLower.startsWith('vermelho') || nomeLower.startsWith('azul') ||
+        nomeLower.startsWith('verde') || nomeLower.startsWith('atividade') ||
+        nomeLower.startsWith('legenda') || nomeLower.startsWith('obs:') ||
+        nomeLower.startsWith('observa')) continue;
     // Normaliza números: substitui vírgula por ponto (formato BR → EN)
     function toNum(v) {
       if (typeof v === 'number') return v;
