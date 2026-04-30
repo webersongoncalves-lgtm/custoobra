@@ -733,6 +733,84 @@ function voltarModulo() {
   mostrarTela('screenModulo');
 }
 
+// ─── MÓDULO METAS: INTEGRAÇÃO COM SHEETS ──────────────────────────────────────
+function metasJsonp(params, onOk, onErro) {
+  const callbackName = 'metasCb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+  const script = document.createElement('script');
+  const query = new URLSearchParams({ ...params, callback: callbackName });
+  let done = false;
+  const timer = setTimeout(function() {
+    if (done) return;
+    done = true;
+    cleanup();
+    if (onErro) onErro(new Error('Tempo esgotado ao buscar metas.'));
+  }, 15000);
+
+  function cleanup() {
+    clearTimeout(timer);
+    delete window[callbackName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+  }
+
+  window[callbackName] = function(data) {
+    if (done) return;
+    done = true;
+    cleanup();
+    onOk(data);
+  };
+
+  script.onerror = function() {
+    if (done) return;
+    done = true;
+    cleanup();
+    if (onErro) onErro(new Error('Erro ao buscar metas.'));
+  };
+
+  script.src = SCRIPT_URL_METAS + '?' + query.toString();
+  document.head.appendChild(script);
+}
+
+function enviarPayloadMetas(payload, onDone) {
+  const iframeName = 'metasPostFrame_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+  const iframe = document.createElement('iframe');
+  const form = document.createElement('form');
+  const input = document.createElement('input');
+  let finished = false;
+
+  iframe.name = iframeName;
+  iframe.style.display = 'none';
+  form.method = 'POST';
+  form.action = SCRIPT_URL_METAS;
+  form.target = iframeName;
+  form.style.display = 'none';
+  input.type = 'hidden';
+  input.name = 'payload';
+  input.value = JSON.stringify(payload);
+  form.appendChild(input);
+
+  function finish() {
+    if (finished) return;
+    finished = true;
+    setTimeout(function() {
+      if (form.parentNode) form.parentNode.removeChild(form);
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+    }, 500);
+    onDone();
+  }
+
+  iframe.onload = function() {
+    // O Apps Script responde em outro domínio; não lemos a resposta por segurança do navegador.
+    finish();
+  };
+
+  document.body.appendChild(iframe);
+  document.body.appendChild(form);
+  form.submit();
+
+  // Fallback: mesmo se o navegador não disparar load, nunca deixa o botão preso.
+  setTimeout(finish, 8000);
+}
+
 // ─── MÓDULO METAS: BUSCA NO SHEETS ────────────────────────────────────────────
 function buscarMetasDoSheets() {
   // Mostrar loading, esconder demais
@@ -742,11 +820,8 @@ function buscarMetasDoSheets() {
   document.getElementById('metasFormPanel').style.display = 'none';
 
   const periodo = `${metasMes+1}/${metasAno}`;
-  const url = `${SCRIPT_URL_METAS}?acao=buscar_metas&obra=${encodeURIComponent(currentObra)}&periodo=${encodeURIComponent(periodo)}`;
-
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
+  metasJsonp({ acao: 'buscar_metas', obra: currentObra, periodo: periodo },
+    function(data) {
       document.getElementById('metasLoading').style.display = 'none';
       if (data.status === 'ok' && data.itens && data.itens.length > 0) {
         metasServicos = data.itens.map(s => ({
@@ -767,11 +842,12 @@ function buscarMetasDoSheets() {
         metasServicos = [];
         document.getElementById('metasSemDados').style.display = 'block';
       }
-    })
-    .catch(() => {
+    },
+    function() {
       document.getElementById('metasLoading').style.display = 'none';
       document.getElementById('metasSemDados').style.display = 'block';
-    });
+    }
+  );
 }
 
 // ─── MÓDULO ADMIN: UPLOAD E CADASTRO DE METAS ─────────────────────────────────
@@ -853,7 +929,11 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
     // Normaliza números: substitui vírgula por ponto (formato BR → EN)
     function toNum(v) {
       if (typeof v === 'number') return v;
-      const s = String(v || '0').replace(',', '.');
+      let s = String(v || '0').trim();
+      if (!s) return 0;
+      // Converte formato brasileiro 122.029,539 para 122029.539.
+      if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+      s = s.replace(/[^\d.-]/g, '');
       return parseFloat(s) || 0;
     }
     itens.push({
@@ -916,19 +996,7 @@ function confirmarCadastroMetas() {
     itens: window._adminPayload.itens
   };
 
-  // Usar no-cors: dados chegam ao servidor mas resposta é opaca
-  // Aguardamos 3s e assumimos sucesso (o log no Sheets confirma)
-  fetch(SCRIPT_URL_METAS, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload),
-    mode: 'no-cors'
-  })
-  .then(function() {
-    _adminSucesso(nItens, obraEnviada, periodo);
-  })
-  .catch(function() {
-    // no-cors pode cair aqui mesmo enviando com sucesso — tratamos como sucesso
+  enviarPayloadMetas(payload, function() {
     _adminSucesso(nItens, obraEnviada, periodo);
   });
 }
@@ -1114,13 +1182,7 @@ function enviarMetas() {
   const btn = document.getElementById('btnConfirmarMetas');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Enviando...'; }
 
-  fetch(SCRIPT_URL_METAS, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload),
-    mode: 'no-cors'
-  })
-  .then(function() {
+  enviarPayloadMetas(payload, function() {
     document.getElementById('confirmMetasContent').innerHTML = `
       <div class="success-wrap">
         <div class="success-circle">✓</div>
@@ -1130,10 +1192,6 @@ function enviarMetas() {
         <button class="btn btn-primary" onclick="novaMeta()">+ Nova Semana</button>
       </div>`;
     metasRealizados = {};
-  })
-  .catch(function() {
-    if (btn) { btn.disabled = false; btn.textContent = '✓ Confirmar Envio das Metas'; }
-    alert('❌ Erro de conexão. Verifique sua internet e tente novamente.');
   });
 }
 
