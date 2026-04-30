@@ -771,44 +771,26 @@ function metasJsonp(params, onOk, onErro) {
 }
 
 function enviarPayloadMetas(payload, onDone) {
-  const iframeName = 'metasPostFrame_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-  const iframe = document.createElement('iframe');
-  const form = document.createElement('form');
-  const input = document.createElement('input');
   let finished = false;
-
-  iframe.name = iframeName;
-  iframe.style.display = 'none';
-  form.method = 'POST';
-  form.action = SCRIPT_URL_METAS;
-  form.target = iframeName;
-  form.style.display = 'none';
-  input.type = 'hidden';
-  input.name = 'payload';
-  input.value = JSON.stringify(payload);
-  form.appendChild(input);
 
   function finish() {
     if (finished) return;
     finished = true;
-    setTimeout(function() {
-      if (form.parentNode) form.parentNode.removeChild(form);
-      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-    }, 500);
     onDone();
   }
 
-  iframe.onload = function() {
-    // O Apps Script responde em outro domínio; não lemos a resposta por segurança do navegador.
-    finish();
-  };
+  try {
+    fetch(SCRIPT_URL_METAS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+      mode: 'no-cors'
+    }).catch(function() {});
+  } catch(_) {}
 
-  document.body.appendChild(iframe);
-  document.body.appendChild(form);
-  form.submit();
-
-  // Fallback: mesmo se o navegador não disparar load, nunca deixa o botão preso.
-  setTimeout(finish, 8000);
+  // A resposta do Apps Script não pode ser lida no navegador; não esperamos por ela.
+  // Isso evita o estado preso em "Enviando..." e mantém o mesmo padrão do Custo.
+  setTimeout(finish, 1200);
 }
 
 // ─── MÓDULO METAS: BUSCA NO SHEETS ────────────────────────────────────────────
