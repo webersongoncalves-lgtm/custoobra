@@ -517,7 +517,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
 <header>
   <div class="logo">
     <div class="logo-frjr">
-      <img src="./Gestão de Obras FRJR_files/logo-frjr.png" alt="FRJR Empreendimentos" style="height:38px; display:block;">
+      <img src="assets/logo-frjr.png" alt="FRJR Empreendimentos" style="height:38px; display:block;">
     </div>
     <div class="logo-sep"></div>
     <span class="logo-app">Gestão de Obras FRJR</span>
@@ -940,6 +940,24 @@ function fmt(v) {
   return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function chaveObra(obra) {
+  return String(obra || '')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/’/g, "'")
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function servicosDaObra(obra) {
+  if (SERVICOS_POR_OBRA[obra]) return SERVICOS_POR_OBRA[obra];
+  const alvo = chaveObra(obra);
+  const chave = Object.keys(SERVICOS_POR_OBRA).find(k => chaveObra(k) === alvo);
+  return chave ? SERVICOS_POR_OBRA[chave] : [];
+}
+
 // ─── IDENTIFICAÇÃO ────────────────────────────────────────────────────────────
 function abrirUser() { document.getElementById('userOverlay').classList.add('open'); }
 
@@ -958,7 +976,7 @@ function salvarUser() {
   if (!u || !o) { alert('Selecione engenheiro e obra.'); return; }
   currentUser = u;
   currentObra = o;
-  SERVICOS = SERVICOS_POR_OBRA[o] || [];
+  SERVICOS = servicosDaObra(o);
   const nomeAbrev = u.replace('Eng. ', '');
   document.getElementById('badgeUser').textContent = `${nomeAbrev} · ${o}`;
   document.getElementById('userOverlay').classList.remove('open');
@@ -2097,6 +2115,7 @@ function buscar() {
   const q = norm(document.getElementById('searchInput').value.trim());
   const dd = document.getElementById('dropdown');
   if (q.length < 2) { fecharDropdown(); resetServico(); return; }
+  if (!SERVICOS.length && currentObra) SERVICOS = servicosDaObra(currentObra);
   const matches = SERVICOS.filter(s =>
     norm(s.nome).includes(q) || norm(s.etapa).includes(q) || s.id.includes(q)
   ).slice(0, 8);
