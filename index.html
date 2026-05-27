@@ -401,7 +401,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
     <span class="logo-app">Gestão de Obras FRJR</span>
   </div>
   <div class="header-right">
-    <span class="badge-month" id="badgeMonth">MAR 2026</span>
+    <span class="badge-month" id="badgeMonth">Ref. Custo Comprometido ABR/2026 | Ref. Metas Semanais MAI/2026</span>
     <div class="badge-user" onclick="abrirUser()" id="badgeUser">Identificar-se</div>
   </div>
 </header>
@@ -454,7 +454,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
         </div>
 
         <div style="font-size:0.75rem; color:var(--text3); margin-bottom:14px; line-height:1.6;">
-          Período de referência: <strong style="color:var(--text2);" id="adminPeriodoLabel">Abril / 2026</strong><br>
+          Período de referência: <strong style="color:var(--text2);" id="adminPeriodoLabel">Maio / 2026</strong><br>
           Ao confirmar, os dados anteriores desta obra/mês serão substituídos.
         </div>
 
@@ -979,6 +979,16 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
   if (headerRow < 0) headerRow = 2;
 
   const itens = [];
+  function toNum(v) {
+    if (typeof v === 'number') return v;
+    let s = String(v || '0').trim();
+    if (!s) return 0;
+    // Converte formato brasileiro 122.029,539 para 122029.539.
+    if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+    s = s.replace(/[^\d.-]/g, '');
+    return parseFloat(s) || 0;
+  }
+
   for (let i = headerRow + 2; i < data.length; i++) {
     const row = data[i];
     const nome = String(row[0] || '').trim();
@@ -989,16 +999,6 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
         nomeLower.startsWith('verde') || nomeLower.startsWith('atividade') ||
         nomeLower.startsWith('legenda') || nomeLower.startsWith('obs:') ||
         nomeLower.startsWith('observa')) continue;
-    // Normaliza números: substitui vírgula por ponto (formato BR → EN)
-    function toNum(v) {
-      if (typeof v === 'number') return v;
-      let s = String(v || '0').trim();
-      if (!s) return 0;
-      // Converte formato brasileiro 122.029,539 para 122029.539.
-      if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
-      s = s.replace(/[^\d.-]/g, '');
-      return parseFloat(s) || 0;
-    }
     itens.push({
       servico_nome: nome,
       classificacao: String(row[1] || '').trim(),
@@ -1016,6 +1016,8 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
     });
   }
 
+  const parametrosReprogramacao = lerParametrosReprogramacao(wb, toNum);
+
   if (itens.length === 0) {
     alert('Nenhum serviço encontrado na planilha. Verifique o arquivo.');
     return;
@@ -1032,12 +1034,43 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
   window._adminPayload = {
     obra: obraAdmin,
     itens,
+    parametros_reprogramacao: parametrosReprogramacao,
     arquivo_original: {
       nome: fileName,
       base64: arrayBufferToBase64(buffer)
     }
   };
   mostrarBtnConfirmar();
+}
+
+function lerParametrosReprogramacao(wb, toNum) {
+  const sheetName = wb.SheetNames.find(n => normalizarNomeServico(n) === 'parametros_reprogramacao');
+  if (!sheetName) return [];
+
+  const ws = wb.Sheets[sheetName];
+  const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+  const parametros = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    const servico = String(row[2] || '').trim();
+    const prioridade = String(row[5] || '').trim();
+    if (!servico || !prioridade) continue;
+
+    parametros.push({
+      periodo: String(row[0] || '').trim(),
+      obra: String(row[1] || '').trim(),
+      servico_nome: servico,
+      classificacao: String(row[3] || '').trim(),
+      unidade: String(row[4] || '').trim(),
+      prioridade,
+      fator_prioridade: toNum(row[6]),
+      fator_maximo: toNum(row[7]) || 1.2,
+      observacao: String(row[8] || '').trim()
+    });
+  }
+
+  return parametros;
 }
 
 function cancelarAdminUpload() {
@@ -1635,5 +1668,6 @@ document.addEventListener('click', function(e) {
 </script>
 
 
-</body></html>
 
+
+</body></html>
