@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///C:/Users/weber/Downloads/index_5.html -->
+<!-- saved from url=(0051)https://webersongoncalves-lgtm.github.io/custoobra/ -->
 <html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestão de Obras FRJR</title>
-<link href="./index_6_files/css2" rel="stylesheet">
+<link href="./Gestão de Obras FRJR_files/css2" rel="stylesheet">
 <style>
 :root {
   --bg: #F2F5FA;
@@ -126,6 +126,53 @@ main { flex: 1; display: flex; flex-direction: column; max-width: 700px; width: 
 .semana-tab:hover { border-color: var(--accent); color: var(--accent); }
 .semana-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .semana-tab:disabled, .semana-tab[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+.metas-nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  background: #F8FAFE;
+}
+.metas-nav-btn {
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.metas-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.metas-nav-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
+.metas-tab-panel { display: none; }
+.metas-tab-panel.active { display: block; }
+.metas-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.metas-kpi {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--surface);
+}
+.metas-kpi-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); font-weight: 700; margin-bottom: 5px; }
+.metas-kpi-value { font-family: 'IBM Plex Mono', monospace; font-size: 1rem; font-weight: 700; color: var(--text); }
+.metas-chart { display: grid; gap: 9px; margin: 12px 0 18px; }
+.metas-chart-row { display: grid; grid-template-columns: 78px 1fr 86px; gap: 10px; align-items: center; font-size: 0.78rem; color: var(--text2); }
+.metas-chart-bar { height: 10px; border-radius: 999px; background: var(--surface2); overflow: hidden; }
+.metas-chart-fill { height: 100%; border-radius: 999px; background: var(--accent); min-width: 2px; }
+.metas-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+.metas-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 620px; }
+.metas-table th, .metas-table td { padding: 8px 10px; border-bottom: 1px solid #edf2f8; text-align: left; }
+.metas-table th { background: #F8FAFE; color: var(--text2); font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.metas-table td.num { text-align: right; font-family: 'IBM Plex Mono', monospace; color: var(--text2); }
+.metodologia-block { border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; background: var(--surface); }
+.metodologia-title { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.metodologia-text { font-size: 0.78rem; color: var(--text2); line-height: 1.55; }
+.metodologia-list { margin: 8px 0 0 18px; color: var(--text2); font-size: 0.78rem; line-height: 1.55; }
 
 .upload-zone {
   border: 2px dashed var(--border);
@@ -349,6 +396,9 @@ strong.hi { color: var(--accent); font-weight: 700; }
   .confirm-table th, .confirm-table td { padding: 8px 6px; }
   .module-selector { grid-template-columns: 1fr; }
   .meta-row { grid-template-columns: 1fr auto; }
+  .metas-nav { grid-template-columns: 1fr; }
+  .metas-kpis { grid-template-columns: 1fr; }
+  .metas-chart-row { grid-template-columns: 70px 1fr 70px; }
 }
 </style>
 </head>
@@ -395,7 +445,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
 <header>
   <div class="logo">
     <div class="logo-frjr">
-      <img src="./assets/logo-frjr.png" alt="FRJR Empreendimentos" style="height:38px; display:block;">
+      <img src="./Gestão de Obras FRJR_files/logo-frjr.png" alt="FRJR Empreendimentos" style="height:38px; display:block;">
     </div>
     <div class="logo-sep"></div>
     <span class="logo-app">Gestão de Obras FRJR</span>
@@ -528,6 +578,11 @@ strong.hi { color: var(--accent); font-weight: 700; }
         <button class="btn-back" onclick="voltarModulo()">← Voltar</button>
         <span class="panel-title">Metas Semanais</span>
       </div>
+      <div class="metas-nav">
+        <button class="metas-nav-btn active" id="metasTabBtnPreenchimento" onclick="abrirAbaMetas('preenchimento')">Preenchimento da Semana</button>
+        <button class="metas-nav-btn" id="metasTabBtnDashboard" onclick="abrirAbaMetas('dashboard')">Dashboard de Reprogramação</button>
+        <button class="metas-nav-btn" id="metasTabBtnMetodologia" onclick="abrirAbaMetas('metodologia')">Metodologia da Reprogramação</button>
+      </div>
       <div class="panel-body">
 
         <!-- Estado: carregando -->
@@ -543,16 +598,78 @@ strong.hi { color: var(--accent); font-weight: 700; }
           <div style="font-size:0.78rem; color:var(--text3);">As metas desta obra ainda não foram enviadas para este mês.<br>Aguarde o cadastro pelo gestor.</div>
         </div>
 
-        <!-- Seleção de semana (aparece após carregar os serviços) -->
-        <div id="semanaWrap" style="display:none;">
-          <div style="font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--text2); margin-bottom:10px;">Semana de referência</div>
-          <div class="semana-tabs" id="semanaTabs">
-            <div class="semana-tab" onclick="selecionarSemana(1)">1ª Semana</div>
-            <div class="semana-tab" onclick="selecionarSemana(2)">2ª Semana</div>
-            <div class="semana-tab" onclick="selecionarSemana(3)">3ª Semana</div>
-            <div class="semana-tab" onclick="selecionarSemana(4)">4ª Semana</div>
-            <div class="semana-tab" onclick="selecionarSemana(5)">5ª Semana</div>
+        <div id="metasTabPreenchimento" class="metas-tab-panel active">
+          <!-- Seleção de semana (aparece após carregar os serviços) -->
+          <div id="semanaWrap" style="display:none;">
+            <div style="font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--text2); margin-bottom:10px;">Semana de referência</div>
+            <div class="semana-tabs" id="semanaTabs">
+              <div class="semana-tab" onclick="selecionarSemana(1)">1ª Semana</div>
+              <div class="semana-tab" onclick="selecionarSemana(2)">2ª Semana</div>
+              <div class="semana-tab" onclick="selecionarSemana(3)">3ª Semana</div>
+              <div class="semana-tab" onclick="selecionarSemana(4)">4ª Semana</div>
+              <div class="semana-tab" onclick="selecionarSemana(5)">5ª Semana</div>
+            </div>
           </div>
+        </div>
+
+        <div id="metasTabDashboard" class="metas-tab-panel">
+          <div id="metasDashboardEmpty" style="display:none; text-align:center; padding:24px 0; color:var(--text3); font-size:0.82rem;">
+            Cadastre as metas do mês para visualizar o previsto semanal e mensal.
+          </div>
+          <div id="metasDashboardContent" style="display:none;">
+            <div class="metas-kpis">
+              <div class="metas-kpi">
+                <div class="metas-kpi-label">Serviços</div>
+                <div class="metas-kpi-value" id="metasDashServicos">0</div>
+              </div>
+              <div class="metas-kpi">
+                <div class="metas-kpi-label">Previsto no mês</div>
+                <div class="metas-kpi-value" id="metasDashTotal">0</div>
+              </div>
+              <div class="metas-kpi">
+                <div class="metas-kpi-label">Semana mais carregada</div>
+                <div class="metas-kpi-value" id="metasDashPico">-</div>
+              </div>
+            </div>
+            <div style="font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--text2); margin-bottom:8px;">Previsto por semana</div>
+            <div class="metas-chart" id="metasDashChart"></div>
+            <div style="font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--text2); margin-bottom:8px;">Previsto por serviço</div>
+            <div class="metas-table-wrap">
+              <table class="metas-table">
+                <thead>
+                  <tr>
+                    <th>Serviço</th><th>Class.</th><th>Un</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th><th>Total</th>
+                  </tr>
+                </thead>
+                <tbody id="metasDashTabela"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="metasTabMetodologia" class="metas-tab-panel">
+          <div class="metodologia-block">
+            <div class="metodologia-title">Como este módulo será usado</div>
+            <div class="metodologia-text">
+              A primeira etapa já guarda os parâmetros por serviço junto com o cadastro mensal. A próxima etapa usará esses parâmetros para recalcular automaticamente as semanas restantes após o preenchimento do realizado.
+            </div>
+          </div>
+          <div class="metodologia-block">
+            <div class="metodologia-title">Parâmetros definidos</div>
+            <ul class="metodologia-list">
+              <li>Prioridade Alta: fator 1,30.</li>
+              <li>Prioridade Normal: fator 1,00.</li>
+              <li>Prioridade Baixa: fator 0,70.</li>
+              <li>Fator máximo padrão: 1,20, usado para limitar aumentos excessivos na reprogramação.</li>
+            </ul>
+          </div>
+          <div class="metodologia-block">
+            <div class="metodologia-title">Próxima evolução</div>
+            <div class="metodologia-text">
+              O dashboard atual mostra o previsto cadastrado. Na evolução seguinte, ele passará a mostrar previsto original, realizado, saldo e previsto reprogramado para a próxima semana e para o restante do mês.
+            </div>
+          </div>
+          <button class="btn btn-ghost" onclick="baixarMetodologiaReprogramacao()">Baixar metodologia</button>
         </div>
 
       </div>
@@ -694,6 +811,7 @@ let selectedServico = null;
 let metasServicos = [];
 let metasSemana = null;
 let metasRealizados = {};
+let metasAbaAtual = 'preenchimento';
 
 // ─── CALENDÁRIO ───────────────────────────────────────────────────────────────
 const monthsFull = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -749,6 +867,7 @@ function mostrarTela(id) {
 function abrirMetas() {
   if (!currentUser) { abrirUser(); return; }
   mostrarTela('screenMetas');
+  abrirAbaMetas('preenchimento');
   buscarMetasDoSheets();
 }
 
@@ -879,6 +998,7 @@ function buscarMetasDoSheets() {
   document.getElementById('metasSemDados').style.display = 'none';
   document.getElementById('semanaWrap').style.display = 'none';
   document.getElementById('metasFormPanel').style.display = 'none';
+  atualizarDashboardMetas();
 
   const periodo = `${metasMes+1}/${metasAno}`;
   metasJsonp({ acao: 'buscar_metas', obra: currentObra, periodo: periodo },
@@ -899,16 +1019,126 @@ function buscarMetasDoSheets() {
         document.querySelectorAll('.semana-tab').forEach(t => t.classList.remove('active'));
         document.getElementById('semanaWrap').style.display = 'block';
         document.getElementById('metasFormPanel').style.display = 'none';
+        atualizarDashboardMetas();
       } else {
         metasServicos = [];
         document.getElementById('metasSemDados').style.display = 'block';
+        atualizarDashboardMetas();
       }
     },
     function() {
       document.getElementById('metasLoading').style.display = 'none';
       document.getElementById('metasSemDados').style.display = 'block';
+      atualizarDashboardMetas();
     }
   );
+}
+
+function abrirAbaMetas(aba) {
+  metasAbaAtual = aba;
+  const abas = ['preenchimento', 'dashboard', 'metodologia'];
+  abas.forEach(function(nome) {
+    const panel = document.getElementById('metasTab' + nome.charAt(0).toUpperCase() + nome.slice(1));
+    const btn = document.getElementById('metasTabBtn' + nome.charAt(0).toUpperCase() + nome.slice(1));
+    if (panel) panel.classList.toggle('active', nome === aba);
+    if (btn) btn.classList.toggle('active', nome === aba);
+  });
+
+  const formPanel = document.getElementById('metasFormPanel');
+  if (formPanel) {
+    formPanel.style.display = (aba === 'preenchimento' && metasSemana) ? 'block' : 'none';
+  }
+  if (aba === 'dashboard') atualizarDashboardMetas();
+}
+
+function numeroCurto(v) {
+  const n = Number(v) || 0;
+  return n.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+}
+
+function atualizarDashboardMetas() {
+  const empty = document.getElementById('metasDashboardEmpty');
+  const content = document.getElementById('metasDashboardContent');
+  if (!empty || !content) return;
+
+  if (!metasServicos.length) {
+    empty.style.display = 'block';
+    content.style.display = 'none';
+    return;
+  }
+
+  const totaisSemana = [0, 0, 0, 0, 0];
+  metasServicos.forEach(function(s) {
+    (s.previsto || []).forEach(function(v, idx) {
+      if (idx < 5) totaisSemana[idx] += Number(v) || 0;
+    });
+  });
+
+  const totalMes = totaisSemana.reduce((s, v) => s + v, 0);
+  const maior = Math.max.apply(null, totaisSemana);
+  const semanaPico = totaisSemana.indexOf(maior) + 1;
+
+  document.getElementById('metasDashServicos').textContent = String(metasServicos.length);
+  document.getElementById('metasDashTotal').textContent = numeroCurto(totalMes);
+  document.getElementById('metasDashPico').textContent = maior > 0 ? `${semanaPico}ª` : '-';
+
+  document.getElementById('metasDashChart').innerHTML = totaisSemana.map(function(total, idx) {
+    const pct = maior > 0 ? Math.max(2, (total / maior) * 100) : 0;
+    return `
+      <div class="metas-chart-row">
+        <div>${idx + 1}ª semana</div>
+        <div class="metas-chart-bar"><div class="metas-chart-fill" style="width:${pct}%"></div></div>
+        <div style="text-align:right;font-family:'IBM Plex Mono', monospace;">${numeroCurto(total)}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('metasDashTabela').innerHTML = metasServicos.map(function(s) {
+    const previsto = s.previsto || [];
+    const total = previsto.reduce((acc, v) => acc + (Number(v) || 0), 0);
+    return `
+      <tr>
+        <td>${s.nome}</td>
+        <td>${s.classificacao || '-'}</td>
+        <td>${s.unidade || '-'}</td>
+        <td class="num">${numeroCurto(previsto[0])}</td>
+        <td class="num">${numeroCurto(previsto[1])}</td>
+        <td class="num">${numeroCurto(previsto[2])}</td>
+        <td class="num">${numeroCurto(previsto[3])}</td>
+        <td class="num">${numeroCurto(previsto[4])}</td>
+        <td class="num">${numeroCurto(total)}</td>
+      </tr>`;
+  }).join('');
+
+  empty.style.display = 'none';
+  content.style.display = 'block';
+}
+
+function baixarMetodologiaReprogramacao() {
+  const texto = [
+    'Metodologia da Reprogramacao - Metas Semanais',
+    '',
+    'Parametros atuais:',
+    '- Prioridade Alta: fator 1,30',
+    '- Prioridade Normal: fator 1,00',
+    '- Prioridade Baixa: fator 0,70',
+    '- Fator maximo padrao: 1,20',
+    '',
+    'Uso previsto:',
+    'Apos o engenheiro preencher o realizado da semana, o sistema calcula o saldo pendente e redistribui esse saldo nas semanas restantes, considerando prioridade e limite de recuperacao.',
+    '',
+    'Observacao:',
+    'Os parametros podem ser revisados pelo gestor a cada novo cadastro mensal de metas.'
+  ].join('\n');
+  const blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `metodologia-reprogramacao-${metasAno}-${String(metasMes + 1).padStart(2, '0')}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() {
+    URL.revokeObjectURL(a.href);
+    a.remove();
+  }, 0);
 }
 
 // ─── MÓDULO ADMIN: UPLOAD E CADASTRO DE METAS ─────────────────────────────────
@@ -1097,6 +1327,7 @@ function confirmarCadastroMetas() {
     periodo,
     timestamp: new Date().toISOString(),
     itens: window._adminPayload.itens,
+    parametros_reprogramacao: window._adminPayload.parametros_reprogramacao || [],
     arquivo_original: window._adminPayload.arquivo_original || null
   };
 
