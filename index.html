@@ -162,9 +162,13 @@ body.metas-wide main { max-width: 1240px; }
 .metas-kpi-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); font-weight: 700; margin-bottom: 5px; }
 .metas-kpi-value { font-family: 'IBM Plex Mono', monospace; font-size: 1rem; font-weight: 700; color: var(--text); }
 .metas-dashboard-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 14px; align-items: start; }
+.metas-dashboard-grid-priority { grid-template-columns: 1.2fr 0.8fr; margin-bottom: 16px; }
 .metas-dashboard-card { border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 14px; }
 .metas-dashboard-title { font-size: 0.72rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
 .metas-filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.metas-filter-block { margin-bottom: 14px; }
+.metas-filter-label { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 6px; }
+.metas-filter-group { display: flex; flex-wrap: wrap; gap: 8px; }
 .metas-filter-chip {
   border: 1.5px solid var(--border);
   background: var(--surface);
@@ -685,14 +689,14 @@ strong.hi { color: var(--accent); font-weight: 700; }
             Cadastre as metas do mês para visualizar o previsto semanal e mensal.
           </div>
           <div id="metasDashboardContent" style="display:none;">
-            <div class="metas-filter-row" id="metasDashFiltros"></div>
+            <div id="metasDashFiltros"></div>
             <div class="metas-kpis">
               <div class="metas-kpi">
                 <div class="metas-kpi-label">Serviços</div>
                 <div class="metas-kpi-value" id="metasDashServicos">0</div>
               </div>
               <div class="metas-kpi">
-                <div class="metas-kpi-label">Frentes ativas</div>
+                <div class="metas-kpi-label" id="metasDashTotalLabel">Frentes ativas</div>
                 <div class="metas-kpi-value" id="metasDashTotal">0</div>
               </div>
               <div class="metas-kpi">
@@ -704,18 +708,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
                 <div class="metas-kpi-value" id="metasDashReprogramados">0</div>
               </div>
             </div>
-            <div class="metas-dashboard-grid">
-              <div class="metas-dashboard-card">
-                <div class="metas-dashboard-title">Frentes ativas por semana</div>
-                <div class="metas-chart" id="metasDashChart"></div>
-              </div>
-              <div class="metas-dashboard-card">
-                <div class="metas-dashboard-title">Distribuição por macroitem</div>
-                <div class="metas-donut-wrap">
-                  <div class="metas-donut" id="metasDashDonut" data-label="0"></div>
-                  <div class="metas-legend" id="metasDashLegenda"></div>
-                </div>
-              </div>
+            <div class="metas-dashboard-grid metas-dashboard-grid-priority">
               <div class="metas-dashboard-card">
                 <div class="metas-dashboard-title">Mapa de calor das frentes</div>
                 <div class="metas-heatmap" id="metasDashHeatmap"></div>
@@ -744,6 +737,19 @@ strong.hi { color: var(--accent); font-weight: 700; }
                 </thead>
                 <tbody id="metasDashTabela"></tbody>
               </table>
+            </div>
+            <div class="metas-dashboard-grid" style="margin-top:16px;">
+              <div class="metas-dashboard-card">
+                <div class="metas-dashboard-title">Frentes ativas por semana</div>
+                <div class="metas-chart" id="metasDashChart"></div>
+              </div>
+              <div class="metas-dashboard-card">
+                <div class="metas-dashboard-title">Distribuição por macroitem</div>
+                <div class="metas-donut-wrap">
+                  <div class="metas-donut" id="metasDashDonut" data-label="0"></div>
+                  <div class="metas-legend" id="metasDashLegenda"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1113,6 +1119,7 @@ function buscarMetasDoSheets() {
     function(data) {
       document.getElementById('metasLoading').style.display = 'none';
       if (data.status === 'ok' && data.itens && data.itens.length > 0) {
+        const parametrosMap = montarMapaParametrosMetas(data.parametros || []);
         metasServicos = data.itens.map(s => ({
           nome: s.servico_nome,
           classificacao: s.classificacao,
@@ -1120,9 +1127,9 @@ function buscarMetasDoSheets() {
           qtdTotal: s.qtd_total,
           prodDiaria: s.prod_diaria,
           acumMesAnt: s.acum_mes_anterior,
-          prioridade: s.prioridade || 'Normal',
-          fatorPrioridade: Number(s.fator_prioridade) || fatorPrioridadeMeta(s.prioridade || 'Normal'),
-          fatorMaximo: Number(s.fator_maximo) || 1.2,
+          prioridade: prioridadeServicoMeta(s, parametrosMap),
+          fatorPrioridade: fatorPrioridadeServicoMeta(s, parametrosMap),
+          fatorMaximo: fatorMaximoServicoMeta(s, parametrosMap),
           previsto: s.previsto
         }));
         metasRealizadosSalvos = Array.isArray(data.realizados) ? data.realizados : [];
@@ -1175,6 +1182,47 @@ function fatorPrioridadeMeta(prioridade) {
   return 1;
 }
 
+function chaveParametroMeta(nome, classificacao, unidade) {
+  return [
+    normalizarNomeServico(nome),
+    normalizarNomeServico(classificacao),
+    normalizarNomeServico(unidade)
+  ].join('|');
+}
+
+function montarMapaParametrosMetas(parametros) {
+  const map = {};
+  parametros.forEach(function(param) {
+    const chaveCompleta = chaveParametroMeta(param.servico_nome, param.classificacao, param.unidade);
+    const chaveNome = normalizarNomeServico(param.servico_nome);
+    if (chaveCompleta.replace(/\|/g, '')) map[chaveCompleta] = param;
+    if (chaveNome) map[chaveNome] = param;
+  });
+  return map;
+}
+
+function parametroServicoMeta(servico, parametrosMap) {
+  const chaveCompleta = chaveParametroMeta(servico.servico_nome || servico.nome, servico.classificacao, servico.unidade);
+  const chaveNome = normalizarNomeServico(servico.servico_nome || servico.nome);
+  return parametrosMap[chaveCompleta] || parametrosMap[chaveNome] || {};
+}
+
+function prioridadeServicoMeta(servico, parametrosMap) {
+  const param = parametroServicoMeta(servico, parametrosMap || {});
+  return param.prioridade || servico.prioridade || 'Normal';
+}
+
+function fatorPrioridadeServicoMeta(servico, parametrosMap) {
+  const prioridade = prioridadeServicoMeta(servico, parametrosMap);
+  const param = parametroServicoMeta(servico, parametrosMap || {});
+  return Number(param.fator_prioridade) || Number(servico.fator_prioridade) || fatorPrioridadeMeta(prioridade);
+}
+
+function fatorMaximoServicoMeta(servico, parametrosMap) {
+  const param = parametroServicoMeta(servico, parametrosMap || {});
+  return Number(param.fator_maximo) || Number(servico.fator_maximo) || 1.2;
+}
+
 function macroitemServico(servico) {
   const texto = normalizarNomeServico(`${servico.classificacao || ''} ${servico.nome || ''}`);
   if (texto.includes('fundacao') || texto.includes('estaca') || texto.includes('radier') || texto.includes('bloco') || texto.includes('sapata')) return 'Fundação';
@@ -1192,7 +1240,7 @@ function semanaAtualMetas() {
 }
 
 function statusServicoMeta(item) {
-  const semanaAtual = semanaAtualMetas();
+  const semanaAtual = Math.min(semanaAtualMetas(), item.ultimaSemanaDisponivel || 5);
   const realizadoAteAtual = item.realizados.slice(0, semanaAtual).reduce((acc, v) => acc + v, 0);
   const previstoAteAtual = item.reprogramado.slice(0, semanaAtual).reduce((acc, v) => acc + v, 0);
   const saldoFuturo = item.reprogramado.slice(semanaAtual).reduce((acc, v) => acc + v, 0);
@@ -1205,19 +1253,36 @@ function statusServicoMeta(item) {
   return { chave: 'ok', icone: '✓', label: 'No prazo' };
 }
 
-function valorRealizadoServicoSemana(servico, semana) {
+function realizadoPertenceServico(realizado, servico) {
   const nome = normalizarNomeServico(servico.nome);
+  const mesmaClassificacao = !realizado.classificacao || !servico.classificacao
+    || normalizarNomeServico(realizado.classificacao) === normalizarNomeServico(servico.classificacao);
+  const mesmaUnidade = !realizado.unidade || !servico.unidade
+    || normalizarNomeServico(realizado.unidade) === normalizarNomeServico(servico.unidade);
+  return normalizarNomeServico(realizado.servico_nome) === nome && mesmaClassificacao && mesmaUnidade;
+}
+
+function valorRealizadoServicoSemana(servico, semana) {
   return metasRealizadosSalvos
-    .filter(r => Number(r.semana) === semana && normalizarNomeServico(r.servico_nome) === nome)
+    .filter(r => Number(r.semana) === semana && realizadoPertenceServico(r, servico))
     .reduce((acc, r) => acc + (Number(r.realizado) || 0), 0);
 }
 
-function primeiraSemanaFutura(servico) {
-  const previsto = servico.previsto || [];
-  const primeiraZerada = previsto.findIndex((v, idx) => idx >= 2 && (Number(v) || 0) === 0);
-  if (primeiraZerada >= 0) return primeiraZerada + 1;
-  const ultimaComPrevisto = previsto.reduce((last, v, idx) => (Number(v) || 0) > 0 ? idx + 1 : last, 0);
-  return Math.min(5, Math.max(1, ultimaComPrevisto));
+function temRealizadoServicoSemana(servico, semana) {
+  return metasRealizadosSalvos.some(r => Number(r.semana) === semana && realizadoPertenceServico(r, servico));
+}
+
+function semanasPlanejadasMetas() {
+  const ultimaComPrevisto = metasServicos.reduce(function(ultima, servico) {
+    const previsto = servico.previsto || [];
+    return previsto.reduce((last, valor, idx) => (Number(valor) || 0) > 0 ? Math.max(last, idx + 1) : last, ultima);
+  }, 0);
+  return Math.min(5, Math.max(1, ultimaComPrevisto || semanaAtualMetas()));
+}
+
+function semanasDisponiveisMetas() {
+  const ultima = semanasPlanejadasMetas();
+  return [1,2,3,4,5].filter(s => s <= ultima);
 }
 
 function distribuirNaoLinear(total, semanas, fatorPrioridade, fatorMaximo, prodDiaria) {
@@ -1248,6 +1313,15 @@ function distribuirNaoLinear(total, semanas, fatorPrioridade, fatorMaximo, prodD
     });
   }
 
+  const distribuido = semanas.reduce((acc, semana) => acc + (dist[semana] || 0), 0);
+  const saldoNaoAlocado = total - distribuido;
+  if (saldoNaoAlocado > 0.0001) {
+    const extraPorSemana = saldoNaoAlocado / semanas.length;
+    semanas.forEach(s => {
+      dist[s] += extraPorSemana;
+    });
+  }
+
   return dist;
 }
 
@@ -1257,17 +1331,20 @@ function calcularReprogramacaoMetas() {
     while (previstoOriginal.length < 5) previstoOriginal.push(0);
 
     const realizados = [1,2,3,4,5].map(semana => valorRealizadoServicoSemana(servico, semana));
-    const semanaComRealizado = realizados.reduce((last, v, idx) => v > 0 ? idx + 1 : last, 0);
-    const corte = semanaComRealizado || Math.min(2, primeiraSemanaFutura(servico) - 1);
-    const semanasFuturas = [1,2,3,4,5].filter(s => s > corte);
+    const realizadosLancados = [1,2,3,4,5].map(semana => temRealizadoServicoSemana(servico, semana));
+    const semanasDisponiveis = semanasDisponiveisMetas();
+    const ultimaSemanaDisponivel = semanasDisponiveis[semanasDisponiveis.length - 1] || 5;
+    const semanaAtual = Math.min(semanaAtualMetas(), ultimaSemanaDisponivel);
+    const corte = Math.max(0, semanaAtual - 1);
+    const semanasFuturas = semanasDisponiveis.filter(s => s > corte);
     const totalPlanejadoMes = previstoOriginal.reduce((acc, v) => acc + v, 0);
-    const alvo = Number(servico.qtdTotal) > 0
+    const alvo = totalPlanejadoMes > 0
+      ? totalPlanejadoMes
+      : Number(servico.qtdTotal) > 0
       ? Math.max(0, Number(servico.qtdTotal) - (Number(servico.acumMesAnt) || 0))
-      : totalPlanejadoMes;
+      : 0;
     const executadoAteCorte = realizados.slice(0, corte).reduce((acc, v) => acc + v, 0);
-    const previstoAteCorte = previstoOriginal.slice(0, corte).reduce((acc, v) => acc + v, 0);
-    const baseConsumida = semanaComRealizado ? executadoAteCorte : previstoAteCorte;
-    const saldo = Math.max(0, alvo - baseConsumida);
+    const saldo = Math.max(0, alvo - executadoAteCorte);
     const dist = distribuirNaoLinear(
       saldo,
       semanasFuturas,
@@ -1277,7 +1354,7 @@ function calcularReprogramacaoMetas() {
     );
     const reprogramado = previstoOriginal.map((v, idxSemana) => {
       const semana = idxSemana + 1;
-      if (semana <= corte) return semanaComRealizado ? realizados[idxSemana] : v;
+      if (semana <= corte) return realizados[idxSemana];
       return dist[semana] !== undefined ? dist[semana] : v;
     });
     const mudou = reprogramado.some((v, i) => Math.abs(v - previstoOriginal[i]) > 0.0001);
@@ -1289,6 +1366,9 @@ function calcularReprogramacaoMetas() {
       previstoOriginal,
       reprogramado,
       realizados,
+      realizadosLancados,
+      semanasDisponiveis,
+      ultimaSemanaDisponivel,
       corte,
       mudou,
       frenteSemanas: reprogramado.map(v => v > 0)
@@ -1316,28 +1396,42 @@ function atualizarDashboardMetas() {
   }
 
   const reprogramados = calcularReprogramacaoMetas();
+  const semanasDash = semanasDisponiveisMetas();
+  const ultimaSemanaDash = semanasDash[semanasDash.length - 1] || 5;
+  if (metasFiltroSemana > ultimaSemanaDash) metasFiltroSemana = 0;
   const filtrados = filtrarDashboardMetas(reprogramados);
   const classes = [...new Set(reprogramados.map(s => String(s.macroitem || 'Geral')))];
-  const frentesSemana = [1,2,3,4,5].map(semana => filtrados.filter(s => s.frenteSemanas[semana - 1]).length);
+  const frentesSemana = semanasDash.map(semana => filtrados.filter(s => s.frenteSemanas[semana - 1]).length);
   const maior = Math.max.apply(null, frentesSemana);
-  const semanaPico = frentesSemana.indexOf(maior) + 1;
-  const totalFrentes = frentesSemana.reduce((acc, v) => acc + v, 0);
+  const semanaPico = semanasDash[frentesSemana.indexOf(maior)] || 0;
+  const semanaReferenciaFrentes = metasFiltroSemana || Math.min(semanaAtualMetas(), ultimaSemanaDash);
+  const totalFrentes = filtrados.filter(s => s.frenteSemanas[semanaReferenciaFrentes - 1]).length;
   const qtdReprogramados = reprogramados.filter(s => s.mudou).length;
 
-  document.getElementById('metasDashFiltros').innerHTML = [
-    `<button class="metas-filter-chip ${metasFiltroSemana === 0 ? 'active' : ''}" onclick="setFiltroSemanaMetas(0)">Todas as semanas</button>`,
-    ...[1,2,3,4,5].map(s => `<button class="metas-filter-chip ${metasFiltroSemana === s ? 'active' : ''}" onclick="setFiltroSemanaMetas(${s})">${s}ª semana</button>`),
-    `<button class="metas-filter-chip ${metasFiltroClassificacao === 'TODAS' ? 'active' : ''}" onclick="setFiltroClassificacaoMetas('TODAS')">Todos macroitens</button>`,
-    ...classes.map(cls => `<button class="metas-filter-chip ${metasFiltroClassificacao === cls ? 'active' : ''}" onclick="setFiltroClassificacaoMetas('${cls.replace(/'/g, "\\'")}')">${cls}</button>`)
-  ].join('');
+  document.getElementById('metasDashFiltros').innerHTML = `
+    <div class="metas-filter-block">
+      <div class="metas-filter-label">Semanas</div>
+      <div class="metas-filter-group">
+        <button class="metas-filter-chip ${metasFiltroSemana === 0 ? 'active' : ''}" onclick="setFiltroSemanaMetas(0)">Todas as semanas</button>
+        ${semanasDash.map(s => `<button class="metas-filter-chip ${metasFiltroSemana === s ? 'active' : ''}" onclick="setFiltroSemanaMetas(${s})">${s}ª semana</button>`).join('')}
+      </div>
+    </div>
+    <div class="metas-filter-block">
+      <div class="metas-filter-label">Macroitens</div>
+      <div class="metas-filter-group">
+        <button class="metas-filter-chip ${metasFiltroClassificacao === 'TODAS' ? 'active' : ''}" onclick="setFiltroClassificacaoMetas('TODAS')">Todos macroitens</button>
+        ${classes.map(cls => `<button class="metas-filter-chip ${metasFiltroClassificacao === cls ? 'active' : ''}" onclick="setFiltroClassificacaoMetas('${cls.replace(/'/g, "\\'")}')">${cls}</button>`).join('')}
+      </div>
+    </div>`;
 
   document.getElementById('metasDashServicos').textContent = String(filtrados.length);
+  document.getElementById('metasDashTotalLabel').textContent = `Frentes ativas S${semanaReferenciaFrentes}`;
   document.getElementById('metasDashTotal').textContent = String(totalFrentes);
   document.getElementById('metasDashPico').textContent = maior > 0 ? `${semanaPico}ª` : '-';
   document.getElementById('metasDashReprogramados').textContent = String(qtdReprogramados);
 
   document.getElementById('metasDashChart').innerHTML = frentesSemana.map(function(total, idx) {
-    const semana = idx + 1;
+    const semana = semanasDash[idx];
     const pct = maior > 0 ? Math.max(2, (total / maior) * 100) : 0;
     return `
       <div class="metas-chart-row ${metasFiltroSemana === semana ? 'active' : ''}" onclick="setFiltroSemanaMetas(${semana})">
@@ -1368,12 +1462,18 @@ function atualizarDashboardMetas() {
   `).join('') || '<div class="metodologia-text">Sem frentes no filtro atual.</div>';
 
   document.getElementById('metasDashHeatmap').innerHTML = [
-    '<div></div><div class="metas-heat-cell">S1</div><div class="metas-heat-cell">S2</div><div class="metas-heat-cell">S3</div><div class="metas-heat-cell">S4</div><div class="metas-heat-cell">S5</div>',
+    semanasDash.map(s => `S${s}`).reduce((html, label) => html + `<div class="metas-heat-cell">${label}</div>`, '<div></div>'),
     ...filtrados.slice(0, 10).map(s => `
       <div title="${s.nome}" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.nome}</div>
-      ${s.frenteSemanas.map((ativa, idx) => `<div class="metas-heat-cell ${ativa ? (frentesSemana[idx] === maior ? 'hot' : 'on') : ''}">${ativa ? numeroCurto(s.reprogramado[idx]) : '-'}</div>`).join('')}
+      ${semanasDash.map((semana, idx) => {
+        const valor = s.reprogramado[semana - 1];
+        const temDado = semana <= s.corte ? s.realizadosLancados[semana - 1] : valor > 0;
+        const ativa = temDado && valor > 0;
+        return `<div class="metas-heat-cell ${ativa ? (frentesSemana[idx] === maior ? 'hot' : 'on') : ''}">${temDado ? numeroCurto(valor) : '-'}</div>`;
+      }).join('')}
     `)
   ].join('');
+  document.getElementById('metasDashHeatmap').style.gridTemplateColumns = `1fr repeat(${semanasDash.length}, 52px)`;
 
   const statusPeso = { risk: 0, att: 1, ok: 2 };
   const statusItens = filtrados
@@ -1390,6 +1490,7 @@ function atualizarDashboardMetas() {
   [1,2,3,4,5].forEach(function(semana) {
     const th = document.getElementById('metasHeadS' + semana);
     if (!th) return;
+    th.style.display = semanasDash.includes(semana) ? '' : 'none';
     th.classList.remove('metas-week-head-past', 'metas-week-head-future');
     th.classList.add(semana < semanaAtualMetas() ? 'metas-week-head-past' : 'metas-week-head-future');
   });
@@ -1402,11 +1503,7 @@ function atualizarDashboardMetas() {
         <td>${s.macroitem || '-'}</td>
         <td>${s.unidade || '-'}</td>
         <td>${s.prioridade || 'Normal'}</td>
-        <td class="num">${numeroCurto(s.reprogramado[0])}</td>
-        <td class="num">${numeroCurto(s.reprogramado[1])}</td>
-        <td class="num">${numeroCurto(s.reprogramado[2])}</td>
-        <td class="num">${numeroCurto(s.reprogramado[3])}</td>
-        <td class="num">${numeroCurto(s.reprogramado[4])}</td>
+        ${semanasDash.map(semana => `<td class="num">${numeroCurto(s.reprogramado[semana - 1])}</td>`).join('')}
         <td>${statusServicoMeta(s).label}</td>
       </tr>`;
   }).join('');
@@ -1428,7 +1525,10 @@ function setFiltroClassificacaoMetas(cls) {
 function destacarServicoDashboard(idx) {
   const item = calcularReprogramacaoMetas().find(s => s.idx === idx);
   if (!item) return;
-  alert(`${item.nome}\n\nUnidade: ${item.unidade || '-'}\nPrioridade: ${item.prioridade || 'Normal'}\nS1: ${numeroCurto(item.reprogramado[0])}\nS2: ${numeroCurto(item.reprogramado[1])}\nS3: ${numeroCurto(item.reprogramado[2])}\nS4: ${numeroCurto(item.reprogramado[3])}\nS5: ${numeroCurto(item.reprogramado[4])}`);
+  const semanas = (item.semanasDisponiveis || semanasDisponiveisMetas())
+    .map(semana => `S${semana}: ${numeroCurto(item.reprogramado[semana - 1])}`)
+    .join('\n');
+  alert(`${item.nome}\n\nUnidade: ${item.unidade || '-'}\nPrioridade: ${item.prioridade || 'Normal'}\n${semanas}`);
 }
 
 function baixarMetodologiaReprogramacao() {
