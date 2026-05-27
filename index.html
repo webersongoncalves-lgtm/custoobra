@@ -208,10 +208,28 @@ body.metas-wide main { max-width: 1240px; }
 }
 .metas-legend { display: grid; gap: 8px; font-size: 0.78rem; color: var(--text2); }
 .metas-legend-item { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid #edf2f8; padding-bottom: 6px; }
-.metas-heatmap { display: grid; grid-template-columns: 1fr repeat(5, 44px); gap: 6px; align-items: center; font-size: 0.72rem; color: var(--text2); }
-.metas-heat-cell { height: 28px; border-radius: 6px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; }
+.metas-heatmap { display: grid; grid-template-columns: 1fr repeat(5, 52px); gap: 6px; align-items: center; font-size: 0.72rem; color: var(--text2); }
+.metas-heat-cell { height: 30px; border-radius: 6px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; line-height: 1; padding: 0 3px; overflow: hidden; text-align: center; }
 .metas-heat-cell.on { background: var(--accent-bg); color: var(--accent); font-weight: 700; }
 .metas-heat-cell.hot { background: #ffe2c8; color: #9a4700; }
+.metas-mini-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 0.72rem; color: var(--text3); }
+.metas-mini-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; background: var(--surface2); border: 1px solid var(--border); }
+.legend-dot.on { background: var(--accent-bg); border-color: #f7c79e; }
+.legend-dot.hot { background: #ffe2c8; border-color: #f2b26f; }
+.metas-status-list { display: grid; gap: 8px; max-height: 250px; overflow: auto; padding-right: 2px; }
+.metas-status-row { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f8; }
+.metas-status-icon { width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 800; color: #fff; }
+.metas-status-icon.ok { background: var(--green); }
+.metas-status-icon.att { background: #E0A800; }
+.metas-status-icon.risk { background: var(--red); }
+.metas-status-name { font-size: 0.76rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.metas-status-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.metas-status-label.ok { color: var(--green); }
+.metas-status-label.att { color: #A87500; }
+.metas-status-label.risk { color: var(--red); }
+.metas-week-head-past { background: var(--green-bg) !important; color: var(--green) !important; }
+.metas-week-head-future { background: var(--red-bg) !important; color: var(--red) !important; }
 .metas-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
 .metas-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 860px; }
 .metas-table th, .metas-table td { padding: 8px 10px; border-bottom: 1px solid #edf2f8; text-align: left; }
@@ -692,7 +710,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
                 <div class="metas-chart" id="metasDashChart"></div>
               </div>
               <div class="metas-dashboard-card">
-                <div class="metas-dashboard-title">Distribuição por classificação</div>
+                <div class="metas-dashboard-title">Distribuição por macroitem</div>
                 <div class="metas-donut-wrap">
                   <div class="metas-donut" id="metasDashDonut" data-label="0"></div>
                   <div class="metas-legend" id="metasDashLegenda"></div>
@@ -701,18 +719,27 @@ strong.hi { color: var(--accent); font-weight: 700; }
               <div class="metas-dashboard-card">
                 <div class="metas-dashboard-title">Mapa de calor das frentes</div>
                 <div class="metas-heatmap" id="metasDashHeatmap"></div>
+                <div class="metas-mini-legend">
+                  <span><i class="legend-dot"></i> Sem frente</span>
+                  <span><i class="legend-dot on"></i> Frente ativa</span>
+                  <span><i class="legend-dot hot"></i> Semana mais carregada</span>
+                </div>
               </div>
               <div class="metas-dashboard-card">
-                <div class="metas-dashboard-title">Leitura da reprogramação</div>
-                <div class="metodologia-text" id="metasDashInsight"></div>
+                <div class="metas-dashboard-title">Status dos serviços</div>
+                <div class="metas-status-list" id="metasDashStatus"></div>
               </div>
             </div>
             <div style="font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--text2); margin:16px 0 8px;">Tabela principal</div>
+            <div class="metas-mini-legend" style="margin:0 0 8px;">
+              <span><i class="legend-dot" style="background:var(--green-bg);border-color:#b2d8c5;"></i> Semana já passou</span>
+              <span><i class="legend-dot" style="background:var(--red-bg);border-color:#efb8b3;"></i> Semana corrente ou futura</span>
+            </div>
             <div class="metas-table-wrap">
               <table class="metas-table">
                 <thead>
                   <tr>
-                    <th>Serviço</th><th>Class.</th><th>Un</th><th>Prioridade</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th><th>Status</th>
+                    <th>Serviço</th><th>Macroitem</th><th>Un</th><th>Prioridade</th><th id="metasHeadS1">S1</th><th id="metasHeadS2">S2</th><th id="metasHeadS3">S3</th><th id="metasHeadS4">S4</th><th id="metasHeadS5">S5</th><th>Status</th>
                   </tr>
                 </thead>
                 <tbody id="metasDashTabela"></tbody>
@@ -1148,6 +1175,36 @@ function fatorPrioridadeMeta(prioridade) {
   return 1;
 }
 
+function macroitemServico(servico) {
+  const texto = normalizarNomeServico(`${servico.classificacao || ''} ${servico.nome || ''}`);
+  if (texto.includes('fundacao') || texto.includes('estaca') || texto.includes('radier') || texto.includes('bloco') || texto.includes('sapata')) return 'Fundação';
+  if (texto.includes('estrutura') || texto.includes('forma') || texto.includes('concreto') || texto.includes('armacao') || texto.includes('laje') || texto.includes('pilar') || texto.includes('viga')) return 'Estrutura';
+  if (texto.includes('infra') || texto.includes('rede') || texto.includes('drenagem') || texto.includes('esgoto') || texto.includes('agua') || texto.includes('pavimentacao') || texto.includes('terraplenagem')) return 'Infraestrutura';
+  if (texto.includes('instalac') || texto.includes('eletrica') || texto.includes('hidraulica') || texto.includes('telecom') || texto.includes('interfonia')) return 'Instalações';
+  if (texto.includes('area comum') || texto.includes('areas comuns') || texto.includes('paisag') || texto.includes('playground') || texto.includes('piscina') || texto.includes('portaria')) return 'Áreas comuns';
+  if (texto.includes('pintura') || texto.includes('revest') || texto.includes('acabamento') || texto.includes('limpeza')) return 'Acabamento';
+  return servico.classificacao || 'Geral';
+}
+
+function semanaAtualMetas() {
+  const dia = now.getDate();
+  return Math.min(5, Math.max(1, Math.ceil(dia / 7)));
+}
+
+function statusServicoMeta(item) {
+  const semanaAtual = semanaAtualMetas();
+  const realizadoAteAtual = item.realizados.slice(0, semanaAtual).reduce((acc, v) => acc + v, 0);
+  const previstoAteAtual = item.reprogramado.slice(0, semanaAtual).reduce((acc, v) => acc + v, 0);
+  const saldoFuturo = item.reprogramado.slice(semanaAtual).reduce((acc, v) => acc + v, 0);
+  if (previstoAteAtual > 0 && realizadoAteAtual < previstoAteAtual * 0.85) {
+    return { chave: 'risk', icone: '!', label: 'Risco de não cumprir' };
+  }
+  if (item.mudou || saldoFuturo > 0 && realizadoAteAtual < previstoAteAtual) {
+    return { chave: 'att', icone: '!', label: 'Atenção' };
+  }
+  return { chave: 'ok', icone: '✓', label: 'No prazo' };
+}
+
 function valorRealizadoServicoSemana(servico, semana) {
   const nome = normalizarNomeServico(servico.nome);
   return metasRealizadosSalvos
@@ -1228,6 +1285,7 @@ function calcularReprogramacaoMetas() {
     return {
       ...servico,
       idx,
+      macroitem: macroitemServico(servico),
       previstoOriginal,
       reprogramado,
       realizados,
@@ -1241,7 +1299,7 @@ function calcularReprogramacaoMetas() {
 function filtrarDashboardMetas(itens) {
   return itens.filter(function(item) {
     const passaSemana = !metasFiltroSemana || item.frenteSemanas[metasFiltroSemana - 1];
-    const passaClasse = metasFiltroClassificacao === 'TODAS' || String(item.classificacao || 'GERAL') === metasFiltroClassificacao;
+    const passaClasse = metasFiltroClassificacao === 'TODAS' || String(item.macroitem || 'Geral') === metasFiltroClassificacao;
     return passaSemana && passaClasse;
   });
 }
@@ -1259,7 +1317,7 @@ function atualizarDashboardMetas() {
 
   const reprogramados = calcularReprogramacaoMetas();
   const filtrados = filtrarDashboardMetas(reprogramados);
-  const classes = [...new Set(reprogramados.map(s => String(s.classificacao || 'GERAL')))];
+  const classes = [...new Set(reprogramados.map(s => String(s.macroitem || 'Geral')))];
   const frentesSemana = [1,2,3,4,5].map(semana => filtrados.filter(s => s.frenteSemanas[semana - 1]).length);
   const maior = Math.max.apply(null, frentesSemana);
   const semanaPico = frentesSemana.indexOf(maior) + 1;
@@ -1269,7 +1327,7 @@ function atualizarDashboardMetas() {
   document.getElementById('metasDashFiltros').innerHTML = [
     `<button class="metas-filter-chip ${metasFiltroSemana === 0 ? 'active' : ''}" onclick="setFiltroSemanaMetas(0)">Todas as semanas</button>`,
     ...[1,2,3,4,5].map(s => `<button class="metas-filter-chip ${metasFiltroSemana === s ? 'active' : ''}" onclick="setFiltroSemanaMetas(${s})">${s}ª semana</button>`),
-    `<button class="metas-filter-chip ${metasFiltroClassificacao === 'TODAS' ? 'active' : ''}" onclick="setFiltroClassificacaoMetas('TODAS')">Todas classes</button>`,
+    `<button class="metas-filter-chip ${metasFiltroClassificacao === 'TODAS' ? 'active' : ''}" onclick="setFiltroClassificacaoMetas('TODAS')">Todos macroitens</button>`,
     ...classes.map(cls => `<button class="metas-filter-chip ${metasFiltroClassificacao === cls ? 'active' : ''}" onclick="setFiltroClassificacaoMetas('${cls.replace(/'/g, "\\'")}')">${cls}</button>`)
   ].join('');
 
@@ -1291,7 +1349,7 @@ function atualizarDashboardMetas() {
 
   const porClasse = classes.map(cls => ({
     cls,
-    qtd: filtrados.filter(s => String(s.classificacao || 'GERAL') === cls).length
+    qtd: filtrados.filter(s => String(s.macroitem || 'Geral') === cls).length
   })).filter(i => i.qtd > 0);
   const totalClasse = porClasse.reduce((acc, i) => acc + i.qtd, 0) || 1;
   const cores = ['#1C3A6E', '#F47920', '#2C6B4A', '#8A5FBF', '#C0392B'];
@@ -1317,17 +1375,31 @@ function atualizarDashboardMetas() {
     `)
   ].join('');
 
-  document.getElementById('metasDashInsight').innerHTML =
-    `A leitura principal agora é por frentes simultâneas, não por soma de quantidades. ` +
-    `No filtro atual, a ${maior > 0 ? semanaPico + 'ª semana' : 'semana selecionada'} concentra ${maior} frente(s). ` +
-    `${qtdReprogramados} serviço(s) tiveram redistribuição automática considerando saldo, prioridade e fator máximo.`;
+  const statusPeso = { risk: 0, att: 1, ok: 2 };
+  const statusItens = filtrados
+    .map(s => ({ ...s, statusMeta: statusServicoMeta(s) }))
+    .sort((a, b) => statusPeso[a.statusMeta.chave] - statusPeso[b.statusMeta.chave]);
+  document.getElementById('metasDashStatus').innerHTML = statusItens.slice(0, 8).map(s => `
+    <div class="metas-status-row" onclick="destacarServicoDashboard(${s.idx})" style="cursor:pointer;">
+      <span class="metas-status-icon ${s.statusMeta.chave}">${s.statusMeta.icone}</span>
+      <span class="metas-status-name" title="${s.nome}">${s.nome}</span>
+      <span class="metas-status-label ${s.statusMeta.chave}">${s.statusMeta.label}</span>
+    </div>
+  `).join('') || '<div class="metodologia-text">Sem serviços no filtro atual.</div>';
+
+  [1,2,3,4,5].forEach(function(semana) {
+    const th = document.getElementById('metasHeadS' + semana);
+    if (!th) return;
+    th.classList.remove('metas-week-head-past', 'metas-week-head-future');
+    th.classList.add(semana < semanaAtualMetas() ? 'metas-week-head-past' : 'metas-week-head-future');
+  });
 
   document.getElementById('metasDashTabela').innerHTML = filtrados.map(function(s) {
     const status = s.mudou ? 'Reprogramado' : 'Original';
     return `
       <tr onclick="destacarServicoDashboard(${s.idx})" style="cursor:pointer;">
         <td>${s.nome}</td>
-        <td>${s.classificacao || '-'}</td>
+        <td>${s.macroitem || '-'}</td>
         <td>${s.unidade || '-'}</td>
         <td>${s.prioridade || 'Normal'}</td>
         <td class="num">${numeroCurto(s.reprogramado[0])}</td>
@@ -1335,7 +1407,7 @@ function atualizarDashboardMetas() {
         <td class="num">${numeroCurto(s.reprogramado[2])}</td>
         <td class="num">${numeroCurto(s.reprogramado[3])}</td>
         <td class="num">${numeroCurto(s.reprogramado[4])}</td>
-        <td>${status}</td>
+        <td>${statusServicoMeta(s).label}</td>
       </tr>`;
   }).join('');
 
