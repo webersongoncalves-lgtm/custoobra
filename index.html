@@ -231,7 +231,8 @@ body.metas-wide main { max-width: 1240px; }
 .metas-status-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 3px rgba(20, 30, 50, 0.06); }
 .metas-status-dot.ok { background: var(--green); }
 .metas-status-dot.att { background: #E0A800; }
-.metas-status-dot.risk { background: var(--red); }
+.metas-status-dot.risk { background: #F47920; }
+.metas-status-dot.fail { background: var(--red); }
 .metas-week-head-past { background: var(--green-bg) !important; color: var(--green) !important; }
 .metas-week-head-future { background: var(--red-bg) !important; color: var(--red) !important; }
 .metas-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
@@ -725,6 +726,12 @@ strong.hi { color: var(--accent); font-weight: 700; }
               <div class="metas-dashboard-card">
                 <div class="metas-dashboard-title">Status dos serviços</div>
                 <div class="metas-status-list" id="metasDashStatus"></div>
+                <div class="metas-mini-legend">
+                  <span><i class="legend-dot" style="background:var(--red);border-color:var(--red);"></i> Não será cumprido</span>
+                  <span><i class="legend-dot" style="background:#F47920;border-color:#F47920;"></i> Risco de não cumprir</span>
+                  <span><i class="legend-dot" style="background:#E0A800;border-color:#E0A800;"></i> Atenção</span>
+                  <span><i class="legend-dot" style="background:var(--green);border-color:var(--green);"></i> No prazo</span>
+                </div>
               </div>
             </div>
             <div style="font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--text2); margin:16px 0 8px;">Tabela principal</div>
@@ -1294,14 +1301,34 @@ function statusServicoMeta(item) {
   if (!item.temMetaMes) {
     return { chave: 'ok', icone: '✓', label: 'No prazo' };
   }
-  const semanaAtual = Math.min(semanaAtualMetas(), item.ultimaSemanaDisponivel || 5);
-  const realizadoAteAtual = item.realizados.slice(0, semanaAtual).reduce((acc, v) => acc + v, 0);
-  const previstoAteAtual = item.reprogramado.slice(0, semanaAtual).reduce((acc, v) => acc + v, 0);
-  const saldoFuturo = item.reprogramado.slice(semanaAtual).reduce((acc, v) => acc + v, 0);
-  if (previstoAteAtual > 0 && realizadoAteAtual < previstoAteAtual * 0.85) {
+  const semanasDisponiveis = item.semanasDisponiveis || semanasDisponiveisMetas();
+  const semanasComMeta = semanasDisponiveis.filter(semana => (item.previstoOriginal[semana - 1] || 0) > 0);
+  const semanasRestantes = semanasDisponiveis.filter(semana => semana > item.corte);
+  const realizadoAteCorte = item.realizados.slice(0, item.corte).reduce((acc, v) => acc + v, 0);
+  const saldo = Math.max(0, item.totalPlanejadoMes - realizadoAteCorte);
+
+  if (saldo <= 0) {
+    return { chave: 'ok', icone: '✓', label: 'No prazo' };
+  }
+  if (!semanasRestantes.length) {
+    return { chave: 'fail', icone: '!', label: 'Não será cumprido' };
+  }
+
+  const diasPlanejados = Math.max(1, semanasComMeta.length || semanasDisponiveis.length) * 5;
+  const diasRestantes = Math.max(1, semanasRestantes.length) * 5;
+  const produtividadePlanejada = Number(item.prodDiaria) > 0
+    ? Number(item.prodDiaria)
+    : item.totalPlanejadoMes / diasPlanejados;
+  const produtividadeReprogramada = saldo / diasRestantes;
+  const pressao = produtividadePlanejada > 0 ? produtividadeReprogramada / produtividadePlanejada : 0;
+
+  if (pressao >= 1.2) {
+    return { chave: 'fail', icone: '!', label: 'Não será cumprido' };
+  }
+  if (pressao >= 1.1) {
     return { chave: 'risk', icone: '!', label: 'Risco de não cumprir' };
   }
-  if (item.mudou || saldoFuturo > 0 && realizadoAteAtual < previstoAteAtual) {
+  if (pressao > 1) {
     return { chave: 'att', icone: '!', label: 'Atenção' };
   }
   return { chave: 'ok', icone: '✓', label: 'No prazo' };
@@ -1542,7 +1569,7 @@ function atualizarDashboardMetas() {
   ].join('');
   document.getElementById('metasDashHeatmap').style.gridTemplateColumns = `1fr repeat(${semanasDash.length}, 52px)`;
 
-  const statusPeso = { risk: 0, att: 1, ok: 2 };
+  const statusPeso = { fail: 0, risk: 1, att: 2, ok: 3 };
   const statusItens = filtrados
     .map(s => ({ ...s, statusMeta: statusServicoMeta(s) }))
     .sort((a, b) => (a.temMetaMes !== b.temMetaMes ? (a.temMetaMes ? -1 : 1) : statusPeso[a.statusMeta.chave] - statusPeso[b.statusMeta.chave])
@@ -1608,6 +1635,10 @@ function baixarMetodologiaReprogramacao() {
     '- Prioridade Normal: fator 1,00',
     '- Prioridade Baixa: fator 0,70',
     '- Fator maximo padrao: 1,20',
+    '- Farol verde: produtividade reprogramada ate 100% da produtividade planejada',
+    '- Farol amarelo: acima de 100% e abaixo de 110%',
+    '- Farol laranja: a partir de 110% e abaixo de 120%',
+    '- Farol vermelho: a partir de 120% ou sem semanas futuras para saldo pendente',
     '',
     'Uso previsto:',
     'Apos o engenheiro preencher o realizado da semana, o sistema calcula o saldo pendente e redistribui esse saldo nas semanas restantes, considerando prioridade e limite de recuperacao.',
