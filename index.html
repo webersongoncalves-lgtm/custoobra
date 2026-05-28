@@ -220,6 +220,7 @@ body.metas-wide main { max-width: 1240px; }
 .metas-heat-cell.current-week-head { background: #fff1f0; color: var(--red); font-weight: 800; box-shadow: inset 0 0 0 2px rgba(204, 55, 43, 0.5); }
 .metas-mini-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 0.72rem; color: var(--text3); }
 .metas-mini-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.metas-heat-count { font-weight: 700; color: var(--text2); }
 .legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; background: var(--surface2); border: 1px solid var(--border); }
 .legend-dot.on { background: var(--accent-bg); border-color: #f7c79e; }
 .legend-dot.hot { background: #ffe2c8; border-color: #f2b26f; }
@@ -227,11 +228,10 @@ body.metas-wide main { max-width: 1240px; }
 .metas-status-list { display: grid; gap: 8px; max-height: 250px; overflow: auto; padding-right: 2px; }
 .metas-status-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f8; }
 .metas-status-name { font-size: 0.76rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.metas-traffic { display: inline-grid; grid-template-rows: repeat(3, 6px); gap: 3px; width: 14px; padding: 4px; border-radius: 10px; background: #eef3fa; border: 1px solid var(--border); }
-.metas-traffic-dot { width: 6px; height: 6px; border-radius: 50%; background: #c9d3e1; }
-.metas-traffic.ok .metas-traffic-dot.green { background: var(--green); }
-.metas-traffic.att .metas-traffic-dot.yellow { background: #E0A800; }
-.metas-traffic.risk .metas-traffic-dot.red { background: var(--red); }
+.metas-status-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 3px rgba(20, 30, 50, 0.06); }
+.metas-status-dot.ok { background: var(--green); }
+.metas-status-dot.att { background: #E0A800; }
+.metas-status-dot.risk { background: var(--red); }
 .metas-week-head-past { background: var(--green-bg) !important; color: var(--green) !important; }
 .metas-week-head-future { background: var(--red-bg) !important; color: var(--red) !important; }
 .metas-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
@@ -719,6 +719,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
                   <span><i class="legend-dot on"></i> Frente ativa</span>
                   <span><i class="legend-dot hot"></i> Semana mais carregada</span>
                   <span><i class="legend-dot current"></i> Semana corrente</span>
+                  <span class="metas-heat-count" id="metasDashHeatCount">0 de 0 serviços</span>
                 </div>
               </div>
               <div class="metas-dashboard-card">
@@ -1203,6 +1204,14 @@ function fatorPrioridadeMeta(prioridade) {
   return 1;
 }
 
+function pesoPrioridadeMeta(prioridade) {
+  const p = normalizarNomeServico(prioridade || 'Normal');
+  if (p.includes('alta')) return 0;
+  if (p.includes('normal')) return 1;
+  if (p.includes('baixa')) return 2;
+  return 1;
+}
+
 function chaveParametroMeta(nome, classificacao, unidade) {
   return [
     normalizarNomeServico(nome),
@@ -1483,12 +1492,17 @@ function atualizarDashboardMetas() {
   `).join('') || '<div class="metodologia-text">Sem frentes no filtro atual.</div>';
 
   const semanaCorrenteDash = Math.min(semanaAtualMetas(), ultimaSemanaDash);
+  const heatItens = filtrados
+    .slice()
+    .sort((a, b) => pesoPrioridadeMeta(a.prioridade) - pesoPrioridadeMeta(b.prioridade) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'))
+    .slice(0, 10);
+  document.getElementById('metasDashHeatCount').textContent = `${heatItens.length} de ${filtrados.length} serviços`;
   document.getElementById('metasDashHeatmap').innerHTML = [
     semanasDash.map(s => `S${s}`).reduce((html, label, idx) => {
       const semana = semanasDash[idx];
       return html + `<div class="metas-heat-cell ${semana === semanaCorrenteDash ? 'current-week-head' : ''}">${label}</div>`;
     }, '<div></div>'),
-    ...filtrados.slice(0, 10).map(s => `
+    ...heatItens.map(s => `
       <div title="${s.nome}" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.nome}</div>
       ${semanasDash.map((semana, idx) => {
         const valor = s.reprogramado[semana - 1];
@@ -1507,11 +1521,7 @@ function atualizarDashboardMetas() {
   document.getElementById('metasDashStatus').innerHTML = statusItens.map(s => `
     <div class="metas-status-row" onclick="destacarServicoDashboard(${s.idx})" style="cursor:pointer;">
       <span class="metas-status-name" title="${s.nome}">${s.nome}</span>
-      <span class="metas-traffic ${s.statusMeta.chave}" title="${s.statusMeta.label}" aria-label="${s.statusMeta.label}">
-        <span class="metas-traffic-dot red"></span>
-        <span class="metas-traffic-dot yellow"></span>
-        <span class="metas-traffic-dot green"></span>
-      </span>
+      <span class="metas-status-dot ${s.statusMeta.chave}" title="${s.statusMeta.label}" aria-label="${s.statusMeta.label}"></span>
     </div>
   `).join('') || '<div class="metodologia-text">Sem serviços no filtro atual.</div>';
 
