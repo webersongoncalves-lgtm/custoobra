@@ -359,8 +359,8 @@ body.metas-wide main { max-width: 1240px; }
 .search-wrap { position: relative; }
 .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.9rem; pointer-events: none; }
 .search-wrap input { padding-left: 36px; }
-.search-wrap:focus-within .search-icon { display: none; }
-.search-wrap:focus-within input { padding-left: 12px; }
+.search-wrap:focus-within .search-icon, .search-wrap.has-value .search-icon { display: none; }
+.search-wrap:focus-within input, .search-wrap.has-value input { padding-left: 12px; }
 .dropdown {
   display: none;
   position: absolute;
@@ -392,6 +392,8 @@ body.metas-wide main { max-width: 1240px; }
 .valor-wrap { position: relative; }
 .valor-prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; color: var(--text3); pointer-events: none; font-family: 'IBM Plex Mono', monospace; }
 .valor-wrap input { padding-left: 36px; }
+.valor-wrap:focus-within .valor-prefix, .valor-wrap.has-value .valor-prefix { display: none; }
+.valor-wrap:focus-within input, .valor-wrap.has-value input { padding-left: 12px; }
 
 /* ─── BUTTONS ────────────────────────────────── */
 .btn { display: block; width: 100%; padding: 13px 18px; border: none; border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.15s; text-align: center; }
@@ -2113,8 +2115,16 @@ function novaMeta() {
 // ─── MÓDULO CUSTO: BUSCA ──────────────────────────────────────────────────────
 function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
 
+function atualizarEstadoCampos() {
+  const searchWrap = document.getElementById('searchInput').closest('.search-wrap');
+  const valorWrap = document.getElementById('inputValor').closest('.valor-wrap');
+  searchWrap.classList.toggle('has-value', document.getElementById('searchInput').value.trim().length > 0);
+  valorWrap.classList.toggle('has-value', document.getElementById('inputValor').value.trim().length > 0);
+}
+
 function buscar() {
   const input = document.getElementById('searchInput');
+  atualizarEstadoCampos();
   const q = norm(input.value.trim());
   const dd = document.getElementById('dropdown');
   if (q.length < 2) { fecharDropdown(); resetServico(); return; }
@@ -2145,12 +2155,16 @@ function hl(text, q) {
   return text.slice(0,i) + `<strong class="hi">${text.slice(i,i+q.length)}</strong>` + text.slice(i+q.length);
 }
 
-function abrirDropdown() { if (document.getElementById('searchInput').value.length >= 2) buscar(); }
+function abrirDropdown() {
+  atualizarEstadoCampos();
+  if (document.getElementById('searchInput').value.length >= 2) buscar();
+}
 function fecharDropdown() { document.getElementById('dropdown').classList.remove('open'); }
 
 function selecionarServico(id) {
   selectedServico = SERVICOS.find(s => s.id === id);
   document.getElementById('searchInput').value = selectedServico.nome;
+  atualizarEstadoCampos();
   fecharDropdown();
   const pill = document.getElementById('etapaPill');
   pill.innerHTML = `<div class="etapa-pill"><span class="etapa-pill-dot"></span>${selectedServico.etapa} <span style="opacity:.6;font-weight:400">· ${selectedServico.id}</span></div>`;
@@ -2164,8 +2178,14 @@ function resetServico() {
   document.getElementById('btnAdd').disabled = true;
 }
 
+function valorInformado() {
+  return parseFloat(String(document.getElementById('inputValor').value || '').replace(',', '.'));
+}
+
 function checkAdd() {
-  const v = parseFloat(document.getElementById('inputValor').value);
+  atualizarEstadoCampos();
+  fecharDropdown();
+  const v = valorInformado();
   const contrato = document.getElementById('inputContrato').value.trim();
   document.getElementById('btnAdd').disabled = !(selectedServico && v > 0 && contrato.length > 0);
 }
@@ -2173,7 +2193,9 @@ function checkAdd() {
 // ─── MÓDULO CUSTO: LOTE ───────────────────────────────────────────────────────
 function adicionarLancamento() {
   if (!currentUser) { abrirUser(); return; }
-  const valor = parseFloat(document.getElementById('inputValor').value);
+  checkAdd();
+  if (!selectedServico || document.getElementById('btnAdd').disabled) return;
+  const valor = valorInformado();
   const contrato = document.getElementById('inputContrato').value.trim();
   const obs = document.getElementById('inputObs').value.trim();
   const item = {
@@ -2193,6 +2215,7 @@ function adicionarLancamento() {
   document.getElementById('etapaPill').style.display = 'none';
   selectedServico = null;
   document.getElementById('btnAdd').disabled = true;
+  atualizarEstadoCampos();
   document.getElementById('searchInput').focus();
 }
 
@@ -2350,9 +2373,14 @@ function mostrarBtnConfirmar() {
 
 // Abrir identificação imediatamente se não houver usuário
 document.getElementById('userOverlay').classList.add('open');
+atualizarEstadoCampos();
 document.addEventListener('click', function(e) {
   if (!document.getElementById('dropdown').contains(e.target) &&
       e.target.id !== 'searchInput') fecharDropdown();
+});
+document.addEventListener('focusin', function(e) {
+  if (!e.target.closest('.search-wrap')) fecharDropdown();
+  atualizarEstadoCampos();
 });
 </script>
 
