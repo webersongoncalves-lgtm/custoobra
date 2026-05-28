@@ -357,10 +357,8 @@ body.metas-wide main { max-width: 1240px; }
 
 /* ─── SEARCH ─────────────────────────────────── */
 .search-wrap { position: relative; }
-.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.9rem; pointer-events: none; }
-.search-wrap input { padding-left: 36px; }
-.search-wrap:focus-within .search-icon, .search-wrap.has-value .search-icon { display: none; }
-.search-wrap:focus-within input, .search-wrap.has-value input { padding-left: 12px; }
+.search-icon { display: none; }
+.search-wrap input { padding-left: 12px; }
 .dropdown {
   display: none;
   position: absolute;
@@ -390,10 +388,8 @@ body.metas-wide main { max-width: 1240px; }
 /* ─── FORM ROW ───────────────────────────────── */
 .form-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
 .valor-wrap { position: relative; }
-.valor-prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; color: var(--text3); pointer-events: none; font-family: 'IBM Plex Mono', monospace; }
-.valor-wrap input { padding-left: 36px; }
-.valor-wrap:focus-within .valor-prefix, .valor-wrap.has-value .valor-prefix { display: none; }
-.valor-wrap:focus-within input, .valor-wrap.has-value input { padding-left: 12px; }
+.valor-prefix { display: none; }
+.valor-wrap input { padding-left: 12px; }
 
 /* ─── BUTTONS ────────────────────────────────── */
 .btn { display: block; width: 100%; padding: 13px 18px; border: none; border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.15s; text-align: center; }
@@ -840,7 +836,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
             <label>Valor Realizado (R$)</label>
             <div class="valor-wrap">
               <span class="valor-prefix">R$</span>
-              <input type="number" id="inputValor" placeholder="0,00" min="0" step="0.01" oninput="checkAdd()">
+              <input type="text" id="inputValor" placeholder="0,00" inputmode="decimal" oninput="checkAdd()">
             </div>
           </div>
           <button class="btn btn-add" id="btnAdd" disabled="" onclick="adicionarLancamento()">
@@ -2127,7 +2123,7 @@ function buscar() {
   atualizarEstadoCampos();
   const q = norm(input.value.trim());
   const dd = document.getElementById('dropdown');
-  if (q.length < 2) { fecharDropdown(); resetServico(); return; }
+  if (q.length < 1) { fecharDropdown(); resetServico(); return; }
   if (!SERVICOS.length && currentObra) SERVICOS = servicosDaObra(currentObra);
   const termos = q.split(/\s+/).filter(Boolean);
   const matches = SERVICOS.filter(s =>
@@ -2157,7 +2153,7 @@ function hl(text, q) {
 
 function abrirDropdown() {
   atualizarEstadoCampos();
-  if (document.getElementById('searchInput').value.length >= 2) buscar();
+  if (document.getElementById('searchInput').value.length >= 1) buscar();
 }
 function fecharDropdown() { document.getElementById('dropdown').classList.remove('open'); }
 
@@ -2179,7 +2175,11 @@ function resetServico() {
 }
 
 function valorInformado() {
-  return parseFloat(String(document.getElementById('inputValor').value || '').replace(',', '.'));
+  const texto = String(document.getElementById('inputValor').value || '')
+    .trim()
+    .replace(/\./g, '')
+    .replace(',', '.');
+  return parseFloat(texto);
 }
 
 function checkAdd() {
