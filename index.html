@@ -225,16 +225,13 @@ body.metas-wide main { max-width: 1240px; }
 .legend-dot.hot { background: #ffe2c8; border-color: #f2b26f; }
 .legend-dot.current { background: transparent; border: 2px solid rgba(204, 55, 43, 0.65); }
 .metas-status-list { display: grid; gap: 8px; max-height: 250px; overflow: auto; padding-right: 2px; }
-.metas-status-row { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f8; }
-.metas-status-icon { width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 800; color: #fff; }
-.metas-status-icon.ok { background: var(--green); }
-.metas-status-icon.att { background: #E0A800; }
-.metas-status-icon.risk { background: var(--red); }
+.metas-status-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f8; }
 .metas-status-name { font-size: 0.76rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.metas-status-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-.metas-status-label.ok { color: var(--green); }
-.metas-status-label.att { color: #A87500; }
-.metas-status-label.risk { color: var(--red); }
+.metas-traffic { display: inline-grid; grid-template-rows: repeat(3, 6px); gap: 3px; width: 14px; padding: 4px; border-radius: 10px; background: #eef3fa; border: 1px solid var(--border); }
+.metas-traffic-dot { width: 6px; height: 6px; border-radius: 50%; background: #c9d3e1; }
+.metas-traffic.ok .metas-traffic-dot.green { background: var(--green); }
+.metas-traffic.att .metas-traffic-dot.yellow { background: #E0A800; }
+.metas-traffic.risk .metas-traffic-dot.red { background: var(--red); }
 .metas-week-head-past { background: var(--green-bg) !important; color: var(--green) !important; }
 .metas-week-head-future { background: var(--red-bg) !important; color: var(--red) !important; }
 .metas-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
@@ -1507,11 +1504,14 @@ function atualizarDashboardMetas() {
   const statusItens = filtrados
     .map(s => ({ ...s, statusMeta: statusServicoMeta(s) }))
     .sort((a, b) => statusPeso[a.statusMeta.chave] - statusPeso[b.statusMeta.chave]);
-  document.getElementById('metasDashStatus').innerHTML = statusItens.slice(0, 8).map(s => `
+  document.getElementById('metasDashStatus').innerHTML = statusItens.map(s => `
     <div class="metas-status-row" onclick="destacarServicoDashboard(${s.idx})" style="cursor:pointer;">
-      <span class="metas-status-icon ${s.statusMeta.chave}">${s.statusMeta.icone}</span>
       <span class="metas-status-name" title="${s.nome}">${s.nome}</span>
-      <span class="metas-status-label ${s.statusMeta.chave}">${s.statusMeta.label}</span>
+      <span class="metas-traffic ${s.statusMeta.chave}" title="${s.statusMeta.label}" aria-label="${s.statusMeta.label}">
+        <span class="metas-traffic-dot red"></span>
+        <span class="metas-traffic-dot yellow"></span>
+        <span class="metas-traffic-dot green"></span>
+      </span>
     </div>
   `).join('') || '<div class="metodologia-text">Sem serviços no filtro atual.</div>';
 
