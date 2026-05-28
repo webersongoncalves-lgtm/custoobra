@@ -216,11 +216,14 @@ body.metas-wide main { max-width: 1240px; }
 .metas-heat-cell { height: 30px; border-radius: 6px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; line-height: 1; padding: 0 3px; overflow: hidden; text-align: center; }
 .metas-heat-cell.on { background: var(--accent-bg); color: var(--accent); font-weight: 700; }
 .metas-heat-cell.hot { background: #ffe2c8; color: #9a4700; }
+.metas-heat-cell.current-week { box-shadow: inset 0 0 0 2px rgba(204, 55, 43, 0.55), 0 0 0 2px rgba(204, 55, 43, 0.08); }
+.metas-heat-cell.current-week-head { background: #fff1f0; color: var(--red); font-weight: 800; box-shadow: inset 0 0 0 2px rgba(204, 55, 43, 0.5); }
 .metas-mini-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 0.72rem; color: var(--text3); }
 .metas-mini-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; background: var(--surface2); border: 1px solid var(--border); }
 .legend-dot.on { background: var(--accent-bg); border-color: #f7c79e; }
 .legend-dot.hot { background: #ffe2c8; border-color: #f2b26f; }
+.legend-dot.current { background: transparent; border: 2px solid rgba(204, 55, 43, 0.65); }
 .metas-status-list { display: grid; gap: 8px; max-height: 250px; overflow: auto; padding-right: 2px; }
 .metas-status-row { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f8; }
 .metas-status-icon { width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 800; color: #fff; }
@@ -239,6 +242,8 @@ body.metas-wide main { max-width: 1240px; }
 .metas-table th, .metas-table td { padding: 8px 10px; border-bottom: 1px solid #edf2f8; text-align: left; }
 .metas-table th { background: #F8FAFE; color: var(--text2); font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .metas-table td.num { text-align: right; font-family: 'IBM Plex Mono', monospace; color: var(--text2); }
+.metas-table th.metas-week-head-current { background: rgba(204, 55, 43, 0.16) !important; color: var(--red) !important; box-shadow: inset 0 2px 0 rgba(204, 55, 43, 0.45); }
+.metas-table td.metas-week-current { background: rgba(204, 55, 43, 0.08); color: var(--red); font-weight: 700; }
 .metodologia-block { border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; background: var(--surface); }
 .metodologia-title { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
 .metodologia-text { font-size: 0.78rem; color: var(--text2); line-height: 1.55; }
@@ -716,6 +721,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
                   <span><i class="legend-dot"></i> Sem frente</span>
                   <span><i class="legend-dot on"></i> Frente ativa</span>
                   <span><i class="legend-dot hot"></i> Semana mais carregada</span>
+                  <span><i class="legend-dot current"></i> Semana corrente</span>
                 </div>
               </div>
               <div class="metas-dashboard-card">
@@ -1479,15 +1485,19 @@ function atualizarDashboardMetas() {
     <div class="metas-legend-item"><span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${cores[idx % cores.length]};margin-right:6px;"></span>${item.cls}</span><strong>${item.qtd}</strong></div>
   `).join('') || '<div class="metodologia-text">Sem frentes no filtro atual.</div>';
 
+  const semanaCorrenteDash = Math.min(semanaAtualMetas(), ultimaSemanaDash);
   document.getElementById('metasDashHeatmap').innerHTML = [
-    semanasDash.map(s => `S${s}`).reduce((html, label) => html + `<div class="metas-heat-cell">${label}</div>`, '<div></div>'),
+    semanasDash.map(s => `S${s}`).reduce((html, label, idx) => {
+      const semana = semanasDash[idx];
+      return html + `<div class="metas-heat-cell ${semana === semanaCorrenteDash ? 'current-week-head' : ''}">${label}</div>`;
+    }, '<div></div>'),
     ...filtrados.slice(0, 10).map(s => `
       <div title="${s.nome}" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.nome}</div>
       ${semanasDash.map((semana, idx) => {
         const valor = s.reprogramado[semana - 1];
         const temDado = semana <= s.corte ? s.realizadosLancados[semana - 1] : valor > 0;
         const ativa = temDado && valor > 0;
-        return `<div class="metas-heat-cell ${ativa ? (frentesSemana[idx] === maior ? 'hot' : 'on') : ''}">${temDado ? numeroCurto(valor) : '-'}</div>`;
+        return `<div class="metas-heat-cell ${ativa ? (frentesSemana[idx] === maior ? 'hot' : 'on') : ''} ${semana === semanaCorrenteDash ? 'current-week' : ''}">${temDado ? numeroCurto(valor) : '-'}</div>`;
       }).join('')}
     `)
   ].join('');
@@ -1509,8 +1519,9 @@ function atualizarDashboardMetas() {
     const th = document.getElementById('metasHeadS' + semana);
     if (!th) return;
     th.style.display = semanasDash.includes(semana) ? '' : 'none';
-    th.classList.remove('metas-week-head-past', 'metas-week-head-future');
+    th.classList.remove('metas-week-head-past', 'metas-week-head-future', 'metas-week-head-current');
     th.classList.add(semana < semanaAtualMetas() ? 'metas-week-head-past' : 'metas-week-head-future');
+    if (semana === semanaCorrenteDash) th.classList.add('metas-week-head-current');
   });
 
   document.getElementById('metasDashTabela').innerHTML = filtrados.map(function(s) {
@@ -1521,7 +1532,7 @@ function atualizarDashboardMetas() {
         <td>${s.macroitem || '-'}</td>
         <td>${s.unidade || '-'}</td>
         <td>${s.prioridade || 'Normal'}</td>
-        ${semanasDash.map(semana => `<td class="num">${numeroCurto(s.reprogramado[semana - 1])}</td>`).join('')}
+        ${semanasDash.map(semana => `<td class="num ${semana === semanaCorrenteDash ? 'metas-week-current' : ''}">${numeroCurto(s.reprogramado[semana - 1])}</td>`).join('')}
         <td>${statusServicoMeta(s).label}</td>
       </tr>`;
   }).join('');
