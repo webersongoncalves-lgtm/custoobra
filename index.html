@@ -1156,6 +1156,7 @@ function buscarMetasDoSheets() {
           qtdTotal: s.qtd_total,
           prodDiaria: s.prod_diaria,
           acumMesAnt: s.acum_mes_anterior,
+          diasUteisSemana: s.dias_uteis_semana || diasUteisObservacaoMeta(s.observacao_parametro),
           prioridade: prioridadeServicoMeta(s, parametrosMap),
           fatorPrioridade: fatorPrioridadeServicoMeta(s, parametrosMap),
           fatorMaximo: fatorMaximoServicoMeta(s, parametrosMap),
@@ -1256,7 +1257,57 @@ function consolidarServicosMetas(servicos) {
       map.set(chave, servico);
     }
   });
-  return Array.from(map.values());
+  const consolidados = Array.from(map.values());
+  aplicarDiasUteisInferidosMetas(consolidados);
+  return consolidados;
+}
+
+function normalizarDiasUteisSemanaMeta(dias) {
+  const arr = Array.isArray(dias) ? dias.slice(0, 5).map(v => Number(v) || 0) : [];
+  while (arr.length < 5) arr.push(0);
+  return arr;
+}
+
+function diasUteisObservacaoMeta(observacao) {
+  const match = String(observacao || '').match(/DIAS_UTEIS_SEMANA:([0-9.,;\s-]+)/i);
+  if (!match) return [];
+  return match[1]
+    .split(/[;,]/)
+    .map(v => Number(String(v).trim().replace(',', '.')) || 0)
+    .slice(0, 5);
+}
+
+function anexarDiasUteisObservacaoMeta(param, dias) {
+  const clone = { ...param };
+  const limpo = String(clone.observacao || '')
+    .replace(/\s*\|?\s*DIAS_UTEIS_SEMANA:[0-9.,;\s-]+/i, '')
+    .trim();
+  const marcador = 'DIAS_UTEIS_SEMANA:' + normalizarDiasUteisSemanaMeta(dias).join(',');
+  clone.observacao = limpo ? `${limpo} | ${marcador}` : marcador;
+  return clone;
+}
+
+function aplicarDiasUteisInferidosMetas(servicos) {
+  const inferidos = [0, 0, 0, 0, 0].map(function(_, idx) {
+    const ratios = servicos
+      .map(function(servico) {
+        const diasExistentes = normalizarDiasUteisSemanaMeta(servico.diasUteisSemana);
+        if (diasExistentes[idx] > 0) return diasExistentes[idx];
+        const previsto = Number((servico.previsto || [])[idx]) || 0;
+        const prodDiaria = Number(servico.prodDiaria) || 0;
+        return previsto > 0 && prodDiaria > 0 ? previsto / prodDiaria : 0;
+      })
+      .filter(v => v > 0 && Number.isFinite(v))
+      .sort((a, b) => a - b);
+    if (!ratios.length) return 0;
+    const meio = Math.floor(ratios.length / 2);
+    return ratios.length % 2 ? ratios[meio] : (ratios[meio - 1] + ratios[meio]) / 2;
+  });
+
+  servicos.forEach(function(servico) {
+    const existentes = normalizarDiasUteisSemanaMeta(servico.diasUteisSemana);
+    servico.diasUteisSemana = existentes.map((v, idx) => v > 0 ? v : inferidos[idx]);
+  });
 }
 
 function parametroServicoMeta(servico, parametrosMap) {
@@ -1302,6 +1353,7 @@ function statusServicoMeta(item) {
     return { chave: 'ok', icone: '✓', label: 'No prazo' };
   }
   const semanasDisponiveis = item.semanasDisponiveis || semanasDisponiveisMetas();
+  const diasSemana = normalizarDiasUteisSemanaMeta(item.diasUteisSemana);
   const semanasComMeta = semanasDisponiveis.filter(semana => (item.previstoOriginal[semana - 1] || 0) > 0);
   const semanasRestantes = semanasDisponiveis.filter(semana => semana > item.corte);
   const realizadoAteCorte = item.realizados.slice(0, item.corte).reduce((acc, v) => acc + v, 0);
@@ -1314,8 +1366,9 @@ function statusServicoMeta(item) {
     return { chave: 'fail', icone: '!', label: 'Não será cumprido' };
   }
 
-  const diasPlanejados = Math.max(1, semanasComMeta.length || semanasDisponiveis.length) * 5;
-  const diasRestantes = Math.max(1, semanasRestantes.length) * 5;
+  const basePlanejada = semanasComMeta.length ? semanasComMeta : semanasDisponiveis;
+  const diasPlanejados = basePlanejada.reduce((acc, semana) => acc + (diasSemana[semana - 1] > 0 ? diasSemana[semana - 1] : 5), 0) || 1;
+  const diasRestantes = semanasRestantes.reduce((acc, semana) => acc + (diasSemana[semana - 1] > 0 ? diasSemana[semana - 1] : 5), 0) || 1;
   const produtividadePlanejada = Number(item.prodDiaria) > 0
     ? Number(item.prodDiaria)
     : item.totalPlanejadoMes / diasPlanejados;
@@ -1356,7 +1409,10 @@ function temRealizadoServicoSemana(servico, semana) {
 function semanasPlanejadasMetas() {
   const ultimaComPrevisto = metasServicos.reduce(function(ultima, servico) {
     const previsto = servico.previsto || [];
-    return previsto.reduce((last, valor, idx) => (Number(valor) || 0) > 0 ? Math.max(last, idx + 1) : last, ultima);
+    const dias = normalizarDiasUteisSemanaMeta(servico.diasUteisSemana);
+    return previsto.reduce((last, valor, idx) => {
+      return (Number(valor) || 0) > 0 || (Number(dias[idx]) || 0) > 0 ? Math.max(last, idx + 1) : last;
+    }, ultima);
   }, 0);
   return Math.min(5, Math.max(1, ultimaComPrevisto || semanaAtualMetas()));
 }
@@ -1366,19 +1422,21 @@ function semanasDisponiveisMetas() {
   return [1,2,3,4,5].filter(s => s <= ultima);
 }
 
-function distribuirNaoLinear(total, semanas, fatorPrioridade, fatorMaximo, prodDiaria) {
+function distribuirNaoLinear(total, semanas, fatorPrioridade, fatorMaximo, prodDiaria, diasUteisSemana) {
   if (!semanas.length || total <= 0) return {};
+  const diasSemana = normalizarDiasUteisSemanaMeta(diasUteisSemana);
   const pesos = semanas.map(function(semana, idx) {
     const posicaoInvertida = semanas.length - idx;
     return Math.pow(posicaoInvertida, fatorPrioridade || 1);
   });
   const somaPesos = pesos.reduce((acc, v) => acc + v, 0) || 1;
-  const limiteSemanal = prodDiaria > 0 ? prodDiaria * 5 * (fatorMaximo || 1.2) : 0;
   const dist = {};
   let excedente = 0;
 
   semanas.forEach(function(semana, idx) {
     let valor = total * (pesos[idx] / somaPesos);
+    const dias = diasSemana[semana - 1] > 0 ? diasSemana[semana - 1] : 5;
+    const limiteSemanal = prodDiaria > 0 ? prodDiaria * dias * (fatorMaximo || 1.2) : 0;
     if (limiteSemanal > 0 && valor > limiteSemanal) {
       excedente += valor - limiteSemanal;
       valor = limiteSemanal;
@@ -1387,9 +1445,15 @@ function distribuirNaoLinear(total, semanas, fatorPrioridade, fatorMaximo, prodD
   });
 
   if (excedente > 0) {
-    const abertas = semanas.filter(s => limiteSemanal <= 0 || dist[s] < limiteSemanal);
+    const abertas = semanas.filter(function(s) {
+      const dias = diasSemana[s - 1] > 0 ? diasSemana[s - 1] : 5;
+      const limiteSemanal = prodDiaria > 0 ? prodDiaria * dias * (fatorMaximo || 1.2) : 0;
+      return limiteSemanal <= 0 || dist[s] < limiteSemanal;
+    });
     const extra = abertas.length ? excedente / abertas.length : 0;
     abertas.forEach(s => {
+      const dias = diasSemana[s - 1] > 0 ? diasSemana[s - 1] : 5;
+      const limiteSemanal = prodDiaria > 0 ? prodDiaria * dias * (fatorMaximo || 1.2) : 0;
       dist[s] += limiteSemanal > 0 ? Math.min(extra, limiteSemanal - dist[s]) : extra;
     });
   }
@@ -1427,7 +1491,8 @@ function calcularReprogramacaoMetas() {
       semanasFuturas,
       Number(servico.fatorPrioridade) || fatorPrioridadeMeta(servico.prioridade),
       Number(servico.fatorMaximo) || 1.2,
-      Number(servico.prodDiaria) || 0
+      Number(servico.prodDiaria) || 0,
+      servico.diasUteisSemana
     );
     const reprogramado = previstoOriginal.map((v, idxSemana) => {
       const semana = idxSemana + 1;
@@ -1639,6 +1704,7 @@ function baixarMetodologiaReprogramacao() {
     '- Farol amarelo: acima de 100% e abaixo de 110%',
     '- Farol laranja: a partir de 110% e abaixo de 120%',
     '- Farol vermelho: a partir de 120% ou sem semanas futuras para saldo pendente',
+    '- Dias uteis por semana: lidos das formulas das colunas PREVISTO da planilha; quando ausentes, inferidos por Previsto / Produtividade diaria.',
     '',
     'Uso previsto:',
     'Apos o engenheiro preencher o realizado da semana, o sistema calcula o saldo pendente e redistribui esse saldo nas semanas restantes, considerando prioridade e limite de recuperacao.',
@@ -1737,6 +1803,8 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
   }
 
   const cellNum = criarLeitorNumericoPlanilha(ws, data, toNum);
+  const semanasPlanilha = detectarSemanasMetasPlanilha(ws, data, headerRow, cellNum);
+  const diasUteisSemanaPlanilha = semanasPlanilha.map(s => s.diasUteis);
 
   for (let i = headerRow + 2; i < data.length; i++) {
     const row = data[i];
@@ -1755,17 +1823,21 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
       qtd_total: cellNum(i, 3),
       prod_diaria: cellNum(i, 4),
       acum_mes_anterior: cellNum(i, 6),
-      previsto: [
-        cellNum(i, 14),
-        cellNum(i, 18),
-        cellNum(i, 22),
-        cellNum(i, 26),
-        cellNum(i, 30)
-      ]
+      dias_uteis_semana: diasUteisSemanaPlanilha,
+      previsto: semanasPlanilha.map(s => cellNum(i, s.col))
     });
   }
 
-  const parametrosReprogramacao = lerParametrosReprogramacao(wb, toNum);
+  const parametrosOriginais = lerParametrosReprogramacao(wb, toNum);
+  const parametrosReprogramacao = (parametrosOriginais.length ? parametrosOriginais : itens.map(item => ({
+    servico_nome: item.servico_nome,
+    classificacao: item.classificacao,
+    unidade: item.unidade,
+    prioridade: 'Normal',
+    fator_prioridade: 1,
+    fator_maximo: 1.2,
+    observacao: ''
+  }))).map(param => anexarDiasUteisObservacaoMeta(param, diasUteisSemanaPlanilha));
 
   if (itens.length === 0) {
     alert('Nenhum serviço encontrado na planilha. Verifique o arquivo.');
@@ -1893,6 +1965,62 @@ function criarLeitorNumericoPlanilha(ws, data, toNum) {
     const value = valorBruto(row, col);
     return value instanceof Date ? dateToSerial(value) : toNum(value);
   };
+}
+
+function detectarSemanasMetasPlanilha(ws, data, headerRow, cellNum) {
+  const semanas = [];
+  const rowSemana = data[headerRow] || [];
+  const rowCampos = data[headerRow + 1] || [];
+  const maxCol = Math.max(rowSemana.length, rowCampos.length);
+
+  function texto(v) {
+    return String(v || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
+  function endereco(row, col) {
+    return XLSX.utils.encode_cell({ r: row, c: col });
+  }
+
+  function extrairDiasUteisColuna(col) {
+    for (let row = headerRow + 2; row < Math.min(data.length, headerRow + 30); row++) {
+      const cell = ws[endereco(row, col)];
+      if (!cell || !cell.f) continue;
+      const refs = String(cell.f).match(/\$?[A-Z]{1,3}\$?(?:2|3)\b/g) || [];
+      for (const ref of refs) {
+        const pos = XLSX.utils.decode_cell(ref.replace(/\$/g, ''));
+        const valor = cellNum(pos.r, pos.c);
+        if (valor > 0 && valor <= 7) return valor;
+      }
+    }
+    const topoMesmaColuna = [cellNum(2, col), cellNum(1, col)].find(v => v > 0 && v <= 7);
+    if (topoMesmaColuna) return topoMesmaColuna;
+    return 0;
+  }
+
+  for (let col = 0; col < maxCol; col++) {
+    const campo = texto(rowCampos[col]);
+    const semana = texto(rowSemana[col]);
+    if (!campo.includes('previsto') || !semana.includes('semana')) continue;
+    semanas.push({
+      col,
+      label: rowSemana[col],
+      diasUteis: extrairDiasUteisColuna(col)
+    });
+  }
+
+  if (!semanas.length) {
+    return [14, 18, 22, 26, 30].map(col => ({
+      col,
+      label: '',
+      diasUteis: [cellNum(2, 14), cellNum(2, 18), cellNum(2, 22), cellNum(2, 26), cellNum(1, 30)][[14, 18, 22, 26, 30].indexOf(col)] || 0
+    }));
+  }
+
+  return semanas.slice(0, 5);
 }
 
 function lerParametrosReprogramacao(wb, toNum) {
