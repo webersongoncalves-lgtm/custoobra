@@ -1292,7 +1292,7 @@ function semanaAtualMetas() {
 
 function statusServicoMeta(item) {
   if (!item.temMetaMes) {
-    return { chave: 'neutral', icone: '-', label: 'Sem meta no mês' };
+    return { chave: 'ok', icone: '✓', label: 'No prazo' };
   }
   const semanaAtual = Math.min(semanaAtualMetas(), item.ultimaSemanaDisponivel || 5);
   const realizadoAteAtual = item.realizados.slice(0, semanaAtual).reduce((acc, v) => acc + v, 0);
@@ -1430,11 +1430,16 @@ function calcularReprogramacaoMetas() {
 
 function filtrarDashboardMetas(itens) {
   return itens.filter(function(item) {
-    if (!item.temMetaMes) return false;
     const passaSemana = !metasFiltroSemana || item.frenteSemanas[metasFiltroSemana - 1];
     const passaClasse = metasFiltroClassificacao === 'TODAS' || String(item.macroitem || 'Geral') === metasFiltroClassificacao;
     return passaSemana && passaClasse;
   });
+}
+
+function ordenarMetasDashboard(a, b) {
+  if (a.temMetaMes !== b.temMetaMes) return a.temMetaMes ? -1 : 1;
+  return pesoPrioridadeMeta(a.prioridade) - pesoPrioridadeMeta(b.prioridade)
+    || String(a.nome).localeCompare(String(b.nome), 'pt-BR');
 }
 
 function atualizarDashboardMetas() {
@@ -1452,15 +1457,14 @@ function atualizarDashboardMetas() {
   const semanasDash = semanasDisponiveisMetas();
   const ultimaSemanaDash = semanasDash[semanasDash.length - 1] || 5;
   if (metasFiltroSemana > ultimaSemanaDash) metasFiltroSemana = 0;
-  const reprogramadosDoMes = reprogramados.filter(s => s.temMetaMes);
   const filtrados = filtrarDashboardMetas(reprogramados);
-  const classes = [...new Set(reprogramadosDoMes.map(s => String(s.macroitem || 'Geral')))];
+  const classes = [...new Set(reprogramados.map(s => String(s.macroitem || 'Geral')))];
   const frentesSemana = semanasDash.map(semana => filtrados.filter(s => s.frenteSemanas[semana - 1]).length);
   const maior = Math.max.apply(null, frentesSemana);
   const semanaPico = semanasDash[frentesSemana.indexOf(maior)] || 0;
   const semanaReferenciaFrentes = metasFiltroSemana || Math.min(semanaAtualMetas(), ultimaSemanaDash);
   const totalFrentes = filtrados.filter(s => s.frenteSemanas[semanaReferenciaFrentes - 1]).length;
-  const qtdReprogramados = reprogramadosDoMes.filter(s => s.mudou).length;
+  const qtdReprogramados = reprogramados.filter(s => s.temMetaMes && s.mudou).length;
 
   document.getElementById('metasDashFiltros').innerHTML = `
     <div class="metas-filter-block">
@@ -1518,7 +1522,7 @@ function atualizarDashboardMetas() {
   const semanaCorrenteDash = Math.min(semanaAtualMetas(), ultimaSemanaDash);
   const heatItens = filtrados
     .slice()
-    .sort((a, b) => pesoPrioridadeMeta(a.prioridade) - pesoPrioridadeMeta(b.prioridade) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'))
+    .sort(ordenarMetasDashboard)
     .slice(0, 10);
   document.getElementById('metasDashHeatCount').textContent = `${heatItens.length} de ${filtrados.length} serviços`;
   document.getElementById('metasDashHeatmap').innerHTML = [
@@ -1541,7 +1545,8 @@ function atualizarDashboardMetas() {
   const statusPeso = { risk: 0, att: 1, ok: 2 };
   const statusItens = filtrados
     .map(s => ({ ...s, statusMeta: statusServicoMeta(s) }))
-    .sort((a, b) => statusPeso[a.statusMeta.chave] - statusPeso[b.statusMeta.chave]);
+    .sort((a, b) => (a.temMetaMes !== b.temMetaMes ? (a.temMetaMes ? -1 : 1) : statusPeso[a.statusMeta.chave] - statusPeso[b.statusMeta.chave])
+      || String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
   document.getElementById('metasDashStatus').innerHTML = statusItens.map(s => `
     <div class="metas-status-row" onclick="destacarServicoDashboard(${s.idx})" style="cursor:pointer;">
       <span class="metas-status-name" title="${s.nome}">${s.nome}</span>
@@ -1558,7 +1563,7 @@ function atualizarDashboardMetas() {
     if (semana === semanaCorrenteDash) th.classList.add('metas-week-head-current');
   });
 
-  document.getElementById('metasDashTabela').innerHTML = filtrados.map(function(s) {
+  document.getElementById('metasDashTabela').innerHTML = filtrados.slice().sort(ordenarMetasDashboard).map(function(s) {
     const status = s.mudou ? 'Reprogramado' : 'Original';
     return `
       <tr onclick="destacarServicoDashboard(${s.idx})" style="cursor:pointer;">
