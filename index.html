@@ -1291,6 +1291,9 @@ function semanaAtualMetas() {
 }
 
 function statusServicoMeta(item) {
+  if (!item.temMetaMes) {
+    return { chave: 'neutral', icone: '-', label: 'Sem meta no mês' };
+  }
   const semanaAtual = Math.min(semanaAtualMetas(), item.ultimaSemanaDisponivel || 5);
   const realizadoAteAtual = item.realizados.slice(0, semanaAtual).reduce((acc, v) => acc + v, 0);
   const previstoAteAtual = item.reprogramado.slice(0, semanaAtual).reduce((acc, v) => acc + v, 0);
@@ -1417,6 +1420,8 @@ function calcularReprogramacaoMetas() {
       semanasDisponiveis,
       ultimaSemanaDisponivel,
       corte,
+      totalPlanejadoMes,
+      temMetaMes: totalPlanejadoMes > 0,
       mudou,
       frenteSemanas: reprogramado.map(v => v > 0)
     };
@@ -1425,6 +1430,7 @@ function calcularReprogramacaoMetas() {
 
 function filtrarDashboardMetas(itens) {
   return itens.filter(function(item) {
+    if (!item.temMetaMes) return false;
     const passaSemana = !metasFiltroSemana || item.frenteSemanas[metasFiltroSemana - 1];
     const passaClasse = metasFiltroClassificacao === 'TODAS' || String(item.macroitem || 'Geral') === metasFiltroClassificacao;
     return passaSemana && passaClasse;
@@ -1446,14 +1452,15 @@ function atualizarDashboardMetas() {
   const semanasDash = semanasDisponiveisMetas();
   const ultimaSemanaDash = semanasDash[semanasDash.length - 1] || 5;
   if (metasFiltroSemana > ultimaSemanaDash) metasFiltroSemana = 0;
+  const reprogramadosDoMes = reprogramados.filter(s => s.temMetaMes);
   const filtrados = filtrarDashboardMetas(reprogramados);
-  const classes = [...new Set(reprogramados.map(s => String(s.macroitem || 'Geral')))];
+  const classes = [...new Set(reprogramadosDoMes.map(s => String(s.macroitem || 'Geral')))];
   const frentesSemana = semanasDash.map(semana => filtrados.filter(s => s.frenteSemanas[semana - 1]).length);
   const maior = Math.max.apply(null, frentesSemana);
   const semanaPico = semanasDash[frentesSemana.indexOf(maior)] || 0;
   const semanaReferenciaFrentes = metasFiltroSemana || Math.min(semanaAtualMetas(), ultimaSemanaDash);
   const totalFrentes = filtrados.filter(s => s.frenteSemanas[semanaReferenciaFrentes - 1]).length;
-  const qtdReprogramados = reprogramados.filter(s => s.mudou).length;
+  const qtdReprogramados = reprogramadosDoMes.filter(s => s.mudou).length;
 
   document.getElementById('metasDashFiltros').innerHTML = `
     <div class="metas-filter-block">
