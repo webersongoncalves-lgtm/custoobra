@@ -1806,16 +1806,24 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
   const semanasPlanilha = detectarSemanasMetasPlanilha(ws, data, headerRow, cellNum);
   const diasUteisSemanaPlanilha = semanasPlanilha.map(s => s.diasUteis);
 
+  let iniciouTabelaServicos = false;
   for (let i = headerRow + 2; i < data.length; i++) {
     const row = data[i];
     const nome = String(row[0] || '').trim();
-    if (!nome || nome.length < 3) continue;
+    if (!nome || nome.length < 3) {
+      if (iniciouTabelaServicos) break;
+      continue;
+    }
     // Filtrar linhas de legenda/rodapé que não são serviços reais
     const nomeLower = nome.toLowerCase();
     if (nomeLower.startsWith('vermelho') || nomeLower.startsWith('azul') ||
         nomeLower.startsWith('verde') || nomeLower.startsWith('atividade') ||
         nomeLower.startsWith('legenda') || nomeLower.startsWith('obs:') ||
-        nomeLower.startsWith('observa')) continue;
+        nomeLower.startsWith('observa')) {
+      if (iniciouTabelaServicos) break;
+      continue;
+    }
+    iniciouTabelaServicos = true;
     itens.push({
       servico_nome: nome,
       classificacao: String(row[1] || '').trim(),
