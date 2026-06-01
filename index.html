@@ -4,7 +4,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestão de Obras FRJR</title>
-<link href="./Gestão de Obras FRJR_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #F2F5FA;
@@ -408,6 +408,13 @@ body.metas-wide main { max-width: 1240px; }
 .btn-remove { background: var(--red-bg); color: var(--red); border: none; border-radius: 6px; width: 26px; height: 26px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
 .btn-remove:hover { background: #f5c6c2; }
 
+.admin-section { padding: 16px 0; }
+.admin-section + .admin-section { border-top: 1px solid var(--border); }
+.admin-section-title { font-size: 0.86rem; font-weight: 700; color: var(--text2); margin-bottom: 10px; }
+.admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.admin-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+.admin-actions .btn { width: auto; min-width: 240px; }
+
 /* ─── LANÇAMENTOS ─────────────────────────────── */
 .empty-list { padding: 32px 18px; text-align: center; color: var(--text3); font-size: 0.85rem; line-height: 1.8; }
 .empty-icon { font-size: 2rem; margin-bottom: 8px; }
@@ -468,6 +475,8 @@ strong.hi { color: var(--accent); font-weight: 700; }
   .confirm-table { font-size: 0.78rem; }
   .confirm-table th, .confirm-table td { padding: 8px 6px; }
   .module-selector { grid-template-columns: 1fr; }
+  .admin-grid { grid-template-columns: 1fr; }
+  .admin-actions .btn { width: 100%; min-width: 0; }
   .meta-row { grid-template-columns: 1fr auto; }
   .metas-nav { grid-template-columns: 1fr; }
   .metas-kpis { grid-template-columns: 1fr; }
@@ -568,79 +577,197 @@ strong.hi { color: var(--accent); font-weight: 700; }
       </div>
       <div class="panel-body">
 
-        <div class="field">
-          <label>Obra / Projeto</label>
-          <select id="selObraAdmin" onchange="mostrarBtnConfirmar()">
-            <option value="">— Selecione a obra —</option>
-            <option value="Pastinho/MG">Pastinho/MG</option>
-            <option value="Botucatu/SP">Botucatu/SP</option>
-            <option value="Santa Bárbara D&#39;Oeste/SP">Santa Bárbara D'Oeste/SP</option>
-          </select>
-        </div>
-
-        <div style="font-size:0.75rem; color:var(--text3); margin-bottom:14px; line-height:1.6;">
-          Período de referência: <strong style="color:var(--text2);" id="adminPeriodoLabel">Maio / 2026</strong><br>
-          Ao confirmar, os dados anteriores desta obra/mês serão substituídos.
-        </div>
-
-        <!-- Upload zone -->
-        <div id="adminUploadZone" class="upload-zone" onclick="document.getElementById(&#39;adminFileInput&#39;).click()" ondragover="event.preventDefault();this.classList.add(&#39;drag&#39;)" ondragleave="this.classList.remove(&#39;drag&#39;)" ondrop="handleDropAdmin(event)">
-          <input type="file" id="adminFileInput" accept=".xlsx,.xls" onchange="handleFileSelectAdmin(event)">
-          <div class="upload-zone-icon">📂</div>
-          <div class="upload-zone-title">Carregar planilha de metas</div>
-          <div class="upload-zone-sub">Clique ou arraste o arquivo .xlsx</div>
-        </div>
-
-        <!-- Preview antes de confirmar -->
-        <div id="adminPreview" style="display:none; align-items:center; gap:10px; padding:12px 14px; background:var(--green-bg); border:1px solid #b2d8c5; border-radius:8px;">
-          <span>📗</span>
-          <div style="flex:1; min-width:0;">
-            <div style="font-size:0.82rem; font-weight:600; color:var(--green);" id="adminPreviewNome"></div>
-            <div style="font-size:0.73rem; color:var(--text3);"><span id="adminPreviewObra"></span> · <span id="adminPreviewCount"></span></div>
+        <div class="admin-section">
+          <div class="admin-section-title">Cadastrar metas mensais</div>
+          <div class="admin-grid">
+            <div class="field">
+              <label>Obra / Projeto</label>
+              <select id="selObraAdmin" onchange="mostrarBtnConfirmar()">
+                <option value="">— Selecione a obra —</option>
+                <option value="Pastinho/MG">Pastinho/MG</option>
+                <option value="Botucatu/SP">Botucatu/SP</option>
+                <option value="Santa Bárbara D&#39;Oeste/SP">Santa Bárbara D'Oeste/SP</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Mês de referência</label>
+              <select id="selPeriodoAdmin"></select>
+            </div>
           </div>
-          <button class="btn-trocar" onclick="cancelarAdminUpload()" style="border-color:#b2d8c5; color:var(--green);">Trocar</button>
+
+          <div style="font-size:0.75rem; color:var(--text3); margin-bottom:14px; line-height:1.6;">
+            Período de referência: <strong style="color:var(--text2);" id="adminPeriodoLabel">Maio / 2026</strong><br>
+            Ao confirmar, os dados anteriores desta obra/mês serão substituídos.
+          </div>
+
+          <!-- Upload zone -->
+          <div id="adminUploadZone" class="upload-zone" onclick="document.getElementById(&#39;adminFileInput&#39;).click()" ondragover="event.preventDefault();this.classList.add(&#39;drag&#39;)" ondragleave="this.classList.remove(&#39;drag&#39;)" ondrop="handleDropAdmin(event)">
+            <input type="file" id="adminFileInput" accept=".xlsx,.xls" onchange="handleFileSelectAdmin(event)">
+            <div class="upload-zone-icon">📂</div>
+            <div class="upload-zone-title">Carregar planilha de metas</div>
+            <div class="upload-zone-sub">Clique ou arraste o arquivo .xlsx</div>
+          </div>
+
+          <!-- Preview antes de confirmar -->
+          <div id="adminPreview" style="display:none; align-items:center; gap:10px; padding:12px 14px; background:var(--green-bg); border:1px solid #b2d8c5; border-radius:8px;">
+            <span>📗</span>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:0.82rem; font-weight:600; color:var(--green);" id="adminPreviewNome"></div>
+              <div style="font-size:0.73rem; color:var(--text3);"><span id="adminPreviewObra"></span> · <span id="adminPreviewCount"></span></div>
+            </div>
+            <button class="btn-trocar" onclick="cancelarAdminUpload()" style="border-color:#b2d8c5; color:var(--green);">Trocar</button>
+          </div>
+
+          <!-- Sucesso -->
+          <div id="adminSucesso" style="display:none; text-align:center; padding:20px 0;">
+            <div style="font-size:1.5rem; margin-bottom:8px;">✅</div>
+            <div style="font-size:0.9rem; font-weight:600; color:var(--green); margin-bottom:4px;">Metas cadastradas com sucesso!</div>
+            <div style="font-size:0.78rem; color:var(--text3); margin-bottom:16px;" id="adminSucessoMsg"></div>
+            <button class="btn btn-ghost" id="btnNovoAdminUpload" style="width:auto; padding:8px 20px;" onclick="novoAdminUpload()">+ Cadastrar outra obra</button>
+          </div>
+
+          <div class="admin-actions">
+            <button class="btn btn-primary" id="btnConfirmarAdmin" onclick="confirmarCadastroMetas()" style="display:none;">
+              ✓ Confirmar Cadastro das Metas
+            </button>
+          </div>
         </div>
 
-        <!-- Sucesso -->
-        <div id="adminSucesso" style="display:none; text-align:center; padding:20px 0;">
-          <div style="font-size:1.5rem; margin-bottom:8px;">✅</div>
-          <div style="font-size:0.9rem; font-weight:600; color:var(--green); margin-bottom:4px;">Metas cadastradas com sucesso!</div>
-          <div style="font-size:0.78rem; color:var(--text3); margin-bottom:16px;" id="adminSucessoMsg"></div>
-          <button class="btn btn-ghost" id="btnNovoAdminUpload" style="width:auto; padding:8px 20px;" onclick="novoAdminUpload()">+ Cadastrar outra obra</button>
-        </div>
-
-        <div style="margin-top:18px; padding-top:18px; border-top:1px solid var(--line);">
-          <div style="font-size:0.86rem; font-weight:700; color:var(--text2); margin-bottom:10px;">Baixar planilha semanal preenchida</div>
-          <div class="field">
-            <label>Obra / Projeto</label>
-            <select id="selObraDownload">
-              <option value="">— Selecione a obra —</option>
-              <option value="Pastinho/MG">Pastinho/MG</option>
-              <option value="Botucatu/SP">Botucatu/SP</option>
-              <option value="Santa Bárbara D&#39;Oeste/SP">Santa Bárbara D'Oeste/SP</option>
-            </select>
+        <div class="admin-section">
+          <div class="admin-section-title">Baixar planilha semanal preenchida</div>
+          <div class="admin-grid">
+            <div class="field">
+              <label>Obra / Projeto</label>
+              <select id="selObraDownload">
+                <option value="">— Selecione a obra —</option>
+                <option value="Pastinho/MG">Pastinho/MG</option>
+                <option value="Botucatu/SP">Botucatu/SP</option>
+                <option value="Santa Bárbara D&#39;Oeste/SP">Santa Bárbara D'Oeste/SP</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Mês de referência</label>
+              <select id="selPeriodoDownload"></select>
+            </div>
+            <div class="field">
+              <label>Baixar com realizados até a semana</label>
+              <select id="selSemanaDownload">
+                <option value="1">1ª Semana</option>
+                <option value="2">2ª Semana</option>
+                <option value="3">3ª Semana</option>
+                <option value="4">4ª Semana</option>
+                <option value="5">5ª Semana</option>
+              </select>
+            </div>
           </div>
-          <div class="field">
-            <label>Baixar com realizados até a semana</label>
-            <select id="selSemanaDownload">
-              <option value="1">1ª Semana</option>
-              <option value="2">2ª Semana</option>
-              <option value="3">3ª Semana</option>
-              <option value="4">4ª Semana</option>
-              <option value="5">5ª Semana</option>
-            </select>
+          <div class="admin-actions">
+            <button class="btn btn-primary" id="btnDownloadMetas" onclick="baixarPlanilhaMetas()">↓ Baixar planilha preenchida</button>
           </div>
-          <button class="btn btn-primary" id="btnDownloadMetas" onclick="baixarPlanilhaMetas()">↓ Baixar planilha preenchida</button>
           <div id="downloadMetasStatus" style="display:none; margin-top:10px; font-size:0.76rem; color:var(--text3); line-height:1.5;"></div>
         </div>
 
-      </div>
-    </div>
+        <div class="admin-section">
+          <div class="admin-section-title">Dashboard do mês</div>
+          <div class="admin-grid">
+            <div class="field">
+              <label>Obra / Projeto</label>
+              <select id="selObraDashboardAdmin">
+                <option value="">— Selecione a obra —</option>
+                <option value="Pastinho/MG">Pastinho/MG</option>
+                <option value="Botucatu/SP">Botucatu/SP</option>
+                <option value="Santa Bárbara D&#39;Oeste/SP">Santa Bárbara D'Oeste/SP</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Mês de referência</label>
+              <select id="selPeriodoDashboardAdmin"></select>
+            </div>
+          </div>
+          <div class="admin-actions">
+            <button class="btn btn-primary" id="btnCarregarDashboardAdmin" onclick="buscarDashboardAdminMetas()">Ver dashboard</button>
+          </div>
+          <div id="adminDashboardLoading" style="display:none; text-align:center; padding:24px 0; color:var(--text3); font-size:0.85rem;">
+            <div style="font-size:1.5rem; margin-bottom:8px;">⏳</div>
+            Buscando metas do mês...
+          </div>
+          <div id="adminDashboardEmpty" style="display:none; text-align:center; padding:24px 0; color:var(--text3); font-size:0.82rem;">
+            Selecione obra e mês para visualizar a dashboard.
+          </div>
+          <div id="adminDashboardContent" style="display:none; margin-top:16px;">
+            <div id="adminDashFiltros"></div>
+            <div class="metas-kpis">
+              <div class="metas-kpi">
+                <div class="metas-kpi-label">Serviços</div>
+                <div class="metas-kpi-value" id="adminDashServicos">0</div>
+              </div>
+              <div class="metas-kpi">
+                <div class="metas-kpi-label" id="adminDashTotalLabel">Frentes ativas</div>
+                <div class="metas-kpi-value" id="adminDashTotal">0</div>
+              </div>
+              <div class="metas-kpi">
+                <div class="metas-kpi-label">Semana mais carregada</div>
+                <div class="metas-kpi-value" id="adminDashPico">-</div>
+              </div>
+              <div class="metas-kpi">
+                <div class="metas-kpi-label">Serviços reprogramados</div>
+                <div class="metas-kpi-value" id="adminDashReprogramados">0</div>
+              </div>
+            </div>
+            <div class="metas-dashboard-grid metas-dashboard-grid-priority">
+              <div class="metas-dashboard-card">
+                <div class="metas-dashboard-title">Mapa de calor das frentes</div>
+                <div class="metas-heatmap" id="adminDashHeatmap"></div>
+                <div class="metas-mini-legend">
+                  <span><i class="legend-dot"></i> Sem frente</span>
+                  <span><i class="legend-dot on"></i> Frente ativa</span>
+                  <span><i class="legend-dot hot"></i> Semana mais carregada</span>
+                  <span><i class="legend-dot current"></i> Semana corrente</span>
+                  <span class="metas-heat-count" id="adminDashHeatCount">0 de 0 serviços</span>
+                </div>
+              </div>
+              <div class="metas-dashboard-card">
+                <div class="metas-dashboard-title">Status dos serviços</div>
+                <div class="metas-status-list" id="adminDashStatus"></div>
+                <div class="metas-mini-legend">
+                  <span><i class="legend-dot" style="background:var(--red);border-color:var(--red);"></i> Não será cumprido</span>
+                  <span><i class="legend-dot" style="background:#F47920;border-color:#F47920;"></i> Risco de não cumprir</span>
+                  <span><i class="legend-dot" style="background:#E0A800;border-color:#E0A800;"></i> Atenção</span>
+                  <span><i class="legend-dot" style="background:var(--green);border-color:var(--green);"></i> No prazo</span>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--text2); margin:16px 0 8px;">Tabela principal</div>
+            <div class="metas-mini-legend" style="margin:0 0 8px;">
+              <span><i class="legend-dot" style="background:var(--green-bg);border-color:#b2d8c5;"></i> Semana já passou</span>
+              <span><i class="legend-dot" style="background:var(--red-bg);border-color:#efb8b3;"></i> Semana corrente ou futura</span>
+            </div>
+            <div class="metas-table-wrap">
+              <table class="metas-table">
+                <thead>
+                  <tr>
+                    <th>Serviço</th><th>Macroitem</th><th>Un</th><th>Prioridade</th><th id="adminHeadS1">S1</th><th id="adminHeadS2">S2</th><th id="adminHeadS3">S3</th><th id="adminHeadS4">S4</th><th id="adminHeadS5">S5</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="adminDashTabela"></tbody>
+              </table>
+            </div>
+            <div class="metas-dashboard-grid" style="margin-top:16px;">
+              <div class="metas-dashboard-card">
+                <div class="metas-dashboard-title">Frentes ativas por semana</div>
+                <div class="metas-chart" id="adminDashChart"></div>
+              </div>
+              <div class="metas-dashboard-card">
+                <div class="metas-dashboard-title">Distribuição por macroitem</div>
+                <div class="metas-donut-wrap">
+                  <div class="metas-donut" id="adminDashDonut" data-label="0"></div>
+                  <div class="metas-legend" id="adminDashLegenda"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <div style="padding:0 0 8px;">
-      <button class="btn btn-primary" id="btnConfirmarAdmin" onclick="confirmarCadastroMetas()" style="display:none;">
-        ✓ Confirmar Cadastro das Metas
-      </button>
+      </div>
     </div>
 
   </div>
@@ -933,6 +1060,12 @@ let metasAbaAtual = 'preenchimento';
 let metasFiltroSemana = 0;
 let metasFiltroClassificacao = 'TODAS';
 let metasRealizadosSalvos = [];
+let adminDashboardServicos = [];
+let adminDashboardRealizados = [];
+let adminDashboardFiltroSemana = 0;
+let adminDashboardFiltroClassificacao = 'TODAS';
+let adminDashboardSemanaAtual = null;
+let metasSemanaAtualOverride = null;
 
 // ─── CALENDÁRIO ───────────────────────────────────────────────────────────────
 const monthsFull = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -1004,7 +1137,7 @@ function salvarUser() {
 function mostrarTela(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.body.classList.toggle('metas-wide', id === 'screenMetas');
+  document.body.classList.toggle('metas-wide', id === 'screenMetas' || id === 'screenAdmin');
 }
 
 function abrirMetas() {
@@ -1134,6 +1267,43 @@ function carregarExcelJS(callback) {
   document.head.appendChild(script);
 }
 
+function periodoMetasSelecionado(selectId) {
+  const select = document.getElementById(selectId);
+  return select && select.value ? select.value : `${metasMes+1}/${metasAno}`;
+}
+
+function preencherPeriodosMetasAdmin() {
+  const selects = ['selPeriodoAdmin', 'selPeriodoDownload', 'selPeriodoDashboardAdmin']
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+  if (!selects.length) return;
+
+  const periodos = [];
+  for (let i = 0; i < 12; i++) {
+    const data = new Date(metasAno, metasMes - i, 1);
+    periodos.push({
+      valor: `${data.getMonth()+1}/${data.getFullYear()}`,
+      label: `${monthsFull[data.getMonth()]} / ${data.getFullYear()}`
+    });
+  }
+
+  selects.forEach(function(select) {
+    select.innerHTML = periodos.map(function(periodo) {
+      return `<option value="${periodo.valor}">${periodo.label}</option>`;
+    }).join('');
+  });
+
+  const selAdmin = document.getElementById('selPeriodoAdmin');
+  const periodoLabel = document.getElementById('adminPeriodoLabel');
+  if (selAdmin && periodoLabel) {
+    const atualizarLabel = function() {
+      periodoLabel.textContent = selAdmin.options[selAdmin.selectedIndex].textContent;
+    };
+    selAdmin.addEventListener('change', atualizarLabel);
+    atualizarLabel();
+  }
+}
+
 // ─── MÓDULO METAS: BUSCA NO SHEETS ────────────────────────────────────────────
 function buscarMetasDoSheets() {
   // Mostrar loading, esconder demais
@@ -1148,20 +1318,7 @@ function buscarMetasDoSheets() {
     function(data) {
       document.getElementById('metasLoading').style.display = 'none';
       if (data.status === 'ok' && data.itens && data.itens.length > 0) {
-        const parametrosMap = montarMapaParametrosMetas(data.parametros || []);
-        metasServicos = consolidarServicosMetas(data.itens.map(s => ({
-          nome: s.servico_nome,
-          classificacao: s.classificacao,
-          unidade: s.unidade,
-          qtdTotal: s.qtd_total,
-          prodDiaria: s.prod_diaria,
-          acumMesAnt: s.acum_mes_anterior,
-          diasUteisSemana: s.dias_uteis_semana || diasUteisObservacaoMeta(s.observacao_parametro),
-          prioridade: prioridadeServicoMeta(s, parametrosMap),
-          fatorPrioridade: fatorPrioridadeServicoMeta(s, parametrosMap),
-          fatorMaximo: fatorMaximoServicoMeta(s, parametrosMap),
-          previsto: s.previsto
-        })));
+        metasServicos = prepararServicosMetasDashboard(data);
         metasRealizadosSalvos = Array.isArray(data.realizados) ? data.realizados : [];
         metasRealizados = {};
         metasSemana = null;
@@ -1181,6 +1338,23 @@ function buscarMetasDoSheets() {
       atualizarDashboardMetas();
     }
   );
+}
+
+function prepararServicosMetasDashboard(data) {
+  const parametrosMap = montarMapaParametrosMetas(data.parametros || []);
+  return consolidarServicosMetas((data.itens || []).map(s => ({
+    nome: s.servico_nome,
+    classificacao: s.classificacao,
+    unidade: s.unidade,
+    qtdTotal: s.qtd_total,
+    prodDiaria: s.prod_diaria,
+    acumMesAnt: s.acum_mes_anterior,
+    diasUteisSemana: s.dias_uteis_semana || diasUteisObservacaoMeta(s.observacao_parametro),
+    prioridade: prioridadeServicoMeta(s, parametrosMap),
+    fatorPrioridade: fatorPrioridadeServicoMeta(s, parametrosMap),
+    fatorMaximo: fatorMaximoServicoMeta(s, parametrosMap),
+    previsto: s.previsto
+  })));
 }
 
 function abrirAbaMetas(aba) {
@@ -1344,6 +1518,7 @@ function macroitemServico(servico) {
 }
 
 function semanaAtualMetas() {
+  if (metasSemanaAtualOverride !== null) return metasSemanaAtualOverride;
   const dia = now.getDate();
   return Math.min(5, Math.max(1, Math.ceil(dia / 7)));
 }
@@ -1479,7 +1654,10 @@ function calcularReprogramacaoMetas() {
     const realizadosLancados = [1,2,3,4,5].map(semana => temRealizadoServicoSemana(servico, semana));
     const semanasDisponiveis = semanasDisponiveisMetas();
     const ultimaSemanaDisponivel = semanasDisponiveis[semanasDisponiveis.length - 1] || 5;
-    const semanaAtual = Math.min(semanaAtualMetas(), ultimaSemanaDisponivel);
+    const semanaBase = semanaAtualMetas();
+    const semanaAtual = metasSemanaAtualOverride !== null
+      ? Math.min(semanaBase, ultimaSemanaDisponivel + 1)
+      : Math.min(semanaBase, ultimaSemanaDisponivel);
     const corte = Math.max(0, semanaAtual - 1);
     const semanasFuturas = semanasDisponiveis.filter(s => s > corte);
     const totalPlanejadoMes = previstoOriginal.reduce((acc, v) => acc + v, 0);
@@ -1689,6 +1867,253 @@ function destacarServicoDashboard(idx) {
     .map(semana => `S${semana}: ${numeroCurto(item.reprogramado[semana - 1])}`)
     .join('\n');
   alert(`${item.nome}\n\nUnidade: ${item.unidade || '-'}\nPrioridade: ${item.prioridade || 'Normal'}\n${semanas}`);
+}
+
+function comEstadoDashboardAdmin(fn) {
+  const servicosAtuais = metasServicos;
+  const realizadosAtuais = metasRealizadosSalvos;
+  const semanaAtualOverrideAnterior = metasSemanaAtualOverride;
+  try {
+    metasServicos = adminDashboardServicos;
+    metasRealizadosSalvos = adminDashboardRealizados;
+    metasSemanaAtualOverride = adminDashboardSemanaAtual;
+    return fn();
+  } finally {
+    metasServicos = servicosAtuais;
+    metasRealizadosSalvos = realizadosAtuais;
+    metasSemanaAtualOverride = semanaAtualOverrideAnterior;
+  }
+}
+
+function semanaAtualParaPeriodoMetas(periodo) {
+  const partes = String(periodo || '').split('/');
+  const mes = parseInt(partes[0], 10) - 1;
+  const ano = parseInt(partes[1], 10);
+  if (!Number.isFinite(mes) || !Number.isFinite(ano)) return null;
+  const ref = ano * 12 + mes;
+  const atual = now.getFullYear() * 12 + now.getMonth();
+  if (ref < atual) return 6;
+  if (ref > atual) return 1;
+  return null;
+}
+
+function buscarDashboardAdminMetas() {
+  const obra = document.getElementById('selObraDashboardAdmin').value;
+  const periodo = periodoMetasSelecionado('selPeriodoDashboardAdmin');
+  const loading = document.getElementById('adminDashboardLoading');
+  const empty = document.getElementById('adminDashboardEmpty');
+  const content = document.getElementById('adminDashboardContent');
+  const btn = document.getElementById('btnCarregarDashboardAdmin');
+
+  if (!obra) {
+    alert('Selecione a obra para visualizar a dashboard.');
+    return;
+  }
+
+  loading.style.display = 'block';
+  empty.style.display = 'none';
+  content.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Carregando...';
+
+  metasJsonp({ acao: 'buscar_metas', obra, periodo },
+    function(data) {
+      loading.style.display = 'none';
+      btn.disabled = false;
+      btn.textContent = 'Ver dashboard';
+      if (data.status === 'ok' && data.itens && data.itens.length > 0) {
+        adminDashboardServicos = prepararServicosMetasDashboard(data);
+        adminDashboardRealizados = Array.isArray(data.realizados) ? data.realizados : [];
+        adminDashboardFiltroSemana = 0;
+        adminDashboardFiltroClassificacao = 'TODAS';
+        adminDashboardSemanaAtual = semanaAtualParaPeriodoMetas(periodo);
+        atualizarDashboardAdminMetas();
+      } else {
+        adminDashboardServicos = [];
+        adminDashboardRealizados = [];
+        adminDashboardSemanaAtual = null;
+        empty.textContent = data.message || 'Nenhuma meta encontrada para esta obra e mês.';
+        empty.style.display = 'block';
+        content.style.display = 'none';
+      }
+    },
+    function(err) {
+      loading.style.display = 'none';
+      btn.disabled = false;
+      btn.textContent = 'Ver dashboard';
+      adminDashboardServicos = [];
+      adminDashboardRealizados = [];
+      adminDashboardSemanaAtual = null;
+      empty.textContent = err.message || 'Erro ao buscar os dados da dashboard.';
+      empty.style.display = 'block';
+      content.style.display = 'none';
+    }
+  );
+}
+
+function filtrarDashboardAdminMetas(itens) {
+  return itens.filter(function(item) {
+    const passaSemana = !adminDashboardFiltroSemana || item.frenteSemanas[adminDashboardFiltroSemana - 1];
+    const passaClasse = adminDashboardFiltroClassificacao === 'TODAS' || String(item.macroitem || 'Geral') === adminDashboardFiltroClassificacao;
+    return passaSemana && passaClasse;
+  });
+}
+
+function atualizarDashboardAdminMetas() {
+  const empty = document.getElementById('adminDashboardEmpty');
+  const content = document.getElementById('adminDashboardContent');
+  if (!empty || !content) return;
+
+  if (!adminDashboardServicos.length) {
+    empty.style.display = 'block';
+    content.style.display = 'none';
+    return;
+  }
+
+  comEstadoDashboardAdmin(function() {
+    const reprogramados = calcularReprogramacaoMetas();
+    const semanasDash = semanasDisponiveisMetas();
+    const ultimaSemanaDash = semanasDash[semanasDash.length - 1] || 5;
+    if (adminDashboardFiltroSemana > ultimaSemanaDash) adminDashboardFiltroSemana = 0;
+    const filtrados = filtrarDashboardAdminMetas(reprogramados);
+    const classes = [...new Set(reprogramados.map(s => String(s.macroitem || 'Geral')))];
+    const frentesSemana = semanasDash.map(semana => filtrados.filter(s => s.frenteSemanas[semana - 1]).length);
+    const maior = Math.max.apply(null, frentesSemana);
+    const semanaPico = semanasDash[frentesSemana.indexOf(maior)] || 0;
+    const semanaReferenciaFrentes = adminDashboardFiltroSemana || Math.min(semanaAtualMetas(), ultimaSemanaDash);
+    const totalFrentes = filtrados.filter(s => s.frenteSemanas[semanaReferenciaFrentes - 1]).length;
+    const qtdReprogramados = reprogramados.filter(s => s.temMetaMes && s.mudou).length;
+
+    document.getElementById('adminDashFiltros').innerHTML = `
+      <div class="metas-filter-block">
+        <div class="metas-filter-label">Semanas</div>
+        <div class="metas-filter-group">
+          <button class="metas-filter-chip ${adminDashboardFiltroSemana === 0 ? 'active' : ''}" onclick="setFiltroSemanaAdminMetas(0)">Todas as semanas</button>
+          ${semanasDash.map(s => `<button class="metas-filter-chip ${adminDashboardFiltroSemana === s ? 'active' : ''}" onclick="setFiltroSemanaAdminMetas(${s})">${s}ª semana</button>`).join('')}
+        </div>
+      </div>
+      <div class="metas-filter-block">
+        <div class="metas-filter-label">Macroitens</div>
+        <div class="metas-filter-group">
+          <button class="metas-filter-chip ${adminDashboardFiltroClassificacao === 'TODAS' ? 'active' : ''}" onclick="setFiltroClassificacaoAdminMetas('TODAS')">Todos macroitens</button>
+          ${classes.map(cls => `<button class="metas-filter-chip ${adminDashboardFiltroClassificacao === cls ? 'active' : ''}" onclick="setFiltroClassificacaoAdminMetas('${cls.replace(/'/g, "\\'")}')">${cls}</button>`).join('')}
+        </div>
+      </div>`;
+
+    document.getElementById('adminDashServicos').textContent = String(filtrados.length);
+    document.getElementById('adminDashTotalLabel').textContent = `Frentes ativas S${semanaReferenciaFrentes}`;
+    document.getElementById('adminDashTotal').textContent = String(totalFrentes);
+    document.getElementById('adminDashPico').textContent = maior > 0 ? `${semanaPico}ª` : '-';
+    document.getElementById('adminDashReprogramados').textContent = String(qtdReprogramados);
+
+    document.getElementById('adminDashChart').innerHTML = frentesSemana.map(function(total, idx) {
+      const semana = semanasDash[idx];
+      const pct = maior > 0 ? Math.max(2, (total / maior) * 100) : 0;
+      return `
+        <div class="metas-chart-row ${adminDashboardFiltroSemana === semana ? 'active' : ''}" onclick="setFiltroSemanaAdminMetas(${semana})">
+          <div>${semana}ª semana</div>
+          <div class="metas-chart-bar"><div class="metas-chart-fill" style="width:${pct}%"></div></div>
+          <div style="text-align:right;font-family:'IBM Plex Mono', monospace;">${total} frentes</div>
+        </div>`;
+    }).join('');
+
+    const porClasse = classes.map(cls => ({
+      cls,
+      qtd: filtrados.filter(s => String(s.macroitem || 'Geral') === cls).length
+    })).filter(i => i.qtd > 0);
+    const totalClasse = porClasse.reduce((acc, i) => acc + i.qtd, 0) || 1;
+    const cores = ['#1C3A6E', '#F47920', '#2C6B4A', '#8A5FBF', '#C0392B'];
+    let graus = 0;
+    const fatias = porClasse.map(function(item, idx) {
+      const ini = graus;
+      const fatia = (item.qtd / totalClasse) * 360;
+      graus += fatia;
+      return `${cores[idx % cores.length]} ${ini}deg ${graus}deg`;
+    }).join(', ');
+    const donut = document.getElementById('adminDashDonut');
+    donut.style.background = fatias ? `conic-gradient(${fatias})` : 'var(--surface2)';
+    donut.setAttribute('data-label', String(totalClasse));
+    document.getElementById('adminDashLegenda').innerHTML = porClasse.map((item, idx) => `
+      <div class="metas-legend-item"><span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${cores[idx % cores.length]};margin-right:6px;"></span>${item.cls}</span><strong>${item.qtd}</strong></div>
+    `).join('') || '<div class="metodologia-text">Sem frentes no filtro atual.</div>';
+
+    const semanaCorrenteDash = adminDashboardSemanaAtual === 6 ? 0 : Math.min(semanaAtualMetas(), ultimaSemanaDash);
+    const heatItens = filtrados.slice().sort(ordenarMetasDashboard).slice(0, 10);
+    document.getElementById('adminDashHeatCount').textContent = `${heatItens.length} de ${filtrados.length} serviços`;
+    document.getElementById('adminDashHeatmap').innerHTML = [
+      semanasDash.map(s => `S${s}`).reduce((html, label, idx) => {
+        const semana = semanasDash[idx];
+        return html + `<div class="metas-heat-cell ${semana === semanaCorrenteDash ? 'current-week-head' : ''}">${label}</div>`;
+      }, '<div></div>'),
+      ...heatItens.map(s => `
+        <div title="${s.nome}" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.nome}</div>
+        ${semanasDash.map((semana, idx) => {
+          const valor = s.reprogramado[semana - 1];
+          const temDado = semana <= s.corte ? s.realizadosLancados[semana - 1] : valor > 0;
+          const ativa = temDado && valor > 0;
+          return `<div class="metas-heat-cell ${ativa ? (frentesSemana[idx] === maior ? 'hot' : 'on') : ''} ${semana === semanaCorrenteDash ? 'current-week' : ''}">${temDado ? numeroCurto(valor) : '-'}</div>`;
+        }).join('')}
+      `)
+    ].join('');
+    document.getElementById('adminDashHeatmap').style.gridTemplateColumns = `1fr repeat(${semanasDash.length}, 52px)`;
+
+    const statusPeso = { fail: 0, risk: 1, att: 2, ok: 3 };
+    const statusItens = filtrados
+      .map(s => ({ ...s, statusMeta: statusServicoMeta(s) }))
+      .sort((a, b) => (a.temMetaMes !== b.temMetaMes ? (a.temMetaMes ? -1 : 1) : statusPeso[a.statusMeta.chave] - statusPeso[b.statusMeta.chave])
+        || String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
+    document.getElementById('adminDashStatus').innerHTML = statusItens.map(s => `
+      <div class="metas-status-row" onclick="destacarServicoAdminDashboard(${s.idx})" style="cursor:pointer;">
+        <span class="metas-status-name" title="${s.nome}">${s.nome}</span>
+        <span class="metas-status-dot ${s.statusMeta.chave}" title="${s.statusMeta.label}" aria-label="${s.statusMeta.label}"></span>
+      </div>
+    `).join('') || '<div class="metodologia-text">Sem serviços no filtro atual.</div>';
+
+    [1,2,3,4,5].forEach(function(semana) {
+      const th = document.getElementById('adminHeadS' + semana);
+      if (!th) return;
+      th.style.display = semanasDash.includes(semana) ? '' : 'none';
+      th.classList.remove('metas-week-head-past', 'metas-week-head-future', 'metas-week-head-current');
+      th.classList.add(semana < semanaAtualMetas() ? 'metas-week-head-past' : 'metas-week-head-future');
+      if (semana === semanaCorrenteDash) th.classList.add('metas-week-head-current');
+    });
+
+    document.getElementById('adminDashTabela').innerHTML = filtrados.slice().sort(ordenarMetasDashboard).map(function(s) {
+      return `
+        <tr onclick="destacarServicoAdminDashboard(${s.idx})" style="cursor:pointer;">
+          <td>${s.nome}</td>
+          <td>${s.macroitem || '-'}</td>
+          <td>${s.unidade || '-'}</td>
+          <td>${s.prioridade || 'Normal'}</td>
+          ${semanasDash.map(semana => `<td class="num ${semana === semanaCorrenteDash ? 'metas-week-current' : ''}">${numeroCurto(s.reprogramado[semana - 1])}</td>`).join('')}
+          <td>${statusServicoMeta(s).label}</td>
+        </tr>`;
+    }).join('');
+
+    empty.style.display = 'none';
+    content.style.display = 'block';
+  });
+}
+
+function setFiltroSemanaAdminMetas(semana) {
+  adminDashboardFiltroSemana = semana;
+  atualizarDashboardAdminMetas();
+}
+
+function setFiltroClassificacaoAdminMetas(cls) {
+  adminDashboardFiltroClassificacao = cls;
+  atualizarDashboardAdminMetas();
+}
+
+function destacarServicoAdminDashboard(idx) {
+  comEstadoDashboardAdmin(function() {
+    const item = calcularReprogramacaoMetas().find(s => s.idx === idx);
+    if (!item) return;
+    const semanas = (item.semanasDisponiveis || semanasDisponiveisMetas())
+      .map(semana => `S${semana}: ${numeroCurto(item.reprogramado[semana - 1])}`)
+      .join('\n');
+    alert(`${item.nome}\n\nUnidade: ${item.unidade || '-'}\nPrioridade: ${item.prioridade || 'Normal'}\n${semanas}`);
+  });
 }
 
 function baixarMetodologiaReprogramacao() {
@@ -2075,12 +2500,12 @@ function confirmarCadastroMetas() {
   btn.disabled = true;
   btn.textContent = '⏳ Enviando...';
 
-  const periodo = `${metasMes+1}/${metasAno}`;
+  const periodo = periodoMetasSelecionado('selPeriodoAdmin');
   const nItens = window._adminPayload.itens.length;
   const obraEnviada = window._adminPayload.obra;
   const payload = {
     tipo: 'cadastro_metas',
-    ref: `CAD-${metasAno}${String(metasMes+1).padStart(2,'0')}-${obraEnviada.replace(/[^a-zA-Z]/g,'')}`,
+    ref: `CAD-${periodo.split('/')[1]}${String(periodo.split('/')[0]).padStart(2,'0')}-${obraEnviada.replace(/[^a-zA-Z]/g,'')}`,
     obra: obraEnviada,
     periodo,
     timestamp: new Date().toISOString(),
@@ -2144,7 +2569,7 @@ function baixarPlanilhaMetas() {
     return;
   }
 
-  const periodo = `${metasMes+1}/${metasAno}`;
+  const periodo = periodoMetasSelecionado('selPeriodoDownload');
   status.style.display = 'block';
   status.textContent = 'Preparando planilha...';
   btn.disabled = true;
@@ -2681,9 +3106,7 @@ function novoLote() {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 // Exibir período de referência na tela admin
-const periodo = `${metasMes+1}/${metasAno}`;
-const periodoLabel = document.getElementById('adminPeriodoLabel');
-if (periodoLabel) periodoLabel.textContent = `${monthsFull[metasMes]} / ${metasAno}`;
+preencherPeriodosMetasAdmin();
 
 function mostrarBtnConfirmar() {
   // Mostra o botão confirmar somente quando há obra selecionada e arquivo carregado
