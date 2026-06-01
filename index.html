@@ -225,7 +225,7 @@ body.metas-wide main { max-width: 1240px; }
 .legend-dot.on { background: var(--accent-bg); border-color: #f7c79e; }
 .legend-dot.hot { background: #ffe2c8; border-color: #f2b26f; }
 .legend-dot.current { background: transparent; border: 2px solid rgba(204, 55, 43, 0.65); }
-.metas-status-list { display: grid; gap: 8px; max-height: 250px; overflow: auto; padding-right: 2px; }
+.metas-status-list { display: grid; gap: 8px; padding-right: 2px; }
 .metas-status-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f8; }
 .metas-status-name { font-size: 0.76rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .metas-status-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 3px rgba(20, 30, 50, 0.06); }
@@ -240,6 +240,7 @@ body.metas-wide main { max-width: 1240px; }
 .metas-table th, .metas-table td { padding: 8px 10px; border-bottom: 1px solid #edf2f8; text-align: left; }
 .metas-table th { background: #F8FAFE; color: var(--text2); font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .metas-table td.num { text-align: right; font-family: 'IBM Plex Mono', monospace; color: var(--text2); }
+.metas-table th[id^="metasHeadS"], .metas-table th[id^="adminHeadS"], .metas-table td.num { width: 72px; min-width: 72px; text-align: right; }
 .metas-table th.metas-week-head-current { background: rgba(204, 55, 43, 0.16) !important; color: var(--red) !important; box-shadow: inset 0 2px 0 rgba(204, 55, 43, 0.45); }
 .metas-table td.metas-week-current { background: rgba(204, 55, 43, 0.08); color: var(--red); font-weight: 700; }
 .metodologia-block { border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; background: var(--surface); }
@@ -1792,8 +1793,7 @@ function atualizarDashboardMetas() {
   const semanaCorrenteDash = Math.min(semanaAtualMetas(), ultimaSemanaDash);
   const heatItens = filtrados
     .slice()
-    .sort(ordenarMetasDashboard)
-    .slice(0, 10);
+    .sort(ordenarMetasDashboard);
   document.getElementById('metasDashHeatCount').textContent = `${heatItens.length} de ${filtrados.length} serviços`;
   document.getElementById('metasDashHeatmap').innerHTML = [
     semanasDash.map(s => `S${s}`).reduce((html, label, idx) => {
@@ -2038,7 +2038,7 @@ function atualizarDashboardAdminMetas() {
     `).join('') || '<div class="metodologia-text">Sem frentes no filtro atual.</div>';
 
     const semanaCorrenteDash = adminDashboardSemanaAtual === 6 ? 0 : Math.min(semanaAtualMetas(), ultimaSemanaDash);
-    const heatItens = filtrados.slice().sort(ordenarMetasDashboard).slice(0, 10);
+    const heatItens = filtrados.slice().sort(ordenarMetasDashboard);
     document.getElementById('adminDashHeatCount').textContent = `${heatItens.length} de ${filtrados.length} serviços`;
     document.getElementById('adminDashHeatmap').innerHTML = [
       semanasDash.map(s => `S${s}`).reduce((html, label, idx) => {
