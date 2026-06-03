@@ -2054,7 +2054,7 @@ function atualizarDashboardAdminMetas() {
       ...heatItens.map(s => `
         <div title="${s.nome}" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.nome}</div>
         ${semanasDash.map((semana, idx) => {
-          const valor = s.reprogramado[semana - 1];
+          const valor = s.previstoOriginal[semana - 1];
           const temDado = semana <= s.corte ? s.realizadosLancados[semana - 1] : valor > 0;
           const ativa = temDado && valor > 0;
           return `<div class="metas-heat-cell ${ativa ? (frentesSemana[idx] === maior ? 'hot' : 'on') : ''} ${semana === semanaCorrenteDash ? 'current-week' : ''}">${temDado ? numeroCurto(valor) : '-'}</div>`;
@@ -2091,7 +2091,7 @@ function atualizarDashboardAdminMetas() {
           <td>${s.macroitem || '-'}</td>
           <td>${s.unidade || '-'}</td>
           <td>${s.prioridade || 'Normal'}</td>
-          ${semanasDash.map(semana => `<td class="num ${semana === semanaCorrenteDash ? 'metas-week-current' : ''}">${numeroCurto(s.reprogramado[semana - 1])}</td>`).join('')}
+          ${semanasDash.map(semana => `<td class="num ${semana === semanaCorrenteDash ? 'metas-week-current' : ''}">${numeroCurto(s.previstoOriginal[semana - 1])}</td>`).join('')}
           <td>${statusServicoMeta(s).label}</td>
         </tr>`;
     }).join('');
@@ -2116,7 +2116,7 @@ function destacarServicoAdminDashboard(idx) {
     const item = calcularReprogramacaoMetas().find(s => s.idx === idx);
     if (!item) return;
     const semanas = (item.semanasDisponiveis || semanasDisponiveisMetas())
-      .map(semana => `S${semana}: ${numeroCurto(item.reprogramado[semana - 1])}`)
+      .map(semana => `S${semana}: ${numeroCurto(item.previstoOriginal[semana - 1])}`)
       .join('\n');
     alert(`${item.nome}\n\nUnidade: ${item.unidade || '-'}\nPrioridade: ${item.prioridade || 'Normal'}\n${semanas}`);
   });
