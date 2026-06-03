@@ -1344,19 +1344,23 @@ function buscarMetasDoSheets() {
 
 function prepararServicosMetasDashboard(data) {
   const parametrosMap = montarMapaParametrosMetas(data.parametros || []);
-  return consolidarServicosMetas((data.itens || []).map(s => ({
-    nome: s.servico_nome,
-    classificacao: s.classificacao,
-    unidade: s.unidade,
-    qtdTotal: s.qtd_total,
-    prodDiaria: s.prod_diaria,
-    acumMesAnt: s.acum_mes_anterior,
-    diasUteisSemana: s.dias_uteis_semana || diasUteisObservacaoMeta(s.observacao_parametro),
-    prioridade: prioridadeServicoMeta(s, parametrosMap),
-    fatorPrioridade: fatorPrioridadeServicoMeta(s, parametrosMap),
-    fatorMaximo: fatorMaximoServicoMeta(s, parametrosMap),
-    previsto: s.previsto
-  })));
+  return consolidarServicosMetas((data.itens || []).map(function(s) {
+    const param = parametroServicoMeta(s, parametrosMap);
+    return {
+      nome: s.servico_nome,
+      classificacao: s.classificacao,
+      macroitem: s.macroitem || param.macroitem || param.classificacao,
+      unidade: s.unidade,
+      qtdTotal: s.qtd_total,
+      prodDiaria: s.prod_diaria,
+      acumMesAnt: s.acum_mes_anterior,
+      diasUteisSemana: s.dias_uteis_semana || diasUteisObservacaoMeta(s.observacao_parametro),
+      prioridade: prioridadeServicoMeta(s, parametrosMap),
+      fatorPrioridade: fatorPrioridadeServicoMeta(s, parametrosMap),
+      fatorMaximo: fatorMaximoServicoMeta(s, parametrosMap),
+      previsto: s.previsto
+    };
+  }));
 }
 
 function abrirAbaMetas(aba) {
@@ -1509,6 +1513,7 @@ function fatorMaximoServicoMeta(servico, parametrosMap) {
 }
 
 function macroitemServico(servico) {
+  if (servico.macroitem) return servico.macroitem;
   const texto = normalizarNomeServico(`${servico.classificacao || ''} ${servico.nome || ''}`);
   if (texto.includes('fundacao') || texto.includes('estaca') || texto.includes('radier') || texto.includes('bloco') || texto.includes('sapata')) return 'Fundação';
   if (texto.includes('estrutura') || texto.includes('forma') || texto.includes('concreto') || texto.includes('armacao') || texto.includes('laje') || texto.includes('pilar') || texto.includes('viga')) return 'Estrutura';
@@ -2250,13 +2255,19 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
       continue;
     }
     iniciouTabelaServicos = true;
+    const prioridade = String(row[2] || '').trim() || 'Normal';
     itens.push({
       servico_nome: nome,
       classificacao: String(row[1] || '').trim(),
-      unidade: String(row[2] || '').trim(),
-      qtd_total: cellNum(i, 3),
-      prod_diaria: cellNum(i, 4),
-      acum_mes_anterior: cellNum(i, 6),
+      macroitem: String(row[3] || '').trim(),
+      unidade: String(row[4] || '').trim(),
+      prioridade,
+      fator_prioridade: fatorPrioridadeMeta(prioridade),
+      indice_prioridade: fatorPrioridadeMeta(prioridade),
+      fator_maximo: 1.2,
+      qtd_total: cellNum(i, 5),
+      prod_diaria: cellNum(i, 6),
+      acum_mes_anterior: cellNum(i, 8),
       dias_uteis_semana: diasUteisSemanaPlanilha,
       previsto: semanasPlanilha.map(s => cellNum(i, s.col))
     });
@@ -2265,10 +2276,12 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
   const parametrosOriginais = lerParametrosReprogramacao(wb, toNum);
   const parametrosReprogramacao = (parametrosOriginais.length ? parametrosOriginais : itens.map(item => ({
     servico_nome: item.servico_nome,
-    classificacao: item.classificacao,
+    classificacao: item.macroitem || item.classificacao,
+    macroitem: item.macroitem,
     unidade: item.unidade,
-    prioridade: 'Normal',
-    fator_prioridade: 1,
+    prioridade: item.prioridade || 'Normal',
+    fator_prioridade: item.fator_prioridade || fatorPrioridadeMeta(item.prioridade),
+    indice_prioridade: item.indice_prioridade || item.fator_prioridade || fatorPrioridadeMeta(item.prioridade),
     fator_maximo: 1.2,
     observacao: ''
   }))).map(param => anexarDiasUteisObservacaoMeta(param, diasUteisSemanaPlanilha));
