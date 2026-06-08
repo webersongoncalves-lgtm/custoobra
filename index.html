@@ -1628,27 +1628,24 @@ function distribuirNaoLinear(total, semanas, fatorPrioridade, fatorMaximo, prodD
     dist[semana] = valor;
   });
 
-  if (excedente > 0) {
+  while (excedente > 0.0001) {
     const abertas = semanas.filter(function(s) {
       const dias = diasSemana[s - 1] > 0 ? diasSemana[s - 1] : 5;
       const limiteSemanal = prodDiaria > 0 ? prodDiaria * dias * (fatorMaximo || 1.2) : 0;
-      return limiteSemanal <= 0 || dist[s] < limiteSemanal;
+      return limiteSemanal <= 0 || dist[s] < limiteSemanal - 0.0001;
     });
-    const extra = abertas.length ? excedente / abertas.length : 0;
+    if (!abertas.length) break;
+    const extra = excedente / abertas.length;
+    let alocado = 0;
     abertas.forEach(s => {
       const dias = diasSemana[s - 1] > 0 ? diasSemana[s - 1] : 5;
       const limiteSemanal = prodDiaria > 0 ? prodDiaria * dias * (fatorMaximo || 1.2) : 0;
-      dist[s] += limiteSemanal > 0 ? Math.min(extra, limiteSemanal - dist[s]) : extra;
+      const incremento = limiteSemanal > 0 ? Math.min(extra, limiteSemanal - dist[s]) : extra;
+      dist[s] += incremento;
+      alocado += incremento;
     });
-  }
-
-  const distribuido = semanas.reduce((acc, semana) => acc + (dist[semana] || 0), 0);
-  const saldoNaoAlocado = total - distribuido;
-  if (saldoNaoAlocado > 0.0001) {
-    const extraPorSemana = saldoNaoAlocado / semanas.length;
-    semanas.forEach(s => {
-      dist[s] += extraPorSemana;
-    });
+    if (alocado <= 0.0001) break;
+    excedente -= alocado;
   }
 
   return dist;
@@ -1686,7 +1683,7 @@ function calcularReprogramacaoMetas() {
     const reprogramado = previstoOriginal.map((v, idxSemana) => {
       const semana = idxSemana + 1;
       if (semana <= corte) return realizadosLancados[idxSemana] ? realizados[idxSemana] : v;
-      return dist[semana] !== undefined ? dist[semana] : v;
+      return dist[semana] !== undefined ? dist[semana] : (temRealizadoParaReprogramar ? 0 : v);
     });
     const previstoDashboard = temRealizadoParaReprogramar ? reprogramado : previstoOriginal;
     const mudou = temRealizadoParaReprogramar && reprogramado.some((v, i) => Math.abs(v - previstoOriginal[i]) > 0.0001);
