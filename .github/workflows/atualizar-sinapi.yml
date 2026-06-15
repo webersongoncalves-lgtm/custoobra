@@ -1,0 +1,28 @@
+name: Atualizar SINAPI
+
+on:
+  schedule:
+    - cron: "0 8 15 * *"
+  workflow_dispatch:
+
+jobs:
+  atualizar-sinapi:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: https://bkeecvmfammwukdvvcjz.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SINAPI_BATCH_SIZE: "500"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: python -m pip install openpyxl
+
+      - name: Baixar, auditar e importar SINAPI
+        run: python _atualizar_sinapi_supabase.py

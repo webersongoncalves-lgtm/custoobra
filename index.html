@@ -4,7 +4,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestão de Obras FRJR</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="./Gestão de Obras FRJR_files/css2" rel="stylesheet">
 <style>
 :root {
   --bg: #F2F5FA;
@@ -79,6 +79,7 @@ header {
 /* ─── MAIN ──────────────────────────────────── */
 main { flex: 1; display: flex; flex-direction: column; max-width: 700px; width: 100%; margin: 0 auto; padding: 24px 16px 80px; gap: 16px; }
 body.metas-wide main { max-width: 1240px; }
+body.orcamento-wide main { max-width: 1280px; }
 
 /* ─── PANEL ─────────────────────────────────── */
 .panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
@@ -88,7 +89,7 @@ body.metas-wide main { max-width: 1240px; }
 .summary-count { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--text3); }
 
 /* ─── MODULE SELECTOR ────────────────────────── */
-.module-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px; }
+.module-selector { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 20px; }
 .module-card {
   background: var(--surface);
   border: 2px solid var(--border);
@@ -106,6 +107,59 @@ body.metas-wide main { max-width: 1240px; }
 .module-card-icon { font-size: 2rem; }
 .module-card-title { font-size: 0.95rem; font-weight: 600; color: var(--text); }
 .module-card-sub { font-size: 0.75rem; color: var(--text3); line-height: 1.4; }
+
+/* ─── ORÇAMENTO MODULE ───────────────────────── */
+.orcamento-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.orcamento-head-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.orcamento-chip { display: inline-flex; align-items: center; justify-content: center; min-height: 28px; border-radius: 999px; padding: 5px 10px; border: 1px solid var(--border); background: #F8FAFE; color: var(--text2); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.orcamento-chip.good { background: var(--green-bg); color: var(--green); border-color: #b2d8c5; }
+.orcamento-lock { max-width: 420px; margin: 22px auto; border: 1px solid var(--border); border-radius: 8px; padding: 18px; background: #F8FAFE; }
+.orcamento-lock-title { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+.orcamento-layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 16px; align-items: start; }
+.orcamento-sidebar { display: grid; gap: 12px; }
+.orcamento-filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.orcamento-results { display: grid; gap: 8px; max-height: 520px; overflow-y: auto; padding-right: 2px; }
+.orcamento-result { border: 1.5px solid var(--border); border-radius: 8px; padding: 11px 12px; background: var(--surface); cursor: pointer; transition: all 0.15s; }
+.orcamento-result:hover { border-color: var(--accent); background: var(--accent-bg); }
+.orcamento-result.active { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.orcamento-result-name { font-size: 0.82rem; font-weight: 700; color: var(--text); line-height: 1.35; }
+.orcamento-result-meta { margin-top: 5px; display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.7rem; color: var(--text3); }
+.orcamento-main { display: grid; gap: 16px; min-width: 0; }
+.orcamento-empty { text-align: center; padding: 28px 16px; color: var(--text3); font-size: 0.82rem; line-height: 1.5; }
+.orcamento-service-title { font-size: 1rem; font-weight: 700; color: var(--text); line-height: 1.35; }
+.orcamento-service-meta { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 8px; color: var(--text3); font-size: 0.75rem; }
+.orcamento-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 14px; }
+.orcamento-option { border: 1.5px solid var(--border); border-radius: 8px; padding: 12px; background: #F8FAFE; cursor: pointer; transition: all 0.15s; }
+.orcamento-option:hover { border-color: var(--accent); background: var(--accent-bg); }
+.orcamento-option.active { border-color: var(--accent); background: var(--accent-bg); }
+.orcamento-option-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.orcamento-option-code { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text2); font-weight: 700; }
+.orcamento-option-price { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--green); font-weight: 800; white-space: nowrap; }
+.orcamento-option-sub { font-size: 0.72rem; color: var(--text3); line-height: 1.45; }
+.orcamento-detail-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) 260px; gap: 14px; align-items: start; }
+.orcamento-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+.orcamento-table { width: 100%; min-width: 660px; border-collapse: collapse; font-size: 0.76rem; }
+.orcamento-table th, .orcamento-table td { padding: 9px 10px; border-bottom: 1px solid #edf2f8; text-align: left; vertical-align: top; }
+.orcamento-table th { background: #F8FAFE; color: var(--text2); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.orcamento-table td.num { text-align: right; font-family: 'IBM Plex Mono', monospace; color: var(--text2); white-space: nowrap; }
+.orcamento-type { display: inline-flex; min-width: 22px; justify-content: center; border-radius: 6px; padding: 2px 6px; font-size: 0.64rem; font-weight: 800; color: var(--text2); background: var(--surface2); }
+.orcamento-type.mat { color: var(--blue); background: var(--blue-bg); }
+.orcamento-type.mo { color: var(--green); background: var(--green-bg); }
+.orcamento-type.eqp { color: #8a5200; background: #fff3d8; }
+.orcamento-add-box { border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: #F8FAFE; }
+.orcamento-add-total { font-family: 'IBM Plex Mono', monospace; font-weight: 800; font-size: 1.05rem; color: var(--text); text-align: right; margin: 4px 0 12px; }
+.orcamento-budget-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+.orcamento-budget-list { display: grid; gap: 8px; }
+.orcamento-budget-item { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.orcamento-budget-name { font-size: 0.8rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.orcamento-budget-sub { font-size: 0.7rem; color: var(--text3); margin-top: 2px; }
+.orcamento-budget-value { font-family: 'IBM Plex Mono', monospace; color: var(--green); font-weight: 800; white-space: nowrap; }
+.orcamento-abc { display: grid; gap: 8px; }
+.orcamento-abc-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; font-size: 0.75rem; color: var(--text2); padding-bottom: 7px; border-bottom: 1px solid #edf2f8; }
+.orcamento-abc-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.orcamento-abc-value { font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--text); white-space: nowrap; }
+.orcamento-export-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.orcamento-export-row .btn { width: auto; }
 
 /* ─── METAS MODULE ───────────────────────────── */
 .metas-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
@@ -225,7 +279,7 @@ body.metas-wide main { max-width: 1240px; }
 .legend-dot.on { background: var(--accent-bg); border-color: #f7c79e; }
 .legend-dot.hot { background: #ffe2c8; border-color: #f2b26f; }
 .legend-dot.current { background: transparent; border: 2px solid rgba(204, 55, 43, 0.65); }
-.metas-status-list { display: grid; gap: 8px; padding-right: 2px; }
+.metas-status-list { display: grid; gap: 8px; max-height: 250px; overflow: auto; padding-right: 2px; }
 .metas-status-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f8; }
 .metas-status-name { font-size: 0.76rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .metas-status-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 3px rgba(20, 30, 50, 0.06); }
@@ -236,12 +290,10 @@ body.metas-wide main { max-width: 1240px; }
 .metas-week-head-past { background: var(--green-bg) !important; color: var(--green) !important; }
 .metas-week-head-future { background: var(--red-bg) !important; color: var(--red) !important; }
 .metas-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
-.metas-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 860px; }
+.metas-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 1050px; }
 .metas-table th, .metas-table td { padding: 8px 10px; border-bottom: 1px solid #edf2f8; text-align: left; }
 .metas-table th { background: #F8FAFE; color: var(--text2); font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .metas-table td.num { text-align: right; font-family: 'IBM Plex Mono', monospace; color: var(--text2); }
-.metas-table th[id^="metasHeadS"], .metas-table th[id^="adminHeadS"], .metas-table td.num { width: 72px; min-width: 72px; text-align: right; }
-.metas-table th[id^="adminHeadS"], #adminDashTabela td.num { width: 72px; min-width: 72px; max-width: 72px; text-align: right; }
 .metas-table th.metas-week-head-current { background: rgba(204, 55, 43, 0.16) !important; color: var(--red) !important; box-shadow: inset 0 2px 0 rgba(204, 55, 43, 0.45); }
 .metas-table td.metas-week-current { background: rgba(204, 55, 43, 0.08); color: var(--red); font-weight: 700; }
 .metodologia-block { border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; background: var(--surface); }
@@ -346,7 +398,7 @@ body.metas-wide main { max-width: 1240px; }
 /* ─── FIELD / FORM ───────────────────────────── */
 .field { margin-bottom: 14px; }
 .field label { display: block; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text2); margin-bottom: 6px; }
-.field select, .field input[type=text], .field input[type=number] {
+.field select, .field input[type=text], .field input[type=number], .field input[type=password] {
   width: 100%;
   padding: 10px 12px;
   border: 1.5px solid var(--border);
@@ -485,6 +537,9 @@ strong.hi { color: var(--accent); font-weight: 700; }
   .metas-dashboard-grid { grid-template-columns: 1fr; }
   .metas-donut-wrap { grid-template-columns: 1fr; }
   .metas-chart-row { grid-template-columns: 70px 1fr 70px; }
+  .orcamento-layout, .orcamento-detail-grid, .orcamento-budget-grid { grid-template-columns: 1fr; }
+  .orcamento-filter-grid { grid-template-columns: 1fr; }
+  .orcamento-budget-item { grid-template-columns: 1fr auto; }
 }
 </style>
 </head>
@@ -531,7 +586,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
 <header>
   <div class="logo">
     <div class="logo-frjr">
-      <img src="assets/logo-frjr.png" alt="FRJR Empreendimentos" style="height:38px; display:block;">
+      <img src="./Gestão de Obras FRJR_files/logo-frjr.png" alt="FRJR Empreendimentos" style="height:38px; display:block;">
     </div>
     <div class="logo-sep"></div>
     <span class="logo-app">Gestão de Obras FRJR</span>
@@ -549,7 +604,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
   <div id="screenModulo" class="screen active">
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title">O que deseja registrar?</span>
+        <span class="panel-title">O que deseja acessar?</span>
       </div>
       <div class="module-selector">
         <div class="module-card" onclick="abrirMetas()">
@@ -561,6 +616,11 @@ strong.hi { color: var(--accent); font-weight: 700; }
           <div class="module-card-icon">💰</div>
           <div class="module-card-title">Custo Comprometido</div>
           <div class="module-card-sub">Lançar valores comprometidos do mês</div>
+        </div>
+        <div class="module-card" onclick="abrirOrcamento()">
+          <div class="module-card-icon">📐</div>
+          <div class="module-card-title">Orçamento</div>
+          <div class="module-card-sub">Consultar CPUs e montar planilhas orçamentárias</div>
         </div>
       </div>
     </div>
@@ -1026,8 +1086,133 @@ strong.hi { color: var(--accent); font-weight: 700; }
 
   </div>
 
+  <!-- TELA: ORÇAMENTO -->
+  <div id="screenOrcamento" class="screen">
+    <div class="panel">
+      <div class="panel-header orcamento-head">
+        <button class="btn-back" onclick="voltarModulo()">← Voltar</button>
+        <span class="panel-title">Orçamento</span>
+        <div class="orcamento-head-actions">
+          <span class="orcamento-chip good">SINAPI MG / RJ / SP</span>
+          <span class="orcamento-chip" id="orcamentoStatusBase">Base local MVP</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div id="orcamentoLock" class="orcamento-lock">
+          <div class="orcamento-lock-title">Acesso ao módulo</div>
+          <div id="orcamentoSetupAviso" style="display:none; margin-bottom:14px; padding:10px 12px; border:1px solid #f0d080; background:#fffbe8; border-radius:8px; color:#7a5e00; font-size:0.76rem; line-height:1.45;">
+            Supabase ainda não configurado. Antes de publicar, informe a URL do projeto e a chave pública anon no arquivo de configuração.
+          </div>
+          <div class="field">
+            <label>E-mail</label>
+            <input type="text" id="orcamentoEmail" placeholder="Digite seu e-mail de acesso">
+          </div>
+          <div class="field">
+            <label>Senha</label>
+            <input type="password" id="orcamentoSenha" placeholder="Digite sua senha" onkeydown="if(event.key === 'Enter') orcamentoLogin()">
+          </div>
+          <button class="btn btn-primary" id="orcamentoLoginBtn" onclick="orcamentoLogin()">Entrar</button>
+          <button class="btn btn-ghost" id="orcamentoDemoLocalBtn" style="display:none;" onclick="orcamentoEntrarDemoLocal()">Entrar em modo teste local</button>
+          <div id="orcamentoSenhaErro" style="display:none; margin-top:10px; font-size:0.76rem; color:var(--red);">Senha inválida.</div>
+        </div>
+
+        <div id="orcamentoApp" style="display:none;">
+          <div class="orcamento-layout">
+            <div class="orcamento-sidebar">
+              <div class="panel" style="box-shadow:none; border:1px solid var(--border);">
+                <div class="panel-header">
+                  <span class="panel-title">Consulta de Serviços</span>
+                </div>
+                <div class="panel-body">
+                  <div class="field">
+                    <label>Buscar</label>
+                    <input type="text" id="orcamentoBusca" placeholder="Código ou descrição..." oninput="orcamentoFiltrar()">
+                  </div>
+                  <div class="orcamento-filter-grid">
+                    <div class="field">
+                      <label>Estado</label>
+                      <select id="orcamentoUf" onchange="orcamentoFiltrar()">
+                        <option value="TODOS">Todos</option>
+                        <option value="MG">MG</option>
+                        <option value="RJ">RJ</option>
+                        <option value="SP">SP</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label>Fonte</label>
+                      <select id="orcamentoFonte" onchange="orcamentoFiltrar()">
+                        <option value="TODAS">Todas</option>
+                        <option value="SINAPI">SINAPI</option>
+                        <option value="PROPRIA">Própria</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="orcamento-results" id="orcamentoResultados"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="orcamento-main">
+              <div class="panel" style="box-shadow:none; border:1px solid var(--border);">
+                <div class="panel-header">
+                  <span class="panel-title">Composições do Serviço</span>
+                  <span class="summary-count" id="orcamentoComposicoesCount">0 opções</span>
+                </div>
+                <div class="panel-body" id="orcamentoDetalhe">
+                  <div class="orcamento-empty">Selecione um serviço para consultar as composições disponíveis.</div>
+                </div>
+              </div>
+
+              <div class="panel" style="box-shadow:none; border:1px solid var(--border);">
+                <div class="panel-header">
+                  <span class="panel-title">Planilha Orçamentária</span>
+                  <span class="summary-count" id="orcamentoItensCount">0 itens</span>
+                </div>
+                <div class="panel-body">
+                  <div class="orcamento-budget-grid">
+                    <div>
+                      <div id="orcamentoItens" class="orcamento-budget-list">
+                        <div class="orcamento-empty">Nenhum item adicionado ao orçamento.</div>
+                      </div>
+                      <div class="field" style="margin-top:14px;">
+                        <label>Nome do orçamento</label>
+                        <input type="text" id="orcamentoNome" value="Orçamento em elaboração">
+                      </div>
+                      <div class="orcamento-export-row">
+                        <button class="btn btn-sm btn-primary" onclick="orcamentoSalvarOnline()">Salvar Orçamento</button>
+                        <button class="btn btn-sm btn-primary" onclick="orcamentoExportarCSV('planilha')">Exportar Planilha</button>
+                        <button class="btn btn-sm btn-ghost" onclick="orcamentoExportarCSV('cpus')">Exportar CPUs</button>
+                        <button class="btn btn-sm btn-ghost" onclick="orcamentoExportarCSV('abc')">Curva ABC</button>
+                      </div>
+                      <div id="orcamentoSaveStatus" style="display:none; margin-top:10px; font-size:0.76rem; color:var(--text3); line-height:1.5;"></div>
+                    </div>
+                    <div class="orcamento-add-box">
+                      <div class="summary-label">Total do Orçamento</div>
+                      <div class="orcamento-add-total" id="orcamentoTotalGeral">R$ 0,00</div>
+                      <div class="summary-label" style="margin-bottom:8px;">ABC de Serviços</div>
+                      <div class="orcamento-abc" id="orcamentoAbcServicos"></div>
+                      <div class="summary-label" style="margin:14px 0 8px;">ABC de Materiais/Insumos</div>
+                      <div class="orcamento-abc" id="orcamentoAbcInsumos"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
+<script>
+window.ORCAMENTO_SUPABASE_CONFIG = {
+  url: 'https://bkeecvmfammwukdvvcjz.supabase.co',
+  anonKey: 'sb_publishable_W8hHLckQMjwC70pndET_Nw_QUgD_N0r'
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const SCRIPT_URL_CUSTO = 'https://script.google.com/macros/s/AKfycbw_2Zqv9jymzx6lyR3V-p8WX1HUQgCa87HMbV0Gg1Q0BUIfj3t8yGS8tT7vvxwm2bWk/exec';
@@ -1140,6 +1325,7 @@ function mostrarTela(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.body.classList.toggle('metas-wide', id === 'screenMetas' || id === 'screenAdmin');
+  document.body.classList.toggle('orcamento-wide', id === 'screenOrcamento');
 }
 
 function abrirMetas() {
@@ -1154,8 +1340,889 @@ function abrirCusto() {
   mostrarTela('screenCusto');
 }
 
+function abrirOrcamento() {
+  mostrarTela('screenOrcamento');
+  orcamentoAtualizarAcesso();
+  if (orcamentoAutorizado) iniciarOrcamento();
+  setTimeout(function() {
+    const email = document.getElementById('orcamentoEmail');
+    if (email && !orcamentoAutorizado && orcamentoConfigPronta()) email.focus();
+  }, 80);
+}
+
 function voltarModulo() {
   mostrarTela('screenModulo');
+}
+
+// ─── MÓDULO ORÇAMENTO ────────────────────────────────────────────────────────
+const ORCAMENTO_SUPABASE_CONFIG = window.ORCAMENTO_SUPABASE_CONFIG || {
+  url: '',
+  anonKey: ''
+};
+const ORCAMENTO_DEMO_LOCAL = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
+const ORCAMENTO_PAGINA_SUPABASE = 1000;
+const ORCAMENTO_RESULTADOS_LIMITE = 200;
+let orcamentoSupabase = null;
+let orcamentoAutorizado = false;
+let orcamentoModoDemo = false;
+let orcamentoUsuario = null;
+let orcamentoServicoSelecionado = null;
+let orcamentoComposicaoSelecionada = null;
+let orcamentoItens = [];
+let ORCAMENTO_SERVICOS = [];
+let ORCAMENTO_FONTES = new Map();
+let orcamentoBuscaOnlineTimer = null;
+let orcamentoBuscaOnlineSeq = 0;
+
+const ORCAMENTO_SERVICOS_DEMO = [
+  {
+    id: 'SERV-001',
+    nome: 'Alvenaria de vedação com bloco cerâmico',
+    etapa: 'Vedação',
+    unidade: 'm²',
+    composicoes: [
+      {
+        id: 'SINAPI-103328-MG',
+        codigo: '103328',
+        fonte: 'SINAPI',
+        uf: 'MG',
+        mesBase: '04/2026',
+        descricao: 'Alvenaria de vedação de blocos cerâmicos furados na horizontal',
+        itens: [
+          { tipo: 'MAT', codigo: '07266', descricao: 'Bloco cerâmico furado para alvenaria', unidade: 'un', coef: 13.35, preco: 1.18 },
+          { tipo: 'MAT', codigo: '37595', descricao: 'Argamassa traço 1:2:8 preparada em obra', unidade: 'm³', coef: 0.014, preco: 545.2 },
+          { tipo: 'MO', codigo: '88309', descricao: 'Pedreiro com encargos complementares', unidade: 'h', coef: 0.63, preco: 29.4 },
+          { tipo: 'MO', codigo: '88316', descricao: 'Servente com encargos complementares', unidade: 'h', coef: 0.315, preco: 20.8 }
+        ]
+      },
+      {
+        id: 'CPU-PROP-ALV-001',
+        codigo: 'CPU-ALV-001',
+        fonte: 'PROPRIA',
+        uf: 'SP',
+        mesBase: '06/2026',
+        descricao: 'Alvenaria interna ajustada por produtividade de obra',
+        itens: [
+          { tipo: 'MAT', codigo: 'CPU-BLOCO-09', descricao: 'Bloco cerâmico 9x19x19 cm', unidade: 'un', coef: 13.8, preco: 1.25 },
+          { tipo: 'MAT', codigo: 'CPU-ARG-01', descricao: 'Argamassa de assentamento', unidade: 'm³', coef: 0.013, preco: 560.0 },
+          { tipo: 'MO', codigo: 'CPU-PED', descricao: 'Pedreiro', unidade: 'h', coef: 0.58, preco: 32.0 },
+          { tipo: 'MO', codigo: 'CPU-SER', descricao: 'Servente', unidade: 'h', coef: 0.29, preco: 22.5 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'SERV-002',
+    nome: 'Chapisco aplicado em alvenaria e estrutura',
+    etapa: 'Revestimento',
+    unidade: 'm²',
+    composicoes: [
+      {
+        id: 'SINAPI-87878-RJ',
+        codigo: '87878',
+        fonte: 'SINAPI',
+        uf: 'RJ',
+        mesBase: '04/2026',
+        descricao: 'Chapisco aplicado em alvenarias e estruturas de concreto',
+        itens: [
+          { tipo: 'MAT', codigo: '87313', descricao: 'Argamassa traço 1:3 para chapisco', unidade: 'm³', coef: 0.0042, preco: 612.4 },
+          { tipo: 'MO', codigo: '88309', descricao: 'Pedreiro com encargos complementares', unidade: 'h', coef: 0.07, preco: 31.2 },
+          { tipo: 'MO', codigo: '88316', descricao: 'Servente com encargos complementares', unidade: 'h', coef: 0.007, preco: 21.7 }
+        ]
+      },
+      {
+        id: 'SINAPI-87878-SP',
+        codigo: '87878',
+        fonte: 'SINAPI',
+        uf: 'SP',
+        mesBase: '04/2026',
+        descricao: 'Chapisco aplicado em alvenarias e estruturas de concreto',
+        itens: [
+          { tipo: 'MAT', codigo: '87313', descricao: 'Argamassa traço 1:3 para chapisco', unidade: 'm³', coef: 0.0042, preco: 638.9 },
+          { tipo: 'MO', codigo: '88309', descricao: 'Pedreiro com encargos complementares', unidade: 'h', coef: 0.07, preco: 32.8 },
+          { tipo: 'MO', codigo: '88316', descricao: 'Servente com encargos complementares', unidade: 'h', coef: 0.007, preco: 22.4 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'SERV-003',
+    nome: 'Piso em concreto desempenado',
+    etapa: 'Pisos',
+    unidade: 'm²',
+    composicoes: [
+      {
+        id: 'SINAPI-94990-MG',
+        codigo: '94990',
+        fonte: 'SINAPI',
+        uf: 'MG',
+        mesBase: '04/2026',
+        descricao: 'Execução de passeio ou piso de concreto moldado in loco',
+        itens: [
+          { tipo: 'MAT', codigo: '34492', descricao: 'Concreto usinado bombeável fck 20 MPa', unidade: 'm³', coef: 0.072, preco: 452.7 },
+          { tipo: 'MAT', codigo: '04517', descricao: 'Sarrafo de madeira não aparelhada', unidade: 'm', coef: 0.45, preco: 5.8 },
+          { tipo: 'MO', codigo: '88309', descricao: 'Pedreiro com encargos complementares', unidade: 'h', coef: 0.26, preco: 29.4 },
+          { tipo: 'MO', codigo: '88316', descricao: 'Servente com encargos complementares', unidade: 'h', coef: 0.52, preco: 20.8 },
+          { tipo: 'EQP', codigo: '95282', descricao: 'Desempenadeira de concreto', unidade: 'h', coef: 0.015, preco: 12.5 }
+        ]
+      }
+    ]
+  }
+];
+
+function orcamentoConfigPronta() {
+  return !!(ORCAMENTO_SUPABASE_CONFIG.url && ORCAMENTO_SUPABASE_CONFIG.anonKey);
+}
+
+function orcamentoAtualizarAcesso() {
+  const configurado = orcamentoConfigPronta();
+  const aviso = document.getElementById('orcamentoSetupAviso');
+  const demoBtn = document.getElementById('orcamentoDemoLocalBtn');
+  const loginBtn = document.getElementById('orcamentoLoginBtn');
+  const email = document.getElementById('orcamentoEmail');
+  const senha = document.getElementById('orcamentoSenha');
+  if (aviso) aviso.style.display = configurado ? 'none' : 'block';
+  if (demoBtn) demoBtn.style.display = (!configurado && ORCAMENTO_DEMO_LOCAL) ? 'block' : 'none';
+  if (loginBtn) loginBtn.disabled = !configurado;
+  if (email) email.disabled = !configurado;
+  if (senha) senha.disabled = !configurado;
+  const status = document.getElementById('orcamentoStatusBase');
+  if (status && !configurado) status.textContent = ORCAMENTO_DEMO_LOCAL ? 'Teste local' : 'Aguardando Supabase';
+}
+
+function orcamentoGetSupabase() {
+  if (!orcamentoConfigPronta()) return null;
+  if (!window.supabase || !window.supabase.createClient) {
+    throw new Error('Biblioteca Supabase não carregada.');
+  }
+  if (!orcamentoSupabase) {
+    orcamentoSupabase = window.supabase.createClient(
+      ORCAMENTO_SUPABASE_CONFIG.url,
+      ORCAMENTO_SUPABASE_CONFIG.anonKey
+    );
+  }
+  return orcamentoSupabase;
+}
+
+async function orcamentoBuscarTodos(tabela, colunas, prepararQuery) {
+  const supabaseClient = orcamentoGetSupabase();
+  const linhas = [];
+  let inicio = 0;
+
+  while (true) {
+    let query = supabaseClient.from(tabela).select(colunas);
+    if (typeof prepararQuery === 'function') query = prepararQuery(query);
+    const { data, error } = await query.range(inicio, inicio + ORCAMENTO_PAGINA_SUPABASE - 1);
+    if (error) throw error;
+
+    const lote = data || [];
+    linhas.push(...lote);
+    if (lote.length < ORCAMENTO_PAGINA_SUPABASE) break;
+    inicio += ORCAMENTO_PAGINA_SUPABASE;
+  }
+
+  return linhas;
+}
+
+async function orcamentoLogin() {
+  const erro = document.getElementById('orcamentoSenhaErro');
+  const btn = document.getElementById('orcamentoLoginBtn');
+  if (!orcamentoConfigPronta()) {
+    erro.textContent = 'Configure o Supabase antes de acessar.';
+    erro.style.display = 'block';
+    return;
+  }
+
+  const email = document.getElementById('orcamentoEmail').value.trim();
+  const senha = document.getElementById('orcamentoSenha').value;
+  if (!email || !senha) {
+    erro.textContent = 'Informe e-mail e senha.';
+    erro.style.display = 'block';
+    return;
+  }
+
+  try {
+    btn.disabled = true;
+    btn.textContent = 'Entrando...';
+    const supabaseClient = orcamentoGetSupabase();
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
+    if (error) throw error;
+    orcamentoUsuario = data.user || null;
+    orcamentoAutorizado = true;
+    orcamentoModoDemo = false;
+    erro.style.display = 'none';
+    await iniciarOrcamento();
+  } catch (err) {
+    erro.textContent = 'Não foi possível entrar. Confira e-mail e senha.';
+    erro.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
+}
+
+function orcamentoEntrarDemoLocal() {
+  if (!ORCAMENTO_DEMO_LOCAL) return;
+  orcamentoAutorizado = true;
+  orcamentoModoDemo = true;
+  orcamentoUsuario = { email: 'teste-local' };
+  iniciarOrcamento();
+}
+
+async function iniciarOrcamento() {
+  document.getElementById('orcamentoLock').style.display = 'none';
+  document.getElementById('orcamentoApp').style.display = 'block';
+  if (orcamentoModoDemo) {
+    ORCAMENTO_SERVICOS = ORCAMENTO_SERVICOS_DEMO;
+    document.getElementById('orcamentoStatusBase').textContent = 'Modo teste local';
+    orcamentoFiltrar();
+  } else {
+    await orcamentoCarregarDadosOnline();
+  }
+  orcamentoRenderItens();
+}
+
+async function orcamentoCarregarDadosOnline() {
+  const status = document.getElementById('orcamentoStatusBase');
+  const resultados = document.getElementById('orcamentoResultados');
+  if (status) status.textContent = 'Conectando Supabase...';
+  try {
+    const fontesDados = await orcamentoBuscarTodos('orc_fontes', 'id,nome,tipo', query => query.eq('ativo', true).order('nome'));
+    ORCAMENTO_FONTES = new Map(fontesDados.map(f => [f.id, f]));
+    ORCAMENTO_SERVICOS = [];
+    if (status) status.textContent = 'Supabase online · busca sob demanda';
+    if (resultados) resultados.innerHTML = '<div class="orcamento-empty">Digite para buscar serviços ou use os filtros.</div>';
+    await orcamentoBuscarServicosOnline();
+  } catch (err) {
+    ORCAMENTO_SERVICOS = [];
+    if (status) status.textContent = 'Erro Supabase';
+    if (resultados) resultados.innerHTML = `<div class="orcamento-empty">Erro ao carregar dados online: ${err.message}</div>`;
+  }
+}
+
+function orcamentoBuscaOnlineAtiva() {
+  return orcamentoAutorizado && !orcamentoModoDemo && orcamentoConfigPronta();
+}
+
+function orcamentoMapearComposicaoSupabase(comp) {
+  const fonte = ORCAMENTO_FONTES.get(comp.fonte_id) || { nome: 'Fonte não informada', tipo: 'OUTRA' };
+  const origemDetalhe = [
+    fonte.nome,
+    comp.projeto_origem,
+    comp.arquivo_origem,
+    comp.aba_origem,
+    comp.referencia_preco
+  ].filter(Boolean).join(' · ');
+  return {
+    id: comp.id,
+    codigo: comp.codigo,
+    fonte: fonte.tipo === 'PROPRIA' ? 'PROPRIA' : fonte.tipo,
+    fonteNome: fonte.nome,
+    uf: comp.uf,
+    mesBase: comp.competencia,
+    regime: comp.regime,
+    origem: comp.origem,
+    origemDetalhe,
+    descricao: comp.descricao,
+    unidade: comp.unidade,
+    custoUnitario: Number(comp.custo_unitario) || 0,
+    itens: [],
+    itensCarregados: false,
+    carregandoItens: false,
+    erroItens: ''
+  };
+}
+
+function orcamentoFonteIdsFiltro() {
+  const fonteFiltro = document.getElementById('orcamentoFonte')?.value || 'TODAS';
+  if (fonteFiltro === 'TODAS') return null;
+  return Array.from(ORCAMENTO_FONTES.entries())
+    .filter(([, fonte]) => fonte.tipo === fonteFiltro)
+    .map(([id]) => id);
+}
+
+function orcamentoPrepararQueryComposicoes(query, incluirBusca) {
+  const uf = document.getElementById('orcamentoUf')?.value || 'TODOS';
+  const fonteIds = orcamentoFonteIdsFiltro();
+  if (uf !== 'TODOS') query = query.eq('uf', uf);
+  if (fonteIds && fonteIds.length) query = query.in('fonte_id', fonteIds);
+  if (fonteIds && !fonteIds.length) query = query.eq('fonte_id', '__sem_fonte__');
+
+  if (incluirBusca) {
+    const termoOriginal = String(document.getElementById('orcamentoBusca')?.value || '').trim();
+    const termos = termoOriginal.split(/\s+/).filter(Boolean).slice(0, 4);
+    termos.forEach(termo => {
+      const seguro = termo.replace(/[%,()]/g, '').trim();
+      if (seguro) {
+        query = query.or(`codigo.ilike.%${seguro}%,descricao.ilike.%${seguro}%,referencia_preco.ilike.%${seguro}%`);
+      }
+    });
+  }
+  return query;
+}
+
+async function orcamentoBuscarServicosOnline() {
+  if (!orcamentoBuscaOnlineAtiva()) return;
+  const resultados = document.getElementById('orcamentoResultados');
+  const status = document.getElementById('orcamentoStatusBase');
+  const buscaSeq = ++orcamentoBuscaOnlineSeq;
+  if (resultados) resultados.innerHTML = '<div class="orcamento-empty">Buscando serviços...</div>';
+
+  try {
+    const supabaseClient = orcamentoGetSupabase();
+    let compQuery = supabaseClient
+      .from('orc_composicoes')
+      .select('id,servico_id,fonte_id,codigo,descricao,unidade,uf,competencia,regime,origem,custo_unitario,codigo_origem,projeto_origem,arquivo_origem,aba_origem,referencia_preco')
+      .eq('ativo', true)
+      .order('descricao')
+      .limit(ORCAMENTO_RESULTADOS_LIMITE);
+    compQuery = orcamentoPrepararQueryComposicoes(compQuery, true);
+
+    const { data: composicoesDados, error: compError } = await compQuery;
+    if (compError) throw compError;
+    if (buscaSeq !== orcamentoBuscaOnlineSeq) return;
+
+    const composicoes = composicoesDados || [];
+    const servicoIds = [...new Set(composicoes.map(comp => comp.servico_id).filter(Boolean))];
+    if (!servicoIds.length) {
+      ORCAMENTO_SERVICOS = [];
+      orcamentoServicoSelecionado = null;
+      orcamentoComposicaoSelecionada = null;
+      if (status) status.textContent = 'Supabase online · 0 serviços encontrados';
+      if (resultados) resultados.innerHTML = '<div class="orcamento-empty">Nenhum serviço encontrado.</div>';
+      orcamentoRenderDetalhe();
+      return;
+    }
+
+    const servicosDados = await orcamentoBuscarTodos(
+      'orc_servicos',
+      'id,codigo_interno,descricao,etapa,disciplina,unidade',
+      query => query.in('id', servicoIds).eq('ativo', true)
+    );
+    if (buscaSeq !== orcamentoBuscaOnlineSeq) return;
+
+    const servicosPorId = new Map(servicosDados.map(servico => [servico.id, servico]));
+    const agrupados = new Map();
+    composicoes.forEach(comp => {
+      const servicoDb = servicosPorId.get(comp.servico_id);
+      if (!servicoDb) return;
+      const id = servicoDb.codigo_interno || servicoDb.id;
+      if (!agrupados.has(id)) {
+        agrupados.set(id, {
+          id,
+          dbId: servicoDb.id,
+          nome: servicoDb.descricao,
+          etapa: servicoDb.etapa || 'Sem etapa',
+          disciplina: servicoDb.disciplina || '',
+          unidade: servicoDb.unidade || '',
+          composicoes: [],
+          composicoesCompletas: false
+        });
+      }
+      agrupados.get(id).composicoes.push(orcamentoMapearComposicaoSupabase(comp));
+    });
+
+    ORCAMENTO_SERVICOS = Array.from(agrupados.values());
+    if (orcamentoServicoSelecionado && !ORCAMENTO_SERVICOS.some(servico => servico.id === orcamentoServicoSelecionado.id)) {
+      orcamentoServicoSelecionado = null;
+      orcamentoComposicaoSelecionada = null;
+      orcamentoRenderDetalhe();
+    }
+    if (status) status.textContent = `Supabase online · ${ORCAMENTO_SERVICOS.length} serviços · ${composicoes.length} CPUs exibidas`;
+    orcamentoRenderResultados(ORCAMENTO_SERVICOS);
+  } catch (err) {
+    if (status) status.textContent = 'Erro Supabase';
+    if (resultados) resultados.innerHTML = `<div class="orcamento-empty">Erro na busca online: ${err.message}</div>`;
+  }
+}
+
+async function orcamentoCarregarComposicoesDoServicoOnline(servico) {
+  if (!orcamentoBuscaOnlineAtiva() || !servico?.dbId || servico.composicoesCompletas) return;
+  const comps = await orcamentoBuscarTodos(
+    'orc_composicoes',
+    'id,servico_id,fonte_id,codigo,descricao,unidade,uf,competencia,regime,origem,custo_unitario,codigo_origem,projeto_origem,arquivo_origem,aba_origem,referencia_preco',
+    query => orcamentoPrepararQueryComposicoes(query.eq('ativo', true).eq('servico_id', servico.dbId).order('competencia', { ascending: false }), false)
+  );
+  servico.composicoes = comps.map(orcamentoMapearComposicaoSupabase);
+  servico.composicoesCompletas = true;
+}
+
+async function orcamentoGarantirItensComposicao(comp) {
+  if (!comp || orcamentoModoDemo || comp.itensCarregados || comp.carregandoItens) return;
+  comp.carregandoItens = true;
+  comp.erroItens = '';
+
+  try {
+    const itens = await orcamentoBuscarTodos(
+      'orc_composicao_itens',
+      'id,composicao_id,tipo,codigo,descricao,unidade,coeficiente,preco_unitario,custo_parcial,ordem',
+      query => query.eq('composicao_id', comp.id).order('ordem')
+    );
+
+    comp.itens = itens.map(item => ({
+      tipo: item.tipo,
+      codigo: item.codigo,
+      descricao: item.descricao,
+      unidade: item.unidade,
+      coef: Number(item.coeficiente) || 0,
+      preco: Number(item.preco_unitario) || 0,
+      total: Number(item.custo_parcial) || 0
+    }));
+    comp.itensCarregados = true;
+  } catch (err) {
+    comp.erroItens = err.message || 'Erro ao carregar itens da CPU.';
+  } finally {
+    comp.carregandoItens = false;
+  }
+}
+
+function orcamentoNorm(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function orcamentoFmt(valor) {
+  return (Number(valor) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function orcamentoTotalComposicao(comp) {
+  if (!comp) return 0;
+  if (comp.custoUnitario !== undefined && comp.custoUnitario !== null) {
+    return Number(comp.custoUnitario) || 0;
+  }
+  return comp.itens.reduce((total, item) => {
+    const parcial = item.total !== undefined ? Number(item.total) : (Number(item.coef) || 0) * (Number(item.preco) || 0);
+    return total + (parcial || 0);
+  }, 0);
+}
+
+function orcamentoComposicoesVisiveis(servico) {
+  const uf = document.getElementById('orcamentoUf')?.value || 'TODOS';
+  const fonte = document.getElementById('orcamentoFonte')?.value || 'TODAS';
+  return (servico?.composicoes || []).filter(comp =>
+    (uf === 'TODOS' || comp.uf === uf) &&
+    (fonte === 'TODAS' || comp.fonte === fonte)
+  );
+}
+
+function orcamentoFiltrar() {
+  if (orcamentoBuscaOnlineAtiva()) {
+    clearTimeout(orcamentoBuscaOnlineTimer);
+    orcamentoBuscaOnlineTimer = setTimeout(() => {
+      orcamentoBuscarServicosOnline();
+    }, 250);
+    return;
+  }
+
+  const termo = orcamentoNorm(document.getElementById('orcamentoBusca').value);
+  const termos = termo.split(/\s+/).filter(Boolean);
+  const filtrados = ORCAMENTO_SERVICOS.filter(servico => {
+    const texto = orcamentoNorm(`${servico.id} ${servico.nome} ${servico.etapa}`);
+    const bateTexto = !termos.length || termos.every(t => texto.includes(t));
+    const comps = orcamentoComposicoesVisiveis(servico);
+    return bateTexto && comps.length;
+  });
+  orcamentoRenderResultados(filtrados);
+}
+
+function orcamentoRenderResultados(servicos) {
+  const el = document.getElementById('orcamentoResultados');
+  if (!servicos.length) {
+    el.innerHTML = '<div class="orcamento-empty">Nenhum serviço encontrado.</div>';
+    return;
+  }
+  el.innerHTML = servicos.map(servico => {
+    const comps = orcamentoComposicoesVisiveis(servico);
+    const menor = Math.min(...comps.map(orcamentoTotalComposicao));
+    const active = orcamentoServicoSelecionado && orcamentoServicoSelecionado.id === servico.id ? ' active' : '';
+    return `
+      <div class="orcamento-result${active}" onclick="orcamentoSelecionarServico('${servico.id}')">
+        <div class="orcamento-result-name">${servico.nome}</div>
+        <div class="orcamento-result-meta">
+          <span>${servico.id}</span>
+          <span>${servico.etapa}</span>
+          <span>${servico.unidade}</span>
+          <span>${comps.length} CPU${comps.length > 1 ? 's' : ''}</span>
+          <span>a partir de ${orcamentoFmt(menor)}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function orcamentoSelecionarServico(id) {
+  orcamentoServicoSelecionado = ORCAMENTO_SERVICOS.find(servico => servico.id === id);
+  if (orcamentoServicoSelecionado) {
+    await orcamentoCarregarComposicoesDoServicoOnline(orcamentoServicoSelecionado);
+  }
+  const comps = orcamentoServicoSelecionado ? orcamentoComposicoesVisiveis(orcamentoServicoSelecionado) : [];
+  orcamentoComposicaoSelecionada = comps[0] || (orcamentoServicoSelecionado ? orcamentoServicoSelecionado.composicoes[0] : null);
+  if (orcamentoBuscaOnlineAtiva()) {
+    orcamentoRenderResultados(ORCAMENTO_SERVICOS);
+  } else {
+    orcamentoFiltrar();
+  }
+  orcamentoRenderDetalhe();
+  if (orcamentoComposicaoSelecionada) {
+    await orcamentoGarantirItensComposicao(orcamentoComposicaoSelecionada);
+    orcamentoRenderDetalhe();
+  }
+}
+
+async function orcamentoSelecionarComposicao(id) {
+  if (!orcamentoServicoSelecionado) return;
+  orcamentoComposicaoSelecionada = orcamentoServicoSelecionado.composicoes.find(comp => comp.id === id);
+  orcamentoRenderDetalhe();
+  await orcamentoGarantirItensComposicao(orcamentoComposicaoSelecionada);
+  orcamentoRenderDetalhe();
+}
+
+function orcamentoRenderDetalhe() {
+  const el = document.getElementById('orcamentoDetalhe');
+  const count = document.getElementById('orcamentoComposicoesCount');
+  if (!orcamentoServicoSelecionado || !orcamentoComposicaoSelecionada) {
+    count.textContent = '0 opções';
+    el.innerHTML = '<div class="orcamento-empty">Selecione um serviço para consultar as composições disponíveis.</div>';
+    return;
+  }
+
+  const servico = orcamentoServicoSelecionado;
+  const comp = orcamentoComposicaoSelecionada;
+  const comps = orcamentoComposicoesVisiveis(servico);
+  const custoUnitario = orcamentoTotalComposicao(comp);
+  count.textContent = `${comps.length} ${comps.length === 1 ? 'opção' : 'opções'}`;
+
+  const options = comps.map(c => {
+    const regime = c.regime && c.regime !== 'NA' ? ` · ${c.regime.replace('_', ' ')}` : '';
+    const origem = c.origemDetalhe ? `<br>${c.origemDetalhe}` : '';
+    return `
+    <div class="orcamento-option${c.id === comp.id ? ' active' : ''}" onclick="orcamentoSelecionarComposicao('${c.id}')">
+      <div class="orcamento-option-top">
+        <span class="orcamento-option-code">${c.codigo}</span>
+        <span class="orcamento-option-price">${orcamentoFmt(orcamentoTotalComposicao(c))}</span>
+      </div>
+      <div class="orcamento-option-sub">${c.fonte} · ${c.uf} · ${c.mesBase}${regime}<br>${c.descricao}${origem}</div>
+    </div>
+  `;
+  }).join('');
+
+  const rows = comp.carregandoItens
+    ? '<tr><td colspan="7" class="orcamento-empty">Carregando itens da CPU...</td></tr>'
+    : comp.erroItens
+      ? `<tr><td colspan="7" class="orcamento-empty">Erro ao carregar itens: ${comp.erroItens}</td></tr>`
+      : !comp.itens.length
+        ? '<tr><td colspan="7" class="orcamento-empty">Nenhum item detalhado encontrado para esta CPU.</td></tr>'
+        : comp.itens.map(item => {
+    const parcial = item.total !== undefined ? Number(item.total) : (Number(item.coef) || 0) * (Number(item.preco) || 0);
+    return `
+      <tr>
+        <td><span class="orcamento-type ${item.tipo.toLowerCase()}">${item.tipo}</span></td>
+        <td class="td-cod">${item.codigo}</td>
+        <td>${item.descricao}</td>
+        <td class="td-cod">${item.unidade}</td>
+        <td class="num">${Number(item.coef).toLocaleString('pt-BR', { maximumFractionDigits: 4 })}</td>
+        <td class="num">${orcamentoFmt(item.preco)}</td>
+        <td class="num">${orcamentoFmt(parcial)}</td>
+      </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div>
+      <div class="orcamento-service-title">${servico.nome}</div>
+      <div class="orcamento-service-meta">
+        <span>${servico.id}</span>
+        <span>${servico.etapa}</span>
+        <span>Unidade: ${servico.unidade}</span>
+      </div>
+      <div class="orcamento-options">${options}</div>
+    </div>
+    <div class="orcamento-detail-grid" style="margin-top:16px;">
+      <div class="orcamento-table-wrap">
+        <table class="orcamento-table">
+          <thead>
+            <tr><th>Tipo</th><th>Código</th><th>Insumo / Composição</th><th>Un</th><th>Coef.</th><th>Preço</th><th>Total</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="orcamento-add-box">
+        <div class="summary-label">Custo unitário</div>
+        <div class="orcamento-add-total">${orcamentoFmt(custoUnitario)}</div>
+        <div class="field">
+          <label>Quantidade</label>
+          <input type="number" id="orcamentoQtd" min="0" step="0.01" value="1" oninput="orcamentoAtualizarResumoItem()">
+        </div>
+        <div class="field">
+          <label>BDI (%)</label>
+          <input type="number" id="orcamentoBdi" min="0" step="0.01" value="0" oninput="orcamentoAtualizarResumoItem()">
+        </div>
+        <div class="summary-label">Total do item</div>
+        <div class="orcamento-add-total" id="orcamentoPreviewTotal">${orcamentoFmt(custoUnitario)}</div>
+        <button class="btn btn-primary" onclick="orcamentoAdicionarItem()">Adicionar ao Orçamento</button>
+      </div>
+    </div>
+  `;
+  orcamentoAtualizarResumoItem();
+}
+
+function orcamentoAtualizarResumoItem() {
+  if (!orcamentoComposicaoSelecionada) return;
+  const qtd = Number(document.getElementById('orcamentoQtd')?.value || 0);
+  const bdi = Number(document.getElementById('orcamentoBdi')?.value || 0);
+  const custoUnitario = orcamentoTotalComposicao(orcamentoComposicaoSelecionada);
+  const total = custoUnitario * qtd * (1 + bdi / 100);
+  const el = document.getElementById('orcamentoPreviewTotal');
+  if (el) el.textContent = orcamentoFmt(total);
+}
+
+async function orcamentoAdicionarItem() {
+  if (!orcamentoServicoSelecionado || !orcamentoComposicaoSelecionada) return;
+  await orcamentoGarantirItensComposicao(orcamentoComposicaoSelecionada);
+  if (orcamentoComposicaoSelecionada.erroItens || !orcamentoComposicaoSelecionada.itens.length) {
+    alert('Não foi possível carregar os itens detalhados desta CPU.');
+    orcamentoRenderDetalhe();
+    return;
+  }
+  const qtd = Number(document.getElementById('orcamentoQtd').value || 0);
+  const bdi = Number(document.getElementById('orcamentoBdi').value || 0);
+  if (qtd <= 0) {
+    alert('Informe uma quantidade maior que zero.');
+    return;
+  }
+  const custoUnitario = orcamentoTotalComposicao(orcamentoComposicaoSelecionada);
+  const precoUnitario = custoUnitario * (1 + bdi / 100);
+  orcamentoItens.push({
+    uid: Date.now() + Math.floor(Math.random() * 1000),
+    servico: { ...orcamentoServicoSelecionado },
+    composicao: JSON.parse(JSON.stringify(orcamentoComposicaoSelecionada)),
+    quantidade: qtd,
+    bdi,
+    custoUnitario,
+    precoUnitario,
+    total: precoUnitario * qtd
+  });
+  orcamentoRenderItens();
+}
+
+function orcamentoRemoverItem(uid) {
+  orcamentoItens = orcamentoItens.filter(item => String(item.uid) !== String(uid));
+  orcamentoRenderItens();
+}
+
+function orcamentoRenderItens() {
+  const lista = document.getElementById('orcamentoItens');
+  const count = document.getElementById('orcamentoItensCount');
+  const totalEl = document.getElementById('orcamentoTotalGeral');
+  count.textContent = `${orcamentoItens.length} ${orcamentoItens.length === 1 ? 'item' : 'itens'}`;
+  const totalGeral = orcamentoItens.reduce((total, item) => total + item.total, 0);
+  totalEl.textContent = orcamentoFmt(totalGeral);
+
+  if (!orcamentoItens.length) {
+    lista.innerHTML = '<div class="orcamento-empty">Nenhum item adicionado ao orçamento.</div>';
+    document.getElementById('orcamentoAbcServicos').innerHTML = '<div class="orcamento-empty" style="padding:10px 0;">Sem itens.</div>';
+    document.getElementById('orcamentoAbcInsumos').innerHTML = '<div class="orcamento-empty" style="padding:10px 0;">Sem itens.</div>';
+    return;
+  }
+
+  lista.innerHTML = orcamentoItens.map(item => `
+    <div class="orcamento-budget-item">
+      <div>
+        <div class="orcamento-budget-name">${item.servico.nome}</div>
+        <div class="orcamento-budget-sub">${item.composicao.fonte} · ${item.composicao.uf} · ${item.composicao.mesBase} · ${item.quantidade.toLocaleString('pt-BR', { maximumFractionDigits: 2 })} ${item.servico.unidade} · BDI ${item.bdi}%</div>
+      </div>
+      <div class="orcamento-budget-value">${orcamentoFmt(item.total)}</div>
+      <button class="btn btn-sm btn-remove" onclick="orcamentoRemoverItem('${item.uid}')">✕</button>
+    </div>
+  `).join('');
+
+  orcamentoRenderAbc();
+}
+
+function orcamentoRenderAbc() {
+  const servicos = [...orcamentoItens]
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 5)
+    .map(item => ({ nome: item.servico.nome, valor: item.total }));
+
+  const insumosMap = {};
+  orcamentoItens.forEach(item => {
+    item.composicao.itens.forEach(insumo => {
+      const key = `${insumo.codigo}|${insumo.descricao}`;
+      const parcial = insumo.total !== undefined ? Number(insumo.total) : (Number(insumo.coef) || 0) * (Number(insumo.preco) || 0);
+      const valor = item.quantidade * (parcial || 0);
+      if (!insumosMap[key]) insumosMap[key] = { nome: insumo.descricao, valor: 0 };
+      insumosMap[key].valor += valor;
+    });
+  });
+  const insumos = Object.values(insumosMap).sort((a, b) => b.valor - a.valor).slice(0, 5);
+
+  document.getElementById('orcamentoAbcServicos').innerHTML = servicos.map(row => `
+    <div class="orcamento-abc-row">
+      <span class="orcamento-abc-name">${row.nome}</span>
+      <span class="orcamento-abc-value">${orcamentoFmt(row.valor)}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('orcamentoAbcInsumos').innerHTML = insumos.map(row => `
+    <div class="orcamento-abc-row">
+      <span class="orcamento-abc-name">${row.nome}</span>
+      <span class="orcamento-abc-value">${orcamentoFmt(row.valor)}</span>
+    </div>
+  `).join('');
+}
+
+async function orcamentoSalvarOnline() {
+  const status = document.getElementById('orcamentoSaveStatus');
+  if (!orcamentoItens.length) {
+    alert('Adicione ao menos um item ao orçamento.');
+    return;
+  }
+  if (orcamentoModoDemo || !orcamentoConfigPronta()) {
+    alert('O salvamento online estará disponível após configurar o Supabase.');
+    return;
+  }
+
+  const nome = (document.getElementById('orcamentoNome').value || '').trim() || 'Orçamento sem nome';
+  const totalCusto = orcamentoItens.reduce((total, item) => total + item.custoUnitario * item.quantidade, 0);
+  const totalPreco = orcamentoItens.reduce((total, item) => total + item.total, 0);
+
+  try {
+    status.style.display = 'block';
+    status.textContent = 'Salvando orçamento congelado...';
+    const supabaseClient = orcamentoGetSupabase();
+    const primeiroItem = orcamentoItens[0];
+    const { data: orcamento, error: orcamentoError } = await supabaseClient
+      .from('orc_orcamentos')
+      .insert({
+        nome,
+        obra: currentObra || null,
+        uf_principal: primeiroItem.composicao.uf || 'NA',
+        competencia_base: primeiroItem.composicao.mesBase || null,
+        status: 'congelado',
+        total_custo: totalCusto,
+        total_preco: totalPreco,
+        congelado_em: new Date().toISOString()
+      })
+      .select('id')
+      .single();
+
+    if (orcamentoError) throw orcamentoError;
+
+    for (const [idx, item] of orcamentoItens.entries()) {
+      const { data: itemSalvo, error: itemError } = await supabaseClient
+        .from('orc_orcamento_itens')
+        .insert({
+          orcamento_id: orcamento.id,
+          servico_id: item.servico.dbId || null,
+          composicao_id: item.composicao.id || null,
+          item_ordem: idx + 1,
+          etapa: item.servico.etapa,
+          servico_descricao: item.servico.nome,
+          unidade: item.servico.unidade,
+          quantidade: item.quantidade,
+          composicao_codigo: item.composicao.codigo,
+          fonte_nome: item.composicao.fonteNome || item.composicao.fonte,
+          uf: item.composicao.uf,
+          competencia: item.composicao.mesBase,
+          custo_unitario: item.custoUnitario,
+          bdi_percentual: item.bdi,
+          preco_unitario: item.precoUnitario,
+          total_custo: item.custoUnitario * item.quantidade,
+          total_preco: item.total,
+          snapshot_composicao: item.composicao
+        })
+        .select('id')
+        .single();
+
+      if (itemError) throw itemError;
+
+      const insumosPayload = item.composicao.itens.map(insumo => {
+        const quantidadeTotal = item.quantidade * (Number(insumo.coef) || 0);
+        const parcial = insumo.total !== undefined ? Number(insumo.total) : (Number(insumo.coef) || 0) * (Number(insumo.preco) || 0);
+        const custoTotal = item.quantidade * (parcial || 0);
+        return {
+          orcamento_item_id: itemSalvo.id,
+          tipo: insumo.tipo,
+          codigo: insumo.codigo,
+          descricao: insumo.descricao,
+          unidade: insumo.unidade,
+          coeficiente: insumo.coef,
+          preco_unitario: insumo.preco,
+          quantidade_total: quantidadeTotal,
+          custo_total: custoTotal
+        };
+      });
+
+      if (insumosPayload.length) {
+        const { error: insumosError } = await supabaseClient
+          .from('orc_orcamento_item_insumos')
+          .insert(insumosPayload);
+        if (insumosError) throw insumosError;
+      }
+    }
+
+    status.textContent = `Orçamento salvo e congelado: ${nome}.`;
+  } catch (err) {
+    status.textContent = `Erro ao salvar: ${err.message}`;
+  }
+}
+
+function orcamentoExportarCSV(tipo) {
+  if (!orcamentoItens.length) {
+    alert('Adicione ao menos um item ao orçamento.');
+    return;
+  }
+  let linhas = [];
+  let nome = 'orcamento';
+
+  if (tipo === 'cpus') {
+    nome = 'cpus-orcamento';
+    linhas = [['servico', 'composicao', 'fonte', 'uf', 'mes_base', 'tipo', 'codigo', 'descricao', 'unidade', 'coeficiente', 'preco_unitario', 'custo_parcial']];
+    orcamentoItens.forEach(item => {
+      item.composicao.itens.forEach(insumo => {
+        const parcial = insumo.total !== undefined ? Number(insumo.total) : (Number(insumo.coef) || 0) * (Number(insumo.preco) || 0);
+        linhas.push([
+          item.servico.nome, item.composicao.codigo, item.composicao.fonte, item.composicao.uf, item.composicao.mesBase,
+          insumo.tipo, insumo.codigo, insumo.descricao, insumo.unidade, insumo.coef, insumo.preco, parcial
+        ]);
+      });
+    });
+  } else if (tipo === 'abc') {
+    nome = 'curva-abc-orcamento';
+    linhas = [['tipo', 'descricao', 'valor']];
+    orcamentoItens.forEach(item => linhas.push(['servico', item.servico.nome, item.total]));
+    const insumosMap = {};
+    orcamentoItens.forEach(item => {
+      item.composicao.itens.forEach(insumo => {
+        const key = `${insumo.codigo}|${insumo.descricao}`;
+        if (!insumosMap[key]) insumosMap[key] = { descricao: insumo.descricao, valor: 0 };
+        const parcial = insumo.total !== undefined ? Number(insumo.total) : (Number(insumo.coef) || 0) * (Number(insumo.preco) || 0);
+        insumosMap[key].valor += item.quantidade * (parcial || 0);
+      });
+    });
+    Object.values(insumosMap).forEach(row => linhas.push(['insumo', row.descricao, row.valor]));
+  } else {
+    nome = 'planilha-orcamentaria';
+    linhas = [['servico', 'etapa', 'unidade', 'quantidade', 'composicao', 'fonte', 'uf', 'mes_base', 'custo_unitario', 'bdi_percentual', 'preco_unitario', 'total']];
+    orcamentoItens.forEach(item => linhas.push([
+      item.servico.nome, item.servico.etapa, item.servico.unidade, item.quantidade, item.composicao.codigo,
+      item.composicao.fonte, item.composicao.uf, item.composicao.mesBase, item.custoUnitario, item.bdi, item.precoUnitario, item.total
+    ]));
+  }
+
+  const csv = linhas.map(linha => linha.map(orcamentoCsvCell).join(';')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${nome}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function orcamentoCsvCell(valor) {
+  const texto = String(valor ?? '').replace(/"/g, '""');
+  return `"${texto}"`;
 }
 
 // ─── MÓDULO METAS: INTEGRAÇÃO COM SHEETS ──────────────────────────────────────
@@ -1357,6 +2424,7 @@ function prepararServicosMetasDashboard(data) {
       diasUteisSemana: s.dias_uteis_semana || diasUteisObservacaoMeta(s.observacao_parametro),
       prioridade: prioridadeServicoMeta(s, parametrosMap),
       fatorPrioridade: fatorPrioridadeServicoMeta(s, parametrosMap),
+      indicePrioridade: fatorPrioridadeServicoMeta(s, parametrosMap),
       fatorMaximo: fatorMaximoServicoMeta(s, parametrosMap),
       previsto: s.previsto
     };
@@ -1383,6 +2451,13 @@ function abrirAbaMetas(aba) {
 function numeroCurto(v) {
   const n = Number(v) || 0;
   return n.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+}
+
+function numeroIndice(v) {
+  const n = Number(v);
+  if (n === Infinity) return '∞';
+  if (!Number.isFinite(n)) return '-';
+  return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function fatorPrioridadeMeta(prioridade) {
@@ -1504,7 +2579,7 @@ function prioridadeServicoMeta(servico, parametrosMap) {
 function fatorPrioridadeServicoMeta(servico, parametrosMap) {
   const prioridade = prioridadeServicoMeta(servico, parametrosMap);
   const param = parametroServicoMeta(servico, parametrosMap || {});
-  return Number(param.fator_prioridade) || Number(servico.fator_prioridade) || fatorPrioridadeMeta(prioridade);
+  return Number(param.indice_prioridade) || Number(param.fator_prioridade) || Number(servico.indicePrioridade) || Number(servico.indice_prioridade) || Number(servico.fator_prioridade) || fatorPrioridadeMeta(prioridade);
 }
 
 function fatorMaximoServicoMeta(servico, parametrosMap) {
@@ -1530,34 +2605,45 @@ function semanaAtualMetas() {
   return Math.min(5, Math.max(1, Math.ceil(dia / 7)));
 }
 
-function statusServicoMeta(item) {
-  if (!item.temMetaMes) {
-    return { chave: 'ok', icone: '✓', label: 'No prazo' };
-  }
+function calcularIndicePressaoMeta(item) {
+  if (!item || !item.temMetaMes) return 0;
+
   const semanasDisponiveis = item.semanasDisponiveis || semanasDisponiveisMetas();
   const diasSemana = normalizarDiasUteisSemanaMeta(item.diasUteisSemana);
-  const semanasComMeta = semanasDisponiveis.filter(semana => (item.previstoOriginal[semana - 1] || 0) > 0);
+  const previstoOriginal = item.previstoOriginal || item.previsto || [0,0,0,0,0];
+  const semanasComMeta = semanasDisponiveis.filter(semana => (previstoOriginal[semana - 1] || 0) > 0);
   const semanasRestantes = semanasDisponiveis.filter(semana => semana > item.corte);
-  const realizadoAteCorte = item.realizados.slice(0, item.corte).reduce((acc, v, idx) => {
-    return acc + (item.realizadosLancados[idx] ? v : (item.previstoOriginal[idx] || 0));
+  const realizadoAteCorte = (item.realizados || []).slice(0, item.corte).reduce((acc, v, idx) => {
+    return acc + ((item.realizadosLancados || [])[idx] ? (Number(v) || 0) : (Number(previstoOriginal[idx]) || 0));
   }, 0);
-  const saldo = Math.max(0, item.totalPlanejadoMes - realizadoAteCorte);
+  const totalPlanejadoMes = Number(item.totalPlanejadoMes) || previstoOriginal.reduce((acc, v) => acc + (Number(v) || 0), 0);
+  const saldo = Math.max(0, totalPlanejadoMes - realizadoAteCorte);
 
-  if (saldo <= 0) {
-    return { chave: 'ok', icone: '✓', label: 'No prazo' };
-  }
-  if (!semanasRestantes.length) {
-    return { chave: 'fail', icone: '!', label: 'Não será cumprido' };
-  }
+  if (saldo <= 0) return 0;
+  if (!semanasRestantes.length) return Infinity;
 
   const basePlanejada = semanasComMeta.length ? semanasComMeta : semanasDisponiveis;
   const diasPlanejados = basePlanejada.reduce((acc, semana) => acc + (diasSemana[semana - 1] > 0 ? diasSemana[semana - 1] : 5), 0) || 1;
   const diasRestantes = semanasRestantes.reduce((acc, semana) => acc + (diasSemana[semana - 1] > 0 ? diasSemana[semana - 1] : 5), 0) || 1;
   const produtividadePlanejada = Number(item.prodDiaria) > 0
     ? Number(item.prodDiaria)
-    : item.totalPlanejadoMes / diasPlanejados;
+    : totalPlanejadoMes / diasPlanejados;
   const produtividadeReprogramada = saldo / diasRestantes;
-  const pressao = produtividadePlanejada > 0 ? produtividadeReprogramada / produtividadePlanejada : 0;
+  return produtividadePlanejada > 0 ? produtividadeReprogramada / produtividadePlanejada : 0;
+}
+
+function statusServicoMeta(item) {
+  if (!item.temMetaMes) {
+    return { chave: 'ok', icone: '✓', label: 'No prazo' };
+  }
+  const pressao = Number.isFinite(item.indicePressao) ? item.indicePressao : calcularIndicePressaoMeta(item);
+
+  if (pressao <= 0) {
+    return { chave: 'ok', icone: '✓', label: 'No prazo' };
+  }
+  if (!Number.isFinite(pressao)) {
+    return { chave: 'fail', icone: '!', label: 'Não será cumprido' };
+  }
 
   if (pressao >= 1.2) {
     return { chave: 'fail', icone: '!', label: 'Não será cumprido' };
@@ -1687,6 +2773,16 @@ function calcularReprogramacaoMetas() {
     });
     const previstoDashboard = temRealizadoParaReprogramar ? reprogramado : previstoOriginal;
     const mudou = temRealizadoParaReprogramar && reprogramado.some((v, i) => Math.abs(v - previstoOriginal[i]) > 0.0001);
+    const baseCalculada = {
+      ...servico,
+      previstoOriginal,
+      realizadosLancados,
+      realizados,
+      semanasDisponiveis,
+      corte,
+      totalPlanejadoMes,
+      temMetaMes: totalPlanejadoMes > 0
+    };
 
     return {
       ...servico,
@@ -1702,6 +2798,8 @@ function calcularReprogramacaoMetas() {
       corte,
       totalPlanejadoMes,
       temMetaMes: totalPlanejadoMes > 0,
+      indicePrioridade: Number(servico.indicePrioridade) || Number(servico.fatorPrioridade) || fatorPrioridadeMeta(servico.prioridade),
+      indicePressao: calcularIndicePressaoMeta(baseCalculada),
       mudou,
       frenteSemanas: previstoDashboard.map(v => v > 0)
     };
@@ -1719,6 +2817,7 @@ function filtrarDashboardMetas(itens) {
 function ordenarMetasDashboard(a, b) {
   if (a.temMetaMes !== b.temMetaMes) return a.temMetaMes ? -1 : 1;
   return pesoPrioridadeMeta(a.prioridade) - pesoPrioridadeMeta(b.prioridade)
+    || ((Number.isFinite(b.indicePressao) ? b.indicePressao : 999) - (Number.isFinite(a.indicePressao) ? a.indicePressao : 999))
     || String(a.nome).localeCompare(String(b.nome), 'pt-BR');
 }
 
@@ -1802,7 +2901,8 @@ function atualizarDashboardMetas() {
   const semanaCorrenteDash = Math.min(semanaAtualMetas(), ultimaSemanaDash);
   const heatItens = filtrados
     .slice()
-    .sort(ordenarMetasDashboard);
+    .sort(ordenarMetasDashboard)
+    .slice(0, 10);
   document.getElementById('metasDashHeatCount').textContent = `${heatItens.length} de ${filtrados.length} serviços`;
   document.getElementById('metasDashHeatmap').innerHTML = [
     semanasDash.map(s => `S${s}`).reduce((html, label, idx) => {
@@ -2047,7 +3147,7 @@ function atualizarDashboardAdminMetas() {
     `).join('') || '<div class="metodologia-text">Sem frentes no filtro atual.</div>';
 
     const semanaCorrenteDash = adminDashboardSemanaAtual === 6 ? 0 : Math.min(semanaAtualMetas(), ultimaSemanaDash);
-    const heatItens = filtrados.slice().sort(ordenarMetasDashboard);
+    const heatItens = filtrados.slice().sort(ordenarMetasDashboard).slice(0, 10);
     document.getElementById('adminDashHeatCount').textContent = `${heatItens.length} de ${filtrados.length} serviços`;
     document.getElementById('adminDashHeatmap').innerHTML = [
       semanasDash.map(s => `S${s}`).reduce((html, label, idx) => {
@@ -2280,12 +3380,11 @@ function parseXlsxAdmin(buffer, obraAdmin, fileName) {
   const parametrosReprogramacao = (parametrosOriginais.length ? parametrosOriginais : itens.map(item => ({
     servico_nome: item.servico_nome,
     classificacao: item.macroitem || item.classificacao,
-    macroitem: item.macroitem,
     unidade: item.unidade,
     prioridade: item.prioridade || 'Normal',
     fator_prioridade: item.fator_prioridade || fatorPrioridadeMeta(item.prioridade),
     indice_prioridade: item.indice_prioridade || item.fator_prioridade || fatorPrioridadeMeta(item.prioridade),
-    fator_maximo: 1.2,
+    fator_maximo: item.fator_maximo || 1.2,
     observacao: ''
   }))).map(param => anexarDiasUteisObservacaoMeta(param, diasUteisSemanaPlanilha));
 
@@ -2485,7 +3584,9 @@ function lerParametrosReprogramacao(wb, toNum) {
     const row = rows[i];
     const servico = String(row[2] || '').trim();
     const prioridade = String(row[5] || '').trim();
+    if (servico.startsWith('=') || prioridade.startsWith('=')) continue;
     if (!servico || !prioridade) continue;
+    const fatorPrioridade = toNum(row[6]);
 
     parametros.push({
       periodo: String(row[0] || '').trim(),
@@ -2494,7 +3595,8 @@ function lerParametrosReprogramacao(wb, toNum) {
       classificacao: String(row[3] || '').trim(),
       unidade: String(row[4] || '').trim(),
       prioridade,
-      fator_prioridade: toNum(row[6]),
+      fator_prioridade: fatorPrioridade > 0 && fatorPrioridade <= 5 ? fatorPrioridade : fatorPrioridadeMeta(prioridade),
+      indice_prioridade: fatorPrioridade > 0 && fatorPrioridade <= 5 ? fatorPrioridade : fatorPrioridadeMeta(prioridade),
       fator_maximo: toNum(row[7]) || 1.2,
       observacao: String(row[8] || '').trim()
     });
