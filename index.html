@@ -2619,8 +2619,21 @@ function baixarPlanilhaMetas() {
 
 function gerarXlsxMetasPreenchido(data, obra, periodo, semanaLimite, done) {
   const status = document.getElementById('downloadMetasStatus');
-  const realizadoCols = [16, 20, 24, 28, 32]; // colunas REALIZADO das semanas 1 a 5
   const realizadosPorServicoSemana = {};
+
+  function detectarColunasRealizadoMetas(worksheet) {
+    const maxLinhasCabecalho = Math.min(12, worksheet.rowCount || 12);
+    for (let rowNumber = 1; rowNumber <= maxLinhasCabecalho; rowNumber++) {
+      const cols = [];
+      const row = worksheet.getRow(rowNumber);
+      row.eachCell(function(cell, colNumber) {
+        const texto = normalizarNomeServico(textoCelulaExcel(cell.value));
+        if (texto === 'realizado') cols.push(colNumber);
+      });
+      if (cols.length >= 5) return cols.slice(0, 5);
+    }
+    return [];
+  }
 
   (data.realizados || []).forEach(function(item) {
     const semana = parseInt(item.semana, 10);
@@ -2635,6 +2648,10 @@ function gerarXlsxMetasPreenchido(data, obra, periodo, semanaLimite, done) {
     workbook.xlsx.load(bytes.buffer).then(function() {
       const worksheet = workbook.worksheets.find(ws => ws.name.toLowerCase().includes('meta')) || workbook.worksheets[0];
       if (!worksheet) throw new Error('Nenhuma aba encontrada na planilha original.');
+      const realizadoCols = detectarColunasRealizadoMetas(worksheet);
+      if (realizadoCols.length < semanaLimite) {
+        throw new Error('Nao encontrei as colunas REALIZADO na planilha original.');
+      }
 
       let preenchidos = 0;
       worksheet.eachRow(function(row) {
