@@ -136,12 +136,14 @@ body.orcamento-wide main { max-width: 1280px; }
 .orcamento-option-code { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text2); font-weight: 700; }
 .orcamento-option-price { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--green); font-weight: 800; white-space: nowrap; }
 .orcamento-option-sub { font-size: 0.72rem; color: var(--text3); line-height: 1.45; }
+.orcamento-option-origin { color: var(--text2); font-weight: 700; }
 .orcamento-detail-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) 260px; gap: 14px; align-items: start; margin-top: 16px; }
 .orcamento-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
 .orcamento-table { width: 100%; min-width: 660px; border-collapse: collapse; font-size: 0.76rem; }
 .orcamento-table th, .orcamento-table td { padding: 9px 10px; border-bottom: 1px solid #edf2f8; text-align: left; vertical-align: top; }
 .orcamento-table th { background: #F8FAFE; color: var(--text2); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .orcamento-table td.num { text-align: right; font-family: 'IBM Plex Mono', monospace; color: var(--text2); white-space: nowrap; }
+.orcamento-table td.orcamento-ref { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .orcamento-type { display: inline-flex; min-width: 22px; justify-content: center; border-radius: 6px; padding: 2px 6px; font-size: 0.64rem; font-weight: 800; color: var(--text2); background: var(--surface2); }
 .orcamento-type.mat, .orcamento-type.insumo { color: var(--blue); background: var(--blue-bg); }
 .orcamento-type.mo { color: var(--green); background: var(--green-bg); }
@@ -1259,6 +1261,7 @@ let orcamentoServicoSelecionado = null;
 let orcamentoComposicaoSelecionada = null;
 let orcamentoItens = [];
 let orcamentoBuscaTimer = null;
+let orcamentoFontesMap = {};
 
 // ─── CALENDÁRIO ───────────────────────────────────────────────────────────────
 const monthsFull = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -1457,6 +1460,28 @@ function orcamentoPgLike(valor) {
   return String(valor || '').trim().replace(/[(),*]/g, ' ').replace(/\s+/g, ' ');
 }
 
+async function orcamentoCarregarFontes(ids) {
+  const faltantes = [...new Set((ids || []).filter(Boolean).filter(id => !orcamentoFontesMap[id]))];
+  if (!faltantes.length) return;
+  try {
+    const rows = await orcamentoRest('orc_fontes', {
+      select: 'id,nome,tipo',
+      id: `in.(${faltantes.join(',')})`
+    });
+    (rows || []).forEach(row => {
+      orcamentoFontesMap[row.id] = row;
+    });
+  } catch (err) {
+    console.warn('Nao foi possivel carregar fontes do Orcamento.', err);
+  }
+}
+
+function orcamentoFonteFallback(row) {
+  if (row && (row.origem === 'propria' || row.origem === 'adaptada')) return 'CPU Própria';
+  if (row && (row.origem === 'oficial' || row.origem === 'sinapi')) return 'SINAPI';
+  return (row && row.origem) || 'Fonte';
+}
+
 async function orcamentoBuscarServicosOnline() {
   const lista = document.getElementById('orcamentoResultados');
   if (lista) lista.innerHTML = '<div class="orcamento-empty">Carregando serviços...</div>';
@@ -1503,7 +1528,7 @@ async function orcamentoCarregarComposicoesDoServico(servico, forcar) {
   if (!servico || (servico.composicoesCarregadas && !forcar)) return;
   const uf = document.getElementById('orcamentoUf')?.value || 'TODOS';
   const params = {
-    select: 'id,servico_id,codigo,descricao,unidade,uf,competencia,regime,origem,custo_unitario,referencia_preco,codigo_origem',
+    select: 'id,servico_id,fonte_id,codigo,descricao,unidade,uf,competencia,regime,origem,custo_unitario,referencia_preco,codigo_origem,projeto_origem,arquivo_origem,aba_origem,linha_origem,item_ref,formato_origem',
     servico_id: `eq.${servico.dbId}`,
     ativo: 'eq.true',
     order: 'custo_unitario.asc',
@@ -1511,23 +1536,35 @@ async function orcamentoCarregarComposicoesDoServico(servico, forcar) {
   };
   if (uf !== 'TODOS') params.uf = `eq.${uf}`;
   const rows = await orcamentoRest('orc_composicoes', params);
-  servico.composicoes = (rows || []).map(row => ({
-    id: row.id,
-    codigo: row.codigo || row.codigo_origem || '',
-    descricao: row.descricao || servico.nome,
-    unidade: row.unidade || servico.unidade || 'NA',
-    uf: row.uf || '',
-    fonte: 'SINAPI',
-    mesBase: row.competencia || '',
-    regime: row.regime || '',
-    origem: row.origem || '',
-    referenciaPreco: row.referencia_preco || '',
-    custoUnitario: Number(row.custo_unitario) || 0,
-    itens: [],
-    itensCarregados: false,
-    carregandoItens: false,
-    erroItens: ''
-  }));
+  await orcamentoCarregarFontes((rows || []).map(row => row.fonte_id));
+  servico.composicoes = (rows || []).map(row => {
+    const fonte = row.fonte_id ? orcamentoFontesMap[row.fonte_id] : null;
+    return {
+      id: row.id,
+      codigo: row.codigo || row.codigo_origem || '',
+      codigoOrigem: row.codigo_origem || '',
+      descricao: row.descricao || servico.nome,
+      unidade: row.unidade || servico.unidade || 'NA',
+      uf: row.uf || '',
+      fonte: (fonte && fonte.nome) || orcamentoFonteFallback(row),
+      fonteTipo: (fonte && fonte.tipo) || '',
+      mesBase: row.competencia || '',
+      regime: row.regime || '',
+      origem: row.origem || '',
+      referenciaPreco: row.referencia_preco || '',
+      projetoOrigem: row.projeto_origem || '',
+      arquivoOrigem: row.arquivo_origem || '',
+      abaOrigem: row.aba_origem || '',
+      linhaOrigem: row.linha_origem || '',
+      itemRef: row.item_ref || '',
+      formatoOrigem: row.formato_origem || '',
+      custoUnitario: Number(row.custo_unitario) || 0,
+      itens: [],
+      itensCarregados: false,
+      carregandoItens: false,
+      erroItens: ''
+    };
+  });
   servico.composicoesCarregadas = true;
 }
 
@@ -1537,7 +1574,7 @@ async function orcamentoGarantirItensComposicao(comp) {
     comp.carregandoItens = true;
     comp.erroItens = '';
     const rows = await orcamentoRest('orc_composicao_itens', {
-      select: 'id,composicao_id,tipo,codigo,descricao,unidade,coeficiente,preco_unitario,custo_parcial,ordem',
+      select: 'id,composicao_id,tipo,codigo,codigo_origem,descricao,unidade,coeficiente,preco_unitario,custo_parcial,ordem,arquivo_origem,aba_origem,linha_origem',
       composicao_id: `eq.${comp.id}`,
       order: 'ordem.asc',
       limit: '500'
@@ -1545,11 +1582,16 @@ async function orcamentoGarantirItensComposicao(comp) {
     comp.itens = (rows || []).map(row => ({
       tipo: row.tipo || 'INS',
       codigo: row.codigo || '',
+      codigoOrigem: row.codigo_origem || '',
       descricao: row.descricao || '',
       unidade: row.unidade || '',
       coef: Number(row.coeficiente) || 0,
       preco: Number(row.preco_unitario) || 0,
-      total: Number(row.custo_parcial) || 0
+      total: Number(row.custo_parcial) || 0,
+      ordem: row.ordem || '',
+      arquivoOrigem: row.arquivo_origem || '',
+      abaOrigem: row.aba_origem || '',
+      linhaOrigem: row.linha_origem || ''
     }));
     comp.itensCarregados = true;
   } catch (err) {
@@ -1626,15 +1668,21 @@ function orcamentoRenderDetalhe() {
     return;
   }
 
-  const options = comps.map(c => `
-    <div class="orcamento-option${String(c.id) === String(comp.id) ? ' active' : ''}" onclick='orcamentoSelecionarComposicao(${JSON.stringify(c.id)})'>
-      <div class="orcamento-option-top">
-        <span class="orcamento-option-code">${orcamentoHtml(c.codigo)}</span>
-        <span class="orcamento-option-price">${orcamentoFmt(orcamentoTotalComposicao(c))}</span>
-      </div>
-      <div class="orcamento-option-sub">${orcamentoHtml(c.fonte)} · ${orcamentoHtml(c.uf)} · ${orcamentoHtml(c.mesBase)}<br>${orcamentoHtml(c.descricao)}</div>
-    </div>
-  `).join('');
+  const options = comps.map(c => {
+    const resumo = orcamentoResumoComposicao(c);
+    return `
+      <div class="orcamento-option${String(c.id) === String(comp.id) ? ' active' : ''}" onclick='orcamentoSelecionarComposicao(${JSON.stringify(c.id)})'>
+        <div class="orcamento-option-top">
+          <span class="orcamento-option-code">${orcamentoHtml(resumo.codigo)}</span>
+          <span class="orcamento-option-price">${orcamentoFmt(orcamentoTotalComposicao(c))}</span>
+        </div>
+        <div class="orcamento-option-sub">
+          <span class="orcamento-option-origin">${orcamentoHtml(resumo.origem)}</span>
+          ${resumo.detalhe ? `<br>${orcamentoHtml(resumo.detalhe)}` : ''}
+          <br>${orcamentoHtml(c.descricao)}
+        </div>
+      </div>`;
+  }).join('');
 
   const linhas = comp.carregandoItens
     ? '<tr><td colspan="7" class="orcamento-empty">Carregando itens da CPU...</td></tr>'
@@ -1645,9 +1693,11 @@ function orcamentoRenderDetalhe() {
         : comp.itens.map(item => {
           const parcial = item.total !== undefined ? Number(item.total) : (Number(item.coef) || 0) * (Number(item.preco) || 0);
           const tipoClass = orcamentoTipoClasse(item.tipo);
+          const codigoItem = orcamentoCodigoItem(item);
+          const codigoCompleto = item.codigo || item.codigoOrigem || item.arquivoOrigem || '';
           return `<tr>
             <td><span class="orcamento-type ${tipoClass}">${orcamentoHtml(item.tipo)}</span></td>
-            <td class="td-cod">${orcamentoHtml(item.codigo)}</td>
+            <td class="td-cod orcamento-ref" title="${orcamentoHtml(codigoCompleto)}">${orcamentoHtml(codigoItem)}</td>
             <td>${orcamentoHtml(item.descricao)}</td>
             <td>${orcamentoHtml(item.unidade)}</td>
             <td class="num">${orcamentoNumero(item.coef)}</td>
@@ -1670,7 +1720,7 @@ function orcamentoRenderDetalhe() {
       <div class="orcamento-table-wrap">
         <table class="orcamento-table">
           <thead>
-            <tr><th>Tipo</th><th>Código</th><th>Insumo / Composição</th><th>Un</th><th>Coef.</th><th>Preço</th><th>Total</th></tr>
+            <tr><th>Tipo</th><th>Ref.</th><th>Insumo / Composição</th><th>Un</th><th>Coef.</th><th>Preço</th><th>Total</th></tr>
           </thead>
           <tbody>${linhas}</tbody>
         </table>
@@ -1753,16 +1803,18 @@ function orcamentoRenderItens() {
     return;
   }
 
-  lista.innerHTML = orcamentoItens.map(item => `
-    <div class="orcamento-budget-item">
-      <div>
-        <div class="orcamento-budget-name">${orcamentoHtml(item.servico.nome)}</div>
-        <div class="orcamento-budget-sub">${orcamentoHtml(item.composicao.fonte)} · ${orcamentoHtml(item.composicao.uf)} · ${orcamentoHtml(item.composicao.mesBase)} · ${orcamentoNumero(item.quantidade)} ${orcamentoHtml(item.servico.unidade)} · BDI ${orcamentoNumero(item.bdi)}%</div>
-      </div>
-      <div class="orcamento-budget-value">${orcamentoFmt(item.total)}</div>
-      <button class="btn btn-sm btn-remove" onclick='orcamentoRemoverItem(${JSON.stringify(item.uid)})'>✕</button>
-    </div>
-  `).join('');
+  lista.innerHTML = orcamentoItens.map(item => {
+    const resumo = orcamentoResumoComposicao(item.composicao);
+    return `
+      <div class="orcamento-budget-item">
+        <div>
+          <div class="orcamento-budget-name">${orcamentoHtml(item.servico.nome)}</div>
+          <div class="orcamento-budget-sub">${orcamentoHtml(resumo.origem)} · ${orcamentoNumero(item.quantidade)} ${orcamentoHtml(item.servico.unidade)} · BDI ${orcamentoNumero(item.bdi)}%</div>
+        </div>
+        <div class="orcamento-budget-value">${orcamentoFmt(item.total)}</div>
+        <button class="btn btn-sm btn-remove" onclick='orcamentoRemoverItem(${JSON.stringify(item.uid)})'>✕</button>
+      </div>`;
+  }).join('');
   orcamentoRenderAbc();
 }
 
@@ -1951,6 +2003,53 @@ function orcamentoHtml(valor) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function orcamentoArquivoCurto(valor) {
+  const nome = String(valor || '').trim();
+  if (!nome) return '';
+  if (/^CPU_PROPRIA/i.test(nome)) return 'CPU própria';
+  return nome.replace(/^\([^)]+\)\s*/, '');
+}
+
+function orcamentoResumoComposicao(comp) {
+  const codigoBase = comp.codigo || comp.codigoOrigem || 'CPU';
+  const codigo = comp.linhaOrigem && (comp.origem === 'propria' || comp.origem === 'adaptada')
+    ? `${codigoBase} · Linha ${comp.linhaOrigem}`
+    : codigoBase;
+  const origem = [comp.fonte || 'Fonte'];
+  if (comp.projetoOrigem) origem.push(comp.projetoOrigem);
+  else if (comp.uf && comp.uf !== 'NA') origem.push(comp.uf);
+  if (comp.formatoOrigem) origem.push(comp.formatoOrigem);
+  if (comp.itemRef) origem.push(`Ref. ${comp.itemRef}`);
+
+  const detalhe = [];
+  const arquivo = orcamentoArquivoCurto(comp.arquivoOrigem || comp.referenciaPreco);
+  if (arquivo) detalhe.push(arquivo);
+  if (comp.abaOrigem) detalhe.push(comp.abaOrigem);
+  if (comp.linhaOrigem) detalhe.push(`Linha ${comp.linhaOrigem}`);
+  if (!detalhe.length && comp.mesBase) detalhe.push(comp.mesBase);
+
+  return {
+    codigo,
+    origem: origem.filter(Boolean).join(' · '),
+    detalhe: detalhe.filter(Boolean).join(' · ')
+  };
+}
+
+function orcamentoCodigoTecnico(valor) {
+  const codigo = String(valor || '').trim();
+  return codigo.length > 24 || /xlsx|orcamento|orc-|cpu-|planilha/i.test(codigo);
+}
+
+function orcamentoCodigoItem(item) {
+  const codigo = String((item && item.codigo) || '').trim();
+  const codigoOrigem = String((item && item.codigoOrigem) || '').trim();
+  if (codigo && !orcamentoCodigoTecnico(codigo)) return codigo;
+  if (codigoOrigem && !orcamentoCodigoTecnico(codigoOrigem)) return codigoOrigem;
+  if (item && item.linhaOrigem) return `Linha ${item.linhaOrigem}`;
+  if (item && item.ordem) return `Item ${item.ordem}`;
+  return (item && item.tipo) || 'Item';
 }
 
 function orcamentoCsvCell(valor) {
