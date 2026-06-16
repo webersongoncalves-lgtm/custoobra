@@ -163,6 +163,242 @@ body.orcamento-wide main { max-width: 1280px; }
 .orcamento-export-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 .orcamento-export-row .btn { width: auto; }
 
+body.orcamento-wide { background: #EAF2F7; }
+body.orcamento-wide header {
+  height: 64px;
+  background: #07445C;
+  border-bottom: 3px solid #F47920;
+  box-shadow: 0 2px 10px rgba(5,44,61,0.18);
+}
+body.orcamento-wide main { max-width: 100%; padding: 0 0 48px; gap: 0; }
+body.orcamento-wide .logo-app { font-size: 1.02rem; }
+#screenOrcamento > .panel {
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  overflow: visible;
+}
+#screenOrcamento .orcamento-head {
+  min-height: 34px;
+  padding: 6px max(18px, calc((100vw - 1200px) / 2));
+  background: #087AA7;
+  border-bottom: 0;
+  color: #fff;
+}
+#screenOrcamento .orcamento-head .panel-title { color: #fff; letter-spacing: 0.04em; }
+#screenOrcamento .orcamento-head .btn-back {
+  color: #fff;
+  border-color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.06);
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+#screenOrcamento .orcamento-head .btn-back:hover { background: rgba(255,255,255,0.14); }
+#screenOrcamento .orcamento-head .orcamento-chip {
+  min-height: 24px;
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.24);
+  color: #fff;
+  border-radius: 6px;
+}
+#screenOrcamento .orcamento-head .orcamento-chip.good {
+  background: rgba(244,121,32,0.16);
+  border-color: rgba(244,121,32,0.62);
+  color: #fff;
+}
+#screenOrcamento .orcamento-body {
+  padding: 18px max(18px, calc((100vw - 1220px) / 2)) 28px;
+  background:
+    linear-gradient(90deg, rgba(8,122,167,0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(8,122,167,0.06) 1px, transparent 1px),
+    #EAF2F7;
+  background-size: 42px 42px;
+}
+.orcamento-workspace {
+  border: 1px solid #C9D9E4;
+  background: #F7FAFC;
+  box-shadow: 0 12px 34px rgba(5,44,61,0.14);
+}
+.orcamento-workbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 16px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #D6E2EA;
+}
+.orcamento-planilha-title {
+  color: #1D5E82;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.orcamento-planilha-sub { margin-top: 2px; color: #6F8292; font-size: 0.74rem; }
+.orcamento-workbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.orcamento-status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: #EAF3F8;
+  color: #1D5E82;
+  border: 1px solid #C8DDE8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.orcamento-ribbon {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 8px 14px;
+  background: #F3F7FA;
+  border-bottom: 1px solid #D6E2EA;
+  overflow-x: auto;
+}
+.orcamento-tool {
+  appearance: none;
+  border: 0;
+  border-right: 1px solid #D6E2EA;
+  min-width: 82px;
+  padding: 7px 10px;
+  background: transparent;
+  color: #395569;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.orcamento-tool:first-child { border-left: 1px solid #D6E2EA; }
+.orcamento-tool:hover { background: #FFFFFF; color: #F47920; }
+.orcamento-tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #0A4C64;
+  color: #fff;
+  font-size: 0.9rem;
+  box-shadow: inset 0 -2px 0 rgba(244,121,32,0.9);
+}
+.orcamento-tool:hover .orcamento-tool-icon { background: #F47920; box-shadow: none; }
+.orcamento-layout {
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
+  align-items: stretch;
+}
+.orcamento-sidebar {
+  background: #F8FBFD;
+  border-right: 1px solid #D6E2EA;
+  min-width: 0;
+}
+.orcamento-sidebar > .panel,
+.orcamento-main > .panel {
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none !important;
+}
+.orcamento-sidebar .panel-header,
+.orcamento-main .panel-header {
+  min-height: 38px;
+  padding: 10px 14px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #D6E2EA;
+}
+.orcamento-sidebar .panel-body,
+.orcamento-main .panel-body { padding: 14px; }
+.orcamento-sidebar .field label,
+.orcamento-main .field label { color: #395569; }
+.orcamento-sidebar input,
+.orcamento-sidebar select,
+.orcamento-main input,
+.orcamento-main select {
+  border-color: #C8DDE8;
+  border-radius: 4px;
+  background: #FFFFFF;
+}
+.orcamento-results {
+  gap: 4px;
+  max-height: 520px;
+  margin-top: 4px;
+}
+.orcamento-result {
+  border: 1px solid #D6E2EA;
+  border-radius: 4px;
+  padding: 9px 10px;
+  background: #FFFFFF;
+}
+.orcamento-result:hover { border-color: #F47920; background: #FFF8F2; }
+.orcamento-result.active {
+  border-color: #F47920;
+  background: #FFF8F2;
+  box-shadow: inset 4px 0 0 #F47920;
+}
+.orcamento-main { gap: 0; background: #FFFFFF; }
+.orcamento-main > .panel + .panel { border-top: 1px solid #D6E2EA !important; }
+.orcamento-service-title { color: #163F57; }
+.orcamento-options {
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 8px;
+}
+.orcamento-option {
+  border: 1px solid #C8DDE8;
+  border-radius: 5px;
+  background: #F7FAFC;
+}
+.orcamento-option:hover { border-color: #F47920; background: #FFF8F2; }
+.orcamento-option.active {
+  border-color: #F47920;
+  background: #FFF8F2;
+  box-shadow: inset 0 3px 0 #F47920;
+}
+.orcamento-detail-grid { grid-template-columns: minmax(0, 1fr) 250px; gap: 12px; }
+.orcamento-table-wrap { border-color: #C8DDE8; border-radius: 4px; background: #FFFFFF; }
+.orcamento-table {
+  min-width: 760px;
+  font-size: 0.73rem;
+}
+.orcamento-table th {
+  background: #EEF4F8;
+  color: #395569;
+  border-bottom: 1px solid #C8DDE8;
+}
+.orcamento-table th,
+.orcamento-table td {
+  padding: 7px 8px;
+  border-right: 1px solid #E4ECF1;
+}
+.orcamento-table tbody tr:hover { background: #FFF8F2; }
+.orcamento-add-box {
+  border-color: #C8DDE8;
+  border-radius: 4px;
+  background: #F7FAFC;
+}
+.orcamento-add-total { color: #0A4C64; }
+.orcamento-budget-grid { grid-template-columns: minmax(0, 1fr) 300px; }
+.orcamento-budget-item {
+  border-color: #D6E2EA;
+  border-radius: 4px;
+  background: #FFFFFF;
+}
+.orcamento-export-row {
+  align-items: stretch;
+  padding-top: 10px;
+  border-top: 1px solid #D6E2EA;
+}
+.orcamento-export-row .btn {
+  border-radius: 5px;
+  min-height: 34px;
+}
+
 /* ─── METAS MODULE ───────────────────────────── */
 .metas-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 .btn-back { background: none; border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 0.78rem; color: var(--text2); cursor: pointer; transition: all 0.15s; }
@@ -528,6 +764,22 @@ strong.hi { color: var(--accent); font-weight: 700; }
 
 @media (max-width: 480px) {
   main { padding: 16px 12px 70px; }
+  body.orcamento-wide main { padding: 0 0 32px; }
+  body.orcamento-wide header { height: auto; min-height: 60px; align-items: center; padding: 10px 12px; }
+  body.orcamento-wide .logo { min-width: 0; gap: 8px; overflow: hidden; }
+  body.orcamento-wide .logo-frjr img { height: 32px !important; }
+  body.orcamento-wide .logo-sep { height: 22px; }
+  body.orcamento-wide .logo-app { font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; }
+  body.orcamento-wide .badge-month { display: none; }
+  body.orcamento-wide .header-right { flex-shrink: 0; }
+  body.orcamento-wide .badge-user { max-width: 92px; }
+  #screenOrcamento .orcamento-head { padding: 8px 12px; align-items: flex-start; }
+  #screenOrcamento .orcamento-body { padding: 12px; }
+  .orcamento-workspace { box-shadow: 0 8px 22px rgba(5,44,61,0.12); }
+  .orcamento-workbar { align-items: flex-start; flex-direction: column; }
+  .orcamento-workbar-actions { justify-content: flex-start; }
+  .orcamento-ribbon { padding: 8px; }
+  .orcamento-tool { min-width: 70px; padding: 6px 8px; }
   .panel-body { padding: 14px; }
   .modal { padding: 20px 14px; }
   .confirm-table { font-size: 0.78rem; }
@@ -1092,7 +1344,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
 
   <!-- TELA: ORÇAMENTO -->
   <div id="screenOrcamento" class="screen">
-    <div class="panel">
+    <div class="panel orcamento-shell">
       <div class="panel-header orcamento-head">
         <button class="btn-back" onclick="voltarModulo()">← Voltar</button>
         <span class="panel-title">Orçamento</span>
@@ -1101,7 +1353,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
           <span class="orcamento-chip" id="orcamentoStatusBase">Acesso restrito</span>
         </div>
       </div>
-      <div class="panel-body">
+      <div class="panel-body orcamento-body">
         <div id="orcamentoLock" class="orcamento-lock">
           <div class="orcamento-lock-title">Entrar no módulo</div>
           <div class="field">
@@ -1117,7 +1369,26 @@ strong.hi { color: var(--accent); font-weight: 700; }
         </div>
 
         <div id="orcamentoApp" style="display:none;">
-          <div class="orcamento-layout">
+          <div class="orcamento-workspace">
+            <div class="orcamento-workbar">
+              <div>
+                <div class="orcamento-planilha-title">Planilha 1</div>
+                <div class="orcamento-planilha-sub">Base online · SINAPI MG/RJ/SP · CPU própria</div>
+              </div>
+              <div class="orcamento-workbar-actions">
+                <span class="orcamento-status-pill">Base online</span>
+                <span class="orcamento-status-pill">Atualização automática</span>
+              </div>
+            </div>
+            <div class="orcamento-ribbon">
+              <button class="orcamento-tool" onclick="voltarModulo()"><span class="orcamento-tool-icon">⌂</span><span>Início</span></button>
+              <button class="orcamento-tool" onclick="document.getElementById('orcamentoBusca').focus()"><span class="orcamento-tool-icon">⌕</span><span>Buscar</span></button>
+              <button class="orcamento-tool" onclick="orcamentoSalvarOnline()"><span class="orcamento-tool-icon">✓</span><span>Gravar</span></button>
+              <button class="orcamento-tool" onclick="orcamentoExportarCSV('planilha')"><span class="orcamento-tool-icon">⇩</span><span>Planilha</span></button>
+              <button class="orcamento-tool" onclick="orcamentoExportarCSV('cpus')"><span class="orcamento-tool-icon">▦</span><span>CPUs</span></button>
+              <button class="orcamento-tool" onclick="orcamentoExportarCSV('abc')"><span class="orcamento-tool-icon">%</span><span>Curva ABC</span></button>
+            </div>
+            <div class="orcamento-layout">
             <div class="orcamento-sidebar">
               <div class="panel" style="box-shadow:none; border:1px solid var(--border);">
                 <div class="panel-header">
@@ -1201,6 +1472,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
