@@ -1732,6 +1732,65 @@ function orcamentoPgLike(valor) {
   return String(valor || '').trim().replace(/[(),*]/g, ' ').replace(/\s+/g, ' ');
 }
 
+function orcamentoNormalizarBusca(valor) {
+  return String(valor || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function orcamentoScoreServico(row, termo) {
+  const busca = orcamentoNormalizarBusca(termo);
+  if (!busca) return 0;
+  const descricao = orcamentoNormalizarBusca(row.descricao || '');
+  const codigo = orcamentoNormalizarBusca(row.codigo_interno || row.codigo || '');
+  const etapa = orcamentoNormalizarBusca(row.etapa || row.disciplina || '');
+  const tokens = busca.split(' ').filter(Boolean);
+  let score = 0;
+
+  if (codigo === busca) score += 1000;
+  if (codigo.includes(busca)) score += 650;
+  if (descricao === busca) score += 900;
+  if (descricao.startsWith(busca)) score += 700;
+  if (descricao.includes(` ${busca} `) || descricao.endsWith(` ${busca}`)) score += 450;
+  if (descricao.includes(busca)) score += 250;
+  if (etapa.includes(busca)) score += 80;
+
+  tokens.forEach(token => {
+    if (codigo.includes(token)) score += 120;
+    if (descricao.startsWith(token)) score += 110;
+    if (descricao.includes(token)) score += 70;
+  });
+
+  if (busca.includes('concreto')) {
+    if (/^concreto\b/.test(descricao)) score += 260;
+    if (/^concretagem\b/.test(descricao)) score += 250;
+    if (/(fornec|fornecimento).{0,40}lancamento.{0,40}concreto/.test(descricao)) score += 300;
+    if (/lancamento.{0,40}concreto|concreto.{0,40}lancamento/.test(descricao)) score += 210;
+    if (/\bfck\b/.test(descricao)) score += 190;
+    if (/preparo mecanico|concreto usinado|bombeavel|bomba/.test(descricao)) score += 120;
+    if (/alvenaria|bloco|poco|caixa|canaleta/.test(descricao)) score -= 80;
+  }
+
+  const posicao = descricao.indexOf(busca);
+  if (posicao >= 0) score += Math.max(0, 120 - posicao);
+  return score;
+}
+
+function orcamentoOrdenarServicos(rows, termo) {
+  const busca = orcamentoNormalizarBusca(termo);
+  return [...(rows || [])].sort((a, b) => {
+    if (!busca) return String(a.descricao || '').localeCompare(String(b.descricao || ''), 'pt-BR');
+    const scoreB = orcamentoScoreServico(b, busca);
+    const scoreA = orcamentoScoreServico(a, busca);
+    if (scoreB !== scoreA) return scoreB - scoreA;
+    return String(a.descricao || '').localeCompare(String(b.descricao || ''), 'pt-BR');
+  });
+}
+
 async function orcamentoCarregarFontes(ids) {
   const faltantes = [...new Set((ids || []).filter(Boolean).filter(id => !orcamentoFontesMap[id]))];
   if (!faltantes.length) return;
@@ -1763,13 +1822,13 @@ async function orcamentoBuscarServicosOnline() {
       select: 'id,codigo_interno,descricao,etapa,disciplina,unidade',
       ativo: 'eq.true',
       order: 'descricao.asc',
-      limit: '50'
+      limit: termo ? '500' : '50'
     };
     if (termo) {
       params.or = `(descricao.ilike.*${termo}*,codigo_interno.ilike.*${termo}*)`;
     }
     const rows = await orcamentoRest('orc_servicos', params);
-    orcamentoServicos = (rows || []).map(row => ({
+    orcamentoServicos = orcamentoOrdenarServicos(rows || [], termo).map(row => ({
       dbId: row.id,
       codigo: row.codigo_interno || row.id,
       nome: row.descricao || '',
