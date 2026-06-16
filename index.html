@@ -1742,6 +1742,112 @@ function orcamentoNormalizarBusca(valor) {
     .trim();
 }
 
+const ORCAMENTO_BUSCA_STOPWORDS = new Set([
+  'a', 'ao', 'aos', 'as', 'com', 'da', 'das', 'de', 'do', 'dos', 'e',
+  'em', 'na', 'nas', 'no', 'nos', 'o', 'os', 'para', 'por', 'um', 'uma'
+]);
+
+function orcamentoVariantesBuscaToken(token) {
+  const base = orcamentoNormalizarBusca(token);
+  if (!base || ORCAMENTO_BUSCA_STOPWORDS.has(base)) return [];
+  if (base.length < 3 && !/^\d+$/.test(base)) return [];
+  const variantes = new Set([base]);
+
+  if (base.startsWith('fornec')) {
+    variantes.add('fornec');
+    variantes.add('fornecimento');
+  }
+  if (base === 'lancamento') {
+    variantes.add('lançamento');
+  }
+  if (base === 'instalacao') {
+    variantes.add('instalação');
+  }
+  if (base === 'concreto') {
+    variantes.add('concretagem');
+  }
+
+  return [...variantes];
+}
+
+function orcamentoGruposBusca(termo) {
+  const tokens = orcamentoNormalizarBusca(termo).split(' ').filter(Boolean);
+  const vistos = new Set();
+  const grupos = [];
+  tokens.forEach(token => {
+    const variantes = orcamentoVariantesBuscaToken(token);
+    if (!variantes.length) return;
+    const chave = variantes.join('|');
+    if (vistos.has(chave)) return;
+    vistos.add(chave);
+    grupos.push(variantes);
+  });
+  return grupos;
+}
+
+function orcamentoTextoServicoBusca(row) {
+  return orcamentoNormalizarBusca([
+    row.descricao,
+    row.codigo_interno,
+    row.codigo,
+    row.etapa,
+    row.disciplina,
+    row.unidade
+  ].filter(Boolean).join(' '));
+}
+
+function orcamentoServicoCombinaBusca(row, termo) {
+  const grupos = orcamentoGruposBusca(termo);
+  if (!grupos.length) return true;
+  const texto = orcamentoTextoServicoBusca(row);
+  return grupos.every(grupo => grupo.some(variante => texto.includes(orcamentoNormalizarBusca(variante))));
+}
+
+function orcamentoTermosSupabaseBusca(termo) {
+  const termos = new Set();
+  const frase = orcamentoPgLike(termo);
+  if (frase) termos.add(frase);
+  orcamentoGruposBusca(termo).flat().forEach(variante => {
+    const limpa = orcamentoPgLike(variante);
+    if (limpa) termos.add(limpa);
+  });
+  const busca = orcamentoNormalizarBusca(termo);
+  if (busca.includes('concreto')) {
+    ['concreto', 'concretagem', 'fck', 'fornec', 'lancamento', 'lançamento'].forEach(termoExtra => termos.add(termoExtra));
+  }
+  return [...termos];
+}
+
+function orcamentoOrSupabaseBusca(termos) {
+  const clausulas = [];
+  termos.forEach(termo => {
+    const limpa = orcamentoPgLike(termo);
+    if (!limpa) return;
+    clausulas.push(`descricao.ilike.*${limpa}*`);
+    clausulas.push(`codigo_interno.ilike.*${limpa}*`);
+  });
+  return clausulas.length ? `(${clausulas.join(',')})` : '';
+}
+
+function orcamentoFiltrosSupabaseBusca(termo) {
+  const filtros = [];
+  const todosTermos = orcamentoTermosSupabaseBusca(termo);
+  const filtroGeral = orcamentoOrSupabaseBusca(todosTermos);
+  if (filtroGeral) filtros.push(filtroGeral);
+
+  orcamentoGruposBusca(termo).forEach(grupo => {
+    const filtroGrupo = orcamentoOrSupabaseBusca(grupo);
+    if (filtroGrupo) filtros.push(filtroGrupo);
+  });
+
+  if (orcamentoNormalizarBusca(termo).includes('concreto')) {
+    const filtroConcreto = orcamentoOrSupabaseBusca(['concreto', 'concretagem', 'fck', 'fornec', 'lancamento', 'lançamento']);
+    if (filtroConcreto) filtros.push(filtroConcreto);
+  }
+
+  return [...new Set(filtros)];
+}
+
 function orcamentoScoreServico(row, termo) {
   const busca = orcamentoNormalizarBusca(termo);
   if (!busca) return 0;
@@ -1768,7 +1874,7 @@ function orcamentoScoreServico(row, termo) {
   if (busca.includes('concreto')) {
     if (/^concreto\b/.test(descricao)) score += 260;
     if (/^concretagem\b/.test(descricao)) score += 250;
-    if (/(fornec|fornecimento).{0,40}lancamento.{0,40}concreto/.test(descricao)) score += 300;
+    if (/(fornec|fornecimento).{0,40}lancamento.{0,40}concreto/.test(descricao)) score += 1050;
     if (/lancamento.{0,40}concreto|concreto.{0,40}lancamento/.test(descricao)) score += 210;
     if (/\bfck\b/.test(descricao)) score += 190;
     if (/preparo mecanico|concreto usinado|bombeavel|bomba/.test(descricao)) score += 120;
@@ -1818,16 +1924,27 @@ async function orcamentoBuscarServicosOnline() {
   if (lista) lista.innerHTML = '<div class="orcamento-empty">Carregando serviços...</div>';
   try {
     const termo = orcamentoPgLike(document.getElementById('orcamentoBusca')?.value || '');
-    const params = {
+    const paramsBase = {
       select: 'id,codigo_interno,descricao,etapa,disciplina,unidade',
       ativo: 'eq.true',
       order: 'descricao.asc',
-      limit: termo ? '500' : '50'
+      limit: termo ? '1000' : '50'
     };
-    if (termo) {
-      params.or = `(descricao.ilike.*${termo}*,codigo_interno.ilike.*${termo}*)`;
+    let rows = [];
+    if (!termo) {
+      rows = await orcamentoRest('orc_servicos', paramsBase);
+    } else {
+      const filtros = orcamentoFiltrosSupabaseBusca(termo);
+      const resultados = await Promise.all(filtros.map(filtro => orcamentoRest('orc_servicos', {
+        ...paramsBase,
+        or: filtro
+      })));
+      const mapa = new Map();
+      resultados.flat().forEach(row => {
+        if (row && row.id) mapa.set(row.id, row);
+      });
+      rows = [...mapa.values()].filter(row => orcamentoServicoCombinaBusca(row, termo));
     }
-    const rows = await orcamentoRest('orc_servicos', params);
     orcamentoServicos = orcamentoOrdenarServicos(rows || [], termo).map(row => ({
       dbId: row.id,
       codigo: row.codigo_interno || row.id,
