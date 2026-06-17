@@ -150,12 +150,16 @@ body.orcamento-wide main { max-width: 1280px; }
 .orcamento-type.eqp { color: #8a5200; background: #fff3d8; }
 .orcamento-add-box { border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: #F8FAFE; }
 .orcamento-add-total { font-family: 'IBM Plex Mono', monospace; font-weight: 800; font-size: 1.05rem; color: var(--text); text-align: right; margin: 4px 0 12px; }
-.orcamento-add-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(130px, 0.75fr) minmax(130px, 0.75fr) minmax(150px, 1fr) auto; gap: 12px; align-items: end; }
+.orcamento-add-row { display: grid; grid-template-columns: minmax(160px, 1.15fr) minmax(150px, 1fr) minmax(120px, 0.7fr) minmax(120px, 0.7fr) minmax(145px, 0.95fr) auto; gap: 12px; align-items: end; }
 .orcamento-add-row .field { margin-bottom: 0; }
 .orcamento-add-row .orcamento-add-total { margin: 4px 0 0; }
 .orcamento-add-row .btn { width: auto; min-width: 210px; min-height: 46px; white-space: nowrap; }
 .orcamento-budget-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
 .orcamento-budget-list { display: grid; gap: 8px; }
+.orcamento-budget-group { display: grid; gap: 8px; }
+.orcamento-budget-group-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 12px; border: 1px solid #C8DDE8; border-radius: 4px; background: #EEF4F8; color: #163F57; }
+.orcamento-budget-group-title { font-size: 0.76rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.orcamento-budget-group-total { font-family: 'IBM Plex Mono', monospace; color: var(--text); font-size: 0.78rem; font-weight: 800; white-space: nowrap; }
 .orcamento-budget-item { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
 .orcamento-budget-name { font-size: 0.8rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .orcamento-budget-sub { font-size: 0.7rem; color: var(--text3); margin-top: 2px; }
@@ -1541,6 +1545,16 @@ let orcamentoComposicaoSelecionada = null;
 let orcamentoItens = [];
 let orcamentoBuscaTimer = null;
 let orcamentoFontesMap = {};
+const ORCAMENTO_MACRO_ITENS_PADRAO = [
+  'Fundação',
+  'Estrutura',
+  'Alvenaria',
+  'Cobertura',
+  'Instalações',
+  'Revestimentos',
+  'Acabamentos',
+  'Infraestrutura'
+];
 
 // ─── CALENDÁRIO ───────────────────────────────────────────────────────────────
 const monthsFull = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -2171,7 +2185,7 @@ function orcamentoRenderDetalhe() {
       </div>
       <div class="orcamento-options">${options}</div>
     </div>
-    <div class="orcamento-detail-grid">
+      <div class="orcamento-detail-grid">
       <div class="orcamento-table-wrap">
         <table class="orcamento-table">
           <thead>
@@ -2181,6 +2195,13 @@ function orcamentoRenderDetalhe() {
         </table>
       </div>
       <div class="orcamento-add-box orcamento-add-row">
+        <div class="field">
+          <label>Macro item</label>
+          <input type="text" id="orcamentoMacroItem" list="orcamentoMacroItensLista" placeholder="Ex.: Fundação" value="${orcamentoHtml(orcamentoMacroItemSugerido())}">
+          <datalist id="orcamentoMacroItensLista">
+            ${orcamentoMacroItensDisponiveis().map(nome => `<option value="${orcamentoHtml(nome)}"></option>`).join('')}
+          </datalist>
+        </div>
         <div>
           <div class="summary-label">Custo unitário</div>
           <div class="orcamento-add-total">${orcamentoFmt(orcamentoTotalComposicao(comp))}</div>
@@ -2202,6 +2223,39 @@ function orcamentoRenderDetalhe() {
     </div>
   `;
   orcamentoAtualizarResumoItem();
+}
+
+function orcamentoMacroItemNormalizado(valor) {
+  return String(valor || '').replace(/\s+/g, ' ').trim();
+}
+
+function orcamentoMacroItemSugerido() {
+  if (orcamentoItens.length) return orcamentoItens[orcamentoItens.length - 1].macroItem || '';
+  return '';
+}
+
+function orcamentoMacroItensDisponiveis() {
+  return [...new Set([
+    ...ORCAMENTO_MACRO_ITENS_PADRAO,
+    ...orcamentoItens.map(item => item.macroItem).filter(Boolean)
+  ])].sort((a, b) => String(a).localeCompare(String(b), 'pt-BR'));
+}
+
+function orcamentoAgruparItensPorMacro() {
+  const grupos = [];
+  const porNome = new Map();
+  orcamentoItens.forEach(item => {
+    const macroItem = item.macroItem || 'Sem macro item';
+    if (!porNome.has(macroItem)) {
+      const grupo = { macroItem, itens: [], subtotal: 0 };
+      porNome.set(macroItem, grupo);
+      grupos.push(grupo);
+    }
+    const grupo = porNome.get(macroItem);
+    grupo.itens.push(item);
+    grupo.subtotal += Number(item.total) || 0;
+  });
+  return grupos;
 }
 
 function orcamentoAtualizarResumoItem() {
@@ -2228,6 +2282,12 @@ async function orcamentoAdicionarItem() {
   }
   const qtd = Number(document.getElementById('orcamentoQtd').value || 0);
   const bdi = Number(document.getElementById('orcamentoBdi').value || 0);
+  const macroItem = orcamentoMacroItemNormalizado(document.getElementById('orcamentoMacroItem')?.value || '');
+  if (!macroItem) {
+    alert('Informe ou selecione um macro item antes de adicionar o serviço.');
+    document.getElementById('orcamentoMacroItem')?.focus();
+    return;
+  }
   if (qtd <= 0) {
     alert('Informe uma quantidade maior que zero.');
     return;
@@ -2236,6 +2296,7 @@ async function orcamentoAdicionarItem() {
   const precoUnitario = custoUnitario * (1 + bdi / 100);
   orcamentoItens.push({
     uid: Date.now() + Math.floor(Math.random() * 1000),
+    macroItem,
     servico: { ...orcamentoServicoSelecionado },
     composicao: JSON.parse(JSON.stringify(orcamentoComposicaoSelecionada)),
     quantidade: qtd,
@@ -2267,18 +2328,26 @@ function orcamentoRenderItens() {
     return;
   }
 
-  lista.innerHTML = orcamentoItens.map(item => {
-    const resumo = orcamentoResumoComposicao(item.composicao);
-    return `
-      <div class="orcamento-budget-item">
-        <div>
-          <div class="orcamento-budget-name">${orcamentoHtml(item.servico.nome)}</div>
-          <div class="orcamento-budget-sub">${orcamentoHtml(resumo.origem)} · ${orcamentoNumero(item.quantidade)} ${orcamentoHtml(item.servico.unidade)} · BDI ${orcamentoNumero(item.bdi)}%</div>
-        </div>
-        <div class="orcamento-budget-value">${orcamentoFmt(item.total)}</div>
-        <button class="btn btn-sm btn-remove" onclick='orcamentoRemoverItem(${JSON.stringify(item.uid)})'>✕</button>
-      </div>`;
-  }).join('');
+  lista.innerHTML = orcamentoAgruparItensPorMacro().map(grupo => `
+    <div class="orcamento-budget-group">
+      <div class="orcamento-budget-group-head">
+        <div class="orcamento-budget-group-title">${orcamentoHtml(grupo.macroItem)}</div>
+        <div class="orcamento-budget-group-total">${orcamentoFmt(grupo.subtotal)}</div>
+      </div>
+      ${grupo.itens.map(item => {
+        const resumo = orcamentoResumoComposicao(item.composicao);
+        return `
+          <div class="orcamento-budget-item">
+            <div>
+              <div class="orcamento-budget-name">${orcamentoHtml(item.servico.nome)}</div>
+              <div class="orcamento-budget-sub">${orcamentoHtml(resumo.origem)} · ${orcamentoNumero(item.quantidade)} ${orcamentoHtml(item.servico.unidade)} · BDI ${orcamentoNumero(item.bdi)}%</div>
+            </div>
+            <div class="orcamento-budget-value">${orcamentoFmt(item.total)}</div>
+            <button class="btn btn-sm btn-remove" onclick='orcamentoRemoverItem(${JSON.stringify(item.uid)})'>✕</button>
+          </div>`;
+      }).join('')}
+    </div>
+  `).join('');
   orcamentoRenderAbc();
 }
 
@@ -2287,9 +2356,9 @@ function orcamentoRenderAbc() {
   const insumosMap = {};
   orcamentoItens.forEach(item => {
     item.composicao.itens.forEach(insumo => {
-      const key = `${insumo.codigo}|${insumo.descricao}`;
+      const key = `${item.macroItem}|${insumo.codigo}|${insumo.descricao}`;
       const parcial = insumo.total !== undefined ? Number(insumo.total) : (Number(insumo.coef) || 0) * (Number(insumo.preco) || 0);
-      if (!insumosMap[key]) insumosMap[key] = { nome: insumo.descricao, valor: 0 };
+      if (!insumosMap[key]) insumosMap[key] = { macroItem: item.macroItem, nome: insumo.descricao, valor: 0 };
       insumosMap[key].valor += item.quantidade * (parcial || 0);
     });
   });
@@ -2297,14 +2366,14 @@ function orcamentoRenderAbc() {
 
   document.getElementById('orcamentoAbcServicos').innerHTML = servicos.map(item => `
     <div class="orcamento-abc-row">
-      <span class="orcamento-abc-name">${orcamentoHtml(item.servico.nome)}</span>
+      <span class="orcamento-abc-name">${orcamentoHtml(item.macroItem)} · ${orcamentoHtml(item.servico.nome)}</span>
       <span class="orcamento-abc-value">${orcamentoFmt(item.total)}</span>
     </div>
   `).join('') || '<div class="orcamento-empty" style="padding:10px 0;">Sem itens.</div>';
 
   document.getElementById('orcamentoAbcInsumos').innerHTML = insumos.map(row => `
     <div class="orcamento-abc-row">
-      <span class="orcamento-abc-name">${orcamentoHtml(row.nome)}</span>
+      <span class="orcamento-abc-name">${orcamentoHtml(row.macroItem)} · ${orcamentoHtml(row.nome)}</span>
       <span class="orcamento-abc-value">${orcamentoFmt(row.valor)}</span>
     </div>
   `).join('') || '<div class="orcamento-empty" style="padding:10px 0;">Sem itens.</div>';
@@ -2352,6 +2421,7 @@ async function orcamentoSalvarOnline() {
           composicao_id: item.composicao.id || null,
           item_ordem: idx + 1,
           etapa: item.servico.etapa,
+          macro_item: item.macroItem,
           servico_descricao: item.servico.nome,
           unidade: item.servico.unidade,
           quantidade: item.quantidade,
@@ -2364,7 +2434,11 @@ async function orcamentoSalvarOnline() {
           preco_unitario: item.precoUnitario,
           total_custo: item.custoUnitario * item.quantidade,
           total_preco: item.total,
-          snapshot_composicao: item.composicao
+          snapshot_composicao: {
+            ...item.composicao,
+            macroItem: item.macroItem,
+            macro_item: item.macroItem
+          }
         }
       });
       const itemId = Array.isArray(salvo) && salvo[0] ? salvo[0].id : null;
@@ -2405,31 +2479,31 @@ function orcamentoExportarCSV(tipo) {
 
   if (tipo === 'cpus') {
     nome = 'cpus-orcamento';
-    linhas = [['servico', 'composicao', 'fonte', 'uf', 'mes_base', 'tipo', 'codigo', 'descricao', 'unidade', 'coeficiente', 'preco_unitario', 'custo_parcial']];
+    linhas = [['macro_item', 'servico', 'composicao', 'fonte', 'uf', 'mes_base', 'tipo', 'codigo', 'descricao', 'unidade', 'coeficiente', 'preco_unitario', 'custo_parcial']];
     orcamentoItens.forEach(item => {
       item.composicao.itens.forEach(insumo => {
         const parcial = insumo.total !== undefined ? Number(insumo.total) : (Number(insumo.coef) || 0) * (Number(insumo.preco) || 0);
-        linhas.push([item.servico.nome, item.composicao.codigo, item.composicao.fonte, item.composicao.uf, item.composicao.mesBase, insumo.tipo, insumo.codigo, insumo.descricao, insumo.unidade, insumo.coef, insumo.preco, parcial]);
+        linhas.push([item.macroItem, item.servico.nome, item.composicao.codigo, item.composicao.fonte, item.composicao.uf, item.composicao.mesBase, insumo.tipo, insumo.codigo, insumo.descricao, insumo.unidade, insumo.coef, insumo.preco, parcial]);
       });
     });
   } else if (tipo === 'abc') {
     nome = 'curva-abc-orcamento';
-    linhas = [['tipo', 'descricao', 'valor']];
-    orcamentoItens.forEach(item => linhas.push(['servico', item.servico.nome, item.total]));
+    linhas = [['tipo', 'macro_item', 'descricao', 'valor']];
+    orcamentoItens.forEach(item => linhas.push(['servico', item.macroItem, item.servico.nome, item.total]));
     const insumosMap = {};
     orcamentoItens.forEach(item => {
       item.composicao.itens.forEach(insumo => {
-        const key = `${insumo.codigo}|${insumo.descricao}`;
-        if (!insumosMap[key]) insumosMap[key] = { descricao: insumo.descricao, valor: 0 };
+        const key = `${item.macroItem}|${insumo.codigo}|${insumo.descricao}`;
+        if (!insumosMap[key]) insumosMap[key] = { macroItem: item.macroItem, descricao: insumo.descricao, valor: 0 };
         const parcial = insumo.total !== undefined ? Number(insumo.total) : (Number(insumo.coef) || 0) * (Number(insumo.preco) || 0);
         insumosMap[key].valor += item.quantidade * (parcial || 0);
       });
     });
-    Object.values(insumosMap).forEach(row => linhas.push(['insumo', row.descricao, row.valor]));
+    Object.values(insumosMap).forEach(row => linhas.push(['insumo', row.macroItem, row.descricao, row.valor]));
   } else {
     nome = 'planilha-orcamentaria';
-    linhas = [['servico', 'etapa', 'unidade', 'quantidade', 'composicao', 'fonte', 'uf', 'mes_base', 'custo_unitario', 'bdi_percentual', 'preco_unitario', 'total']];
-    orcamentoItens.forEach(item => linhas.push([item.servico.nome, item.servico.etapa, item.servico.unidade, item.quantidade, item.composicao.codigo, item.composicao.fonte, item.composicao.uf, item.composicao.mesBase, item.custoUnitario, item.bdi, item.precoUnitario, item.total]));
+    linhas = [['macro_item', 'servico', 'etapa', 'unidade', 'quantidade', 'composicao', 'fonte', 'uf', 'mes_base', 'custo_unitario', 'bdi_percentual', 'preco_unitario', 'total']];
+    orcamentoItens.forEach(item => linhas.push([item.macroItem, item.servico.nome, item.servico.etapa, item.servico.unidade, item.quantidade, item.composicao.codigo, item.composicao.fonte, item.composicao.uf, item.composicao.mesBase, item.custoUnitario, item.bdi, item.precoUnitario, item.total]));
   }
 
   const csv = linhas.map(linha => linha.map(orcamentoCsvCell).join(';')).join('\n');
