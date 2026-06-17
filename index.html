@@ -2221,6 +2221,11 @@ async function orcamentoAdicionarItem() {
     orcamentoRenderDetalhe();
     return;
   }
+  const fechamento = orcamentoValidarFechamentoComposicao(orcamentoComposicaoSelecionada);
+  if (!fechamento.ok) {
+    alert(`A CPU selecionada não fecha com os itens detalhados.\n\nCusto da composição: ${orcamentoFmt(fechamento.custo)}\nSoma dos itens: ${orcamentoFmt(fechamento.soma)}\nDiferença: ${orcamentoFmt(fechamento.diferenca)}\n\nEste item não foi adicionado ao orçamento.`);
+    return;
+  }
   const qtd = Number(document.getElementById('orcamentoQtd').value || 0);
   const bdi = Number(document.getElementById('orcamentoBdi').value || 0);
   if (qtd <= 0) {
@@ -2445,6 +2450,23 @@ function orcamentoTotalComposicao(comp) {
     const parcial = item.total !== undefined ? Number(item.total) : (Number(item.coef) || 0) * (Number(item.preco) || 0);
     return total + (parcial || 0);
   }, 0);
+}
+
+function orcamentoSomaItensComposicao(comp) {
+  return (comp && comp.itens ? comp.itens : []).reduce((total, item) => {
+    const parcial = item.total !== undefined ? Number(item.total) : (Number(item.coef) || 0) * (Number(item.preco) || 0);
+    return total + (parcial || 0);
+  }, 0);
+}
+
+function orcamentoValidarFechamentoComposicao(comp) {
+  const custo = Number(comp && comp.custoUnitario) || 0;
+  const itens = comp && comp.itens ? comp.itens : [];
+  if (!custo || !itens.length) return { ok: true, custo, soma: 0, diferenca: 0, tolerancia: 0 };
+  const soma = orcamentoSomaItensComposicao(comp);
+  const diferenca = Math.abs(soma - custo);
+  const tolerancia = Math.max(0.05, itens.length * 0.02);
+  return { ok: diferenca <= tolerancia, custo, soma, diferenca, tolerancia };
 }
 
 function orcamentoFmt(valor) {
