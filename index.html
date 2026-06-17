@@ -137,8 +137,8 @@ body.orcamento-wide main { max-width: 1280px; }
 .orcamento-option-price { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--green); font-weight: 800; white-space: nowrap; }
 .orcamento-option-sub { font-size: 0.72rem; color: var(--text3); line-height: 1.45; }
 .orcamento-option-origin { color: var(--text2); font-weight: 700; }
-.orcamento-detail-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) 260px; gap: 14px; align-items: start; margin-top: 16px; }
-.orcamento-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+.orcamento-detail-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; margin-top: 16px; }
+.orcamento-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; min-height: 260px; }
 .orcamento-table { width: 100%; min-width: 660px; border-collapse: collapse; font-size: 0.76rem; }
 .orcamento-table th, .orcamento-table td { padding: 9px 10px; border-bottom: 1px solid #edf2f8; text-align: left; vertical-align: top; }
 .orcamento-table th { background: #F8FAFE; color: var(--text2); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -150,6 +150,10 @@ body.orcamento-wide main { max-width: 1280px; }
 .orcamento-type.eqp { color: #8a5200; background: #fff3d8; }
 .orcamento-add-box { border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: #F8FAFE; }
 .orcamento-add-total { font-family: 'IBM Plex Mono', monospace; font-weight: 800; font-size: 1.05rem; color: var(--text); text-align: right; margin: 4px 0 12px; }
+.orcamento-add-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(130px, 0.75fr) minmax(130px, 0.75fr) minmax(150px, 1fr) auto; gap: 12px; align-items: end; }
+.orcamento-add-row .field { margin-bottom: 0; }
+.orcamento-add-row .orcamento-add-total { margin: 4px 0 0; }
+.orcamento-add-row .btn { width: auto; min-width: 210px; min-height: 46px; white-space: nowrap; }
 .orcamento-budget-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
 .orcamento-budget-list { display: grid; gap: 8px; }
 .orcamento-budget-item { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
@@ -360,10 +364,10 @@ body.orcamento-wide .logo-app { font-size: 1.02rem; }
   background: #FFF8F2;
   box-shadow: inset 0 3px 0 #F47920;
 }
-.orcamento-detail-grid { grid-template-columns: minmax(0, 1fr) 250px; gap: 12px; }
+.orcamento-detail-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
 .orcamento-table-wrap { border-color: #C8DDE8; border-radius: 4px; background: #FFFFFF; }
 .orcamento-table {
-  min-width: 760px;
+  min-width: 900px;
   font-size: 0.73rem;
 }
 .orcamento-table th {
@@ -383,6 +387,7 @@ body.orcamento-wide .logo-app { font-size: 1.02rem; }
   background: #F7FAFC;
 }
 .orcamento-add-total { color: #0A4C64; }
+#orcamentoDetalhe { min-height: 520px; }
 .orcamento-budget-grid { grid-template-columns: minmax(0, 1fr) 300px; }
 .orcamento-budget-item {
   border-color: #D6E2EA;
@@ -794,6 +799,8 @@ strong.hi { color: var(--accent); font-weight: 700; }
   .metas-donut-wrap { grid-template-columns: 1fr; }
   .metas-chart-row { grid-template-columns: 70px 1fr 70px; }
   .orcamento-layout, .orcamento-detail-grid, .orcamento-budget-grid { grid-template-columns: 1fr; }
+  .orcamento-add-row { grid-template-columns: 1fr; }
+  .orcamento-add-row .btn { width: 100%; min-width: 0; }
   .orcamento-filter-grid { grid-template-columns: 1fr; }
   .orcamento-budget-item { grid-template-columns: 1fr auto; }
 }
@@ -2173,9 +2180,11 @@ function orcamentoRenderDetalhe() {
           <tbody>${linhas}</tbody>
         </table>
       </div>
-      <div class="orcamento-add-box">
-        <div class="summary-label">Custo unitário</div>
-        <div class="orcamento-add-total">${orcamentoFmt(orcamentoTotalComposicao(comp))}</div>
+      <div class="orcamento-add-box orcamento-add-row">
+        <div>
+          <div class="summary-label">Custo unitário</div>
+          <div class="orcamento-add-total">${orcamentoFmt(orcamentoTotalComposicao(comp))}</div>
+        </div>
         <div class="field">
           <label>Quantidade</label>
           <input type="number" id="orcamentoQtd" min="0" step="0.01" value="1" oninput="orcamentoAtualizarResumoItem()">
@@ -2184,8 +2193,10 @@ function orcamentoRenderDetalhe() {
           <label>BDI (%)</label>
           <input type="number" id="orcamentoBdi" min="0" step="0.01" value="0" oninput="orcamentoAtualizarResumoItem()">
         </div>
-        <div class="summary-label">Total do item</div>
-        <div class="orcamento-add-total" id="orcamentoPreviewTotal">${orcamentoFmt(orcamentoTotalComposicao(comp))}</div>
+        <div>
+          <div class="summary-label">Total do item</div>
+          <div class="orcamento-add-total" id="orcamentoPreviewTotal">${orcamentoFmt(orcamentoTotalComposicao(comp))}</div>
+        </div>
         <button class="btn btn-primary" onclick="orcamentoAdicionarItem()">Adicionar ao Orçamento</button>
       </div>
     </div>
