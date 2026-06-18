@@ -1961,12 +1961,32 @@ async function orcamentoCarregarOpcoesFonte() {
       select: 'id,nome,tipo',
       order: 'nome.asc'
     });
+    const origens = await orcamentoRest('orc_composicoes', {
+      select: 'origem',
+      ativo: 'eq.true',
+      limit: '10000'
+    });
     (rows || []).forEach(row => {
       orcamentoFontesMap[row.id] = row;
     });
-    select.innerHTML = '<option value="TODAS">Todas</option>' + (rows || []).map(row =>
-      `<option value="${orcamentoHtml(row.id)}">${orcamentoHtml(row.nome || row.tipo || row.id)}</option>`
-    ).join('');
+    const opcoes = [];
+    const labels = new Set();
+    (rows || []).forEach(row => {
+      const label = row.nome || row.tipo || row.id;
+      if (!label || labels.has(label)) return;
+      labels.add(label);
+      opcoes.push({ value: `FONTE:${row.id}`, label });
+    });
+    [...new Set((origens || []).map(row => row.origem).filter(Boolean))].forEach(origem => {
+      const label = orcamentoFonteFallback({ origem });
+      if (!label || labels.has(label)) return;
+      labels.add(label);
+      opcoes.push({ value: `ORIGEM:${origem}`, label });
+    });
+    select.innerHTML = '<option value="TODAS">Todas</option>' + opcoes
+      .sort((a, b) => String(a.label).localeCompare(String(b.label), 'pt-BR'))
+      .map(opcao => `<option value="${orcamentoHtml(opcao.value)}">${orcamentoHtml(opcao.label)}</option>`)
+      .join('');
     orcamentoFontesCarregadas = true;
   } catch (err) {
     console.warn('Nao foi possivel carregar opcoes de fonte do Orcamento.', err);
@@ -2035,7 +2055,7 @@ function orcamentoFiltrar() {
 async function orcamentoCarregarComposicoesDoServico(servico, forcar) {
   if (!servico || (servico.composicoesCarregadas && !forcar)) return;
   const uf = document.getElementById('orcamentoUf')?.value || 'TODOS';
-  const fonteId = document.getElementById('orcamentoFonte')?.value || 'TODAS';
+  const fonteFiltro = document.getElementById('orcamentoFonte')?.value || 'TODAS';
   const params = {
     select: 'id,servico_id,fonte_id,codigo,descricao,unidade,uf,competencia,regime,origem,custo_unitario,referencia_preco,codigo_origem,projeto_origem,arquivo_origem,aba_origem,linha_origem,item_ref,formato_origem',
     servico_id: `eq.${servico.dbId}`,
@@ -2044,7 +2064,8 @@ async function orcamentoCarregarComposicoesDoServico(servico, forcar) {
     limit: '80'
   };
   if (uf !== 'TODOS') params.uf = `eq.${uf}`;
-  if (fonteId !== 'TODAS') params.fonte_id = `eq.${fonteId}`;
+  if (fonteFiltro.startsWith('FONTE:')) params.fonte_id = `eq.${fonteFiltro.slice(6)}`;
+  if (fonteFiltro.startsWith('ORIGEM:')) params.origem = `eq.${fonteFiltro.slice(7)}`;
   const rows = await orcamentoRest('orc_composicoes', params);
   await orcamentoCarregarFontes((rows || []).map(row => row.fonte_id));
   servico.composicoes = (rows || []).map(row => {
