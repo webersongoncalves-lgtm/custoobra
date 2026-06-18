@@ -1434,7 +1434,6 @@ strong.hi { color: var(--accent); font-weight: 700; }
                       <label>Fonte</label>
                       <select id="orcamentoFonte" onchange="orcamentoFiltrar()">
                         <option value="TODAS">Todas</option>
-                        <option value="SINAPI">SINAPI</option>
                       </select>
                     </div>
                   </div>
@@ -1555,6 +1554,7 @@ let orcamentoComposicaoSelecionada = null;
 let orcamentoItens = [];
 let orcamentoBuscaTimer = null;
 let orcamentoFontesMap = {};
+let orcamentoFontesCarregadas = false;
 const ORCAMENTO_MACRO_ITENS_PADRAO = [
   'Fundação',
   'Impermeabilização',
@@ -1678,7 +1678,10 @@ function orcamentoAtualizarAcesso() {
   lock.style.display = autenticado ? 'none' : 'block';
   app.style.display = autenticado ? 'block' : 'none';
   if (status) status.textContent = autenticado ? 'Base online' : 'Acesso restrito';
-  if (autenticado && !orcamentoServicos.length) orcamentoBuscarServicosOnline();
+  if (autenticado) {
+    orcamentoCarregarOpcoesFonte();
+    if (!orcamentoServicos.length) orcamentoBuscarServicosOnline();
+  }
 }
 
 async function orcamentoLogin() {
@@ -1949,6 +1952,27 @@ async function orcamentoCarregarFontes(ids) {
   }
 }
 
+async function orcamentoCarregarOpcoesFonte() {
+  if (orcamentoFontesCarregadas) return;
+  const select = document.getElementById('orcamentoFonte');
+  if (!select) return;
+  try {
+    const rows = await orcamentoRest('orc_fontes', {
+      select: 'id,nome,tipo',
+      order: 'nome.asc'
+    });
+    (rows || []).forEach(row => {
+      orcamentoFontesMap[row.id] = row;
+    });
+    select.innerHTML = '<option value="TODAS">Todas</option>' + (rows || []).map(row =>
+      `<option value="${orcamentoHtml(row.id)}">${orcamentoHtml(row.nome || row.tipo || row.id)}</option>`
+    ).join('');
+    orcamentoFontesCarregadas = true;
+  } catch (err) {
+    console.warn('Nao foi possivel carregar opcoes de fonte do Orcamento.', err);
+  }
+}
+
 function orcamentoFonteFallback(row) {
   if (row && (row.origem === 'propria' || row.origem === 'adaptada')) return 'CPU Própria';
   if (row && (row.origem === 'oficial' || row.origem === 'sinapi')) return 'SINAPI';
@@ -2011,6 +2035,7 @@ function orcamentoFiltrar() {
 async function orcamentoCarregarComposicoesDoServico(servico, forcar) {
   if (!servico || (servico.composicoesCarregadas && !forcar)) return;
   const uf = document.getElementById('orcamentoUf')?.value || 'TODOS';
+  const fonteId = document.getElementById('orcamentoFonte')?.value || 'TODAS';
   const params = {
     select: 'id,servico_id,fonte_id,codigo,descricao,unidade,uf,competencia,regime,origem,custo_unitario,referencia_preco,codigo_origem,projeto_origem,arquivo_origem,aba_origem,linha_origem,item_ref,formato_origem',
     servico_id: `eq.${servico.dbId}`,
@@ -2019,6 +2044,7 @@ async function orcamentoCarregarComposicoesDoServico(servico, forcar) {
     limit: '80'
   };
   if (uf !== 'TODOS') params.uf = `eq.${uf}`;
+  if (fonteId !== 'TODAS') params.fonte_id = `eq.${fonteId}`;
   const rows = await orcamentoRest('orc_composicoes', params);
   await orcamentoCarregarFontes((rows || []).map(row => row.fonte_id));
   servico.composicoes = (rows || []).map(row => {
