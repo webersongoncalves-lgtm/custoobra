@@ -150,10 +150,10 @@ body.orcamento-wide main { max-width: 1280px; }
 .orcamento-type.eqp { color: #8a5200; background: #fff3d8; }
 .orcamento-add-box { border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: #F8FAFE; }
 .orcamento-add-total { font-family: 'IBM Plex Mono', monospace; font-weight: 800; font-size: 1.05rem; color: var(--text); text-align: right; margin: 4px 0 12px; }
-.orcamento-add-row { display: grid; grid-template-columns: minmax(160px, 1.15fr) minmax(150px, 1fr) minmax(120px, 0.7fr) minmax(120px, 0.7fr) minmax(145px, 0.95fr) auto; gap: 12px; align-items: end; }
+.orcamento-add-row { display: grid; grid-template-columns: minmax(130px, 1.15fr) minmax(110px, 0.85fr) minmax(95px, 0.7fr) minmax(95px, 0.7fr) minmax(120px, 0.95fr) minmax(160px, auto); gap: 12px; align-items: end; }
 .orcamento-add-row .field { margin-bottom: 0; }
 .orcamento-add-row .orcamento-add-total { margin: 4px 0 0; }
-.orcamento-add-row .btn { width: auto; min-width: 210px; min-height: 46px; white-space: nowrap; }
+.orcamento-add-row .btn { width: 100%; min-width: 0; min-height: 46px; padding-left: 12px; padding-right: 12px; white-space: normal; line-height: 1.2; }
 .orcamento-budget-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
 .orcamento-budget-list { display: grid; gap: 8px; }
 .orcamento-budget-group { display: grid; gap: 8px; }
@@ -770,6 +770,16 @@ strong.hi { color: var(--accent); font-weight: 700; }
 /* ─── SCREEN MANAGER ─────────────────────────── */
 .screen { display: none; }
 .screen.active { display: block; }
+
+@media (max-width: 1200px) {
+  .orcamento-add-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .orcamento-add-row .btn { width: 100%; }
+}
+
+@media (max-width: 900px) {
+  .orcamento-layout, .orcamento-detail-grid, .orcamento-budget-grid { grid-template-columns: 1fr; }
+  .orcamento-add-row { grid-template-columns: 1fr; }
+}
 
 @media (max-width: 480px) {
   main { padding: 16px 12px 70px; }
@@ -1547,10 +1557,15 @@ let orcamentoBuscaTimer = null;
 let orcamentoFontesMap = {};
 const ORCAMENTO_MACRO_ITENS_PADRAO = [
   'Fundação',
+  'Impermeabilização',
   'Estrutura',
   'Alvenaria',
-  'Cobertura',
+  'Paredes e Teto',
+  'Pisos',
   'Instalações',
+  'Cobertura',
+  'Esquadrias',
+  'Louças e Metais',
   'Revestimentos',
   'Acabamentos',
   'Infraestrutura'
