@@ -2474,35 +2474,48 @@ async function orcamentoSalvarOnline() {
     if (!orcamentoId) throw new Error('Não foi possível obter o ID do orçamento.');
 
     for (const [idx, item] of orcamentoItens.entries()) {
-      const salvo = await orcamentoRest('orc_orcamento_itens', { select: 'id' }, {
-        method: 'POST',
-        prefer: 'return=representation',
-        body: {
-          orcamento_id: orcamentoId,
-          servico_id: item.servico.dbId || null,
-          composicao_id: item.composicao.id || null,
-          item_ordem: idx + 1,
-          etapa: item.servico.etapa,
-          macro_item: item.macroItem,
-          servico_descricao: item.servico.nome,
-          unidade: item.servico.unidade,
-          quantidade: item.quantidade,
-          composicao_codigo: item.composicao.codigo,
-          fonte_nome: item.composicao.fonte,
-          uf: item.composicao.uf,
-          competencia: item.composicao.mesBase,
-          custo_unitario: item.custoUnitario,
-          bdi_percentual: item.bdi,
-          preco_unitario: item.precoUnitario,
-          total_custo: item.custoUnitario * item.quantidade,
-          total_preco: item.total,
-          snapshot_composicao: {
-            ...item.composicao,
-            macroItem: item.macroItem,
-            macro_item: item.macroItem
-          }
+      const payloadItem = {
+        orcamento_id: orcamentoId,
+        servico_id: item.servico.dbId || null,
+        composicao_id: item.composicao.id || null,
+        item_ordem: idx + 1,
+        etapa: item.servico.etapa,
+        macro_item: item.macroItem,
+        servico_descricao: item.servico.nome,
+        unidade: item.servico.unidade,
+        quantidade: item.quantidade,
+        composicao_codigo: item.composicao.codigo,
+        fonte_nome: item.composicao.fonte,
+        uf: item.composicao.uf,
+        competencia: item.composicao.mesBase,
+        custo_unitario: item.custoUnitario,
+        bdi_percentual: item.bdi,
+        preco_unitario: item.precoUnitario,
+        total_custo: item.custoUnitario * item.quantidade,
+        total_preco: item.total,
+        snapshot_composicao: {
+          ...item.composicao,
+          macroItem: item.macroItem,
+          macro_item: item.macroItem
         }
-      });
+      };
+      let salvo;
+      try {
+        salvo = await orcamentoRest('orc_orcamento_itens', { select: 'id' }, {
+          method: 'POST',
+          prefer: 'return=representation',
+          body: payloadItem
+        });
+      } catch (err) {
+        if (!/macro_item|schema cache/i.test(err.message || '')) throw err;
+        const payloadCompat = { ...payloadItem };
+        delete payloadCompat.macro_item;
+        salvo = await orcamentoRest('orc_orcamento_itens', { select: 'id' }, {
+          method: 'POST',
+          prefer: 'return=representation',
+          body: payloadCompat
+        });
+      }
       const itemId = Array.isArray(salvo) && salvo[0] ? salvo[0].id : null;
       if (itemId && item.composicao.itens.length) {
         await orcamentoRest('orc_orcamento_item_insumos', {}, {
