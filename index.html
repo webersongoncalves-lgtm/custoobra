@@ -89,57 +89,61 @@ body.orcamento-wide main { max-width: 1280px; }
 .panel-body { padding: 18px; }
 .summary-count { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--text3); }
 
-/* ─── HOME EXECUTIVA ─────────────────────────── */
-body.home-wide { background: #EEF3F6; }
+/* ─── HOME PLATAFORMA ────────────────────────── */
+body.home-wide { background: #E9EEF2; }
+body.home-wide main { max-width: 1180px; }
 .home-panel {
-  background: #F8FAFC;
-  border: 1px solid #D6E1E8;
-  border-radius: 8px;
-  box-shadow: 0 14px 36px rgba(15,47,58,0.12);
+  background: #0B1620;
+  border: 1px solid #1B3342;
+  border-radius: 10px;
+  box-shadow: 0 18px 46px rgba(10,22,32,0.18);
   overflow: hidden;
 }
 .home-diagram {
   display: grid;
-  gap: 18px;
-  padding: 24px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.98)),
-    #F8FAFC;
+  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-areas:
+    "title title"
+    "modules stage";
+  gap: 14px;
+  padding: 14px;
+  background: #0B1620;
 }
 .home-title {
+  grid-area: title;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
-  align-items: end;
-  padding: 20px 22px;
-  background: #0B2F3A;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #102433 0%, #0E3544 58%, #12313C 100%);
   color: #FFFFFF;
-  border-left: 5px solid #F47920;
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 8px;
 }
 .home-title-main { display: grid; gap: 4px; }
 .home-eyebrow {
-  color: rgba(255,255,255,0.68);
+  color: #9FB3BE;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 .home-title strong {
-  font-size: 1.32rem;
+  font-size: 1.28rem;
   font-weight: 700;
   letter-spacing: 0;
 }
 .home-title-sub {
-  color: rgba(255,255,255,0.78);
+  color: #C9D5DB;
   font-size: 0.82rem;
   line-height: 1.45;
 }
 .home-status-pill {
   align-self: start;
-  border: 1px solid rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.08);
-  color: #FFFFFF;
+  border: 1px solid rgba(61,183,135,0.32);
+  background: rgba(61,183,135,0.12);
+  color: #B7E6D2;
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 0.7rem;
@@ -148,87 +152,96 @@ body.home-wide { background: #EEF3F6; }
   white-space: nowrap;
 }
 .home-modules {
+  grid-area: modules;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-content: start;
+  padding: 14px;
+  background: #111F2A;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
 }
 .home-module {
-  min-height: 138px;
-  padding: 14px;
-  background: #FFFFFF;
-  border: 1px solid #D4DEE6;
-  border-top: 4px solid #1D6B82;
-  border-radius: 8px;
-  color: #162D38;
+  min-height: 0;
+  padding: 13px 14px;
+  background: #152735;
+  border: 1px solid #244254;
+  border-left: 4px solid #2C8FA8;
+  border-radius: 7px;
+  color: #DDE9EE;
   font-family: 'IBM Plex Sans', sans-serif;
   text-align: left;
   cursor: pointer;
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 6px;
   transition: border-color 0.16s, box-shadow 0.16s, transform 0.16s;
 }
 .home-module:hover {
-  border-color: #9EB5C5;
-  box-shadow: 0 10px 24px rgba(15,47,58,0.11);
-  transform: translateY(-2px);
+  border-color: #3B6B80;
+  background: #193244;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.18);
+  transform: translateX(2px);
 }
-.home-module:nth-child(1) { border-top-color: #2F7D5A; }
-.home-module:nth-child(2) { border-top-color: #8A5A16; }
-.home-module:nth-child(3) { border-top-color: #1D6B82; }
-.home-module:nth-child(4) { border-top-color: #7B5EA7; }
-.home-module:nth-child(5) { border-top-color: #A64D57; }
+.home-module:nth-child(1) { border-left-color: #3DB787; }
+.home-module:nth-child(2) { border-left-color: #C59645; }
+.home-module:nth-child(3) { border-left-color: #2C8FA8; }
+.home-module:nth-child(4) { border-left-color: #8B77C7; }
+.home-module:nth-child(5) { border-left-color: #C46A72; }
 .home-module-kicker {
-  color: #667985;
+  color: #8FA5B0;
   font-size: 0.64rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .home-module-name {
-  color: #102A35;
-  font-size: 0.92rem;
+  color: #F5FAFC;
+  font-size: 0.88rem;
   font-weight: 800;
   line-height: 1.18;
   text-transform: uppercase;
 }
 .home-module-sub {
-  color: #5D6F7A;
+  color: #AEBFC7;
   font-size: 0.74rem;
   line-height: 1.38;
 }
-.home-module.is-pending { cursor: help; background: #FBFCFD; border-style: solid; }
-.home-module.is-pending .home-module-kicker { color: #8B768F; }
+.home-module.is-pending { cursor: help; background: #15222F; border-style: solid; }
+.home-module.is-pending .home-module-kicker { color: #B8A8CD; }
 .home-module.is-pending::after {
   content: "EM DESENVOLVIMENTO";
   align-self: end;
   width: max-content;
   max-width: 100%;
   margin-top: 2px;
-  padding: 4px 8px;
+  padding: 4px 7px;
   border-radius: 999px;
-  background: #F1ECF6;
-  color: #695077;
+  background: rgba(139,119,199,0.14);
+  color: #D3C9EA;
   font-size: 0.58rem;
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0.05em;
 }
 .home-stage {
+  grid-area: stage;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  min-width: 0;
 }
 .home-stage-main,
 .home-stage-side {
-  background: #FFFFFF;
-  border: 1px solid #D6E1E8;
+  background: #F7FAFC;
+  border: 1px solid #D5E0E7;
   border-radius: 8px;
   padding: 18px;
 }
 .home-stage-text {
   color: #102A35;
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   font-weight: 800;
   line-height: 1.3;
   text-transform: uppercase;
@@ -250,7 +263,7 @@ body.home-wide { background: #EEF3F6; }
   border-left: 4px solid #1D6B82;
   border-radius: 8px;
   padding: 12px;
-  background: #FBFCFD;
+  background: #FFFFFF;
 }
 .home-data-card:nth-child(2) { border-left-color: #2F7D5A; }
 .home-data-card:nth-child(3) { border-left-color: #8A5A16; }
@@ -280,10 +293,11 @@ body.home-wide { background: #EEF3F6; }
 .home-side-item {
   display: grid;
   gap: 2px;
-  padding: 10px 0;
-  border-bottom: 1px solid #E8EEF2;
+  padding: 11px 12px;
+  border: 1px solid #E8EEF2;
+  border-radius: 7px;
+  background: #FFFFFF;
 }
-.home-side-item:last-child { border-bottom: 0; }
 .home-side-name {
   color: #102A35;
   font-size: 0.8rem;
@@ -296,7 +310,7 @@ body.home-wide { background: #EEF3F6; }
 }
 .home-foot {
   font-size: 0.75rem;
-  color: var(--text3);
+  color: #617887;
   padding: 10px 4px 0;
   line-height: 1.6;
   display: flex;
@@ -1010,10 +1024,16 @@ body.orcamento-wide .logo-app { font-size: 1.02rem; }
 strong.hi { color: var(--accent); font-weight: 700; }
 
 @media (max-width: 1100px) {
+  .home-diagram {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "title"
+      "modules"
+      "stage";
+  }
   .home-title,
   .home-stage { grid-template-columns: 1fr; }
   .home-modules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .home-stage-side { order: -1; }
 }
 
 @media (max-width: 640px) {
@@ -1150,9 +1170,9 @@ strong.hi { color: var(--accent); font-weight: 700; }
       <div class="home-diagram" aria-label="Mapa dos módulos de gestão de obras">
         <div class="home-title">
           <div class="home-title-main">
-            <span class="home-eyebrow">Painel executivo</span>
+            <span class="home-eyebrow">Painel de gestão</span>
             <strong>Gestão de Obras</strong>
-            <span class="home-title-sub">Visão integrada para acompanhar avanço, custo, orçamento, planejamento e análises executivas por obra.</span>
+            <span class="home-title-sub">Visão integrada para acompanhar avanço, custo, orçamento, planejamento e análises por obra.</span>
           </div>
           <span class="home-status-pill">Operação integrada</span>
         </div>
@@ -1185,7 +1205,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
         </div>
         <div class="home-stage">
           <div class="home-stage-main">
-            <div class="home-stage-text">Centro executivo de decisão</div>
+            <div class="home-stage-text">Centro de comando da obra</div>
             <div class="home-stage-sub">A home organiza os módulos por função. A integração de dados será tratada dentro dos módulos de Planejamento e Análises, sem alterar as rotinas atuais de Metas, Custo, Orçamento ou atualizações automáticas.</div>
             <div class="home-data-grid">
               <div class="home-data-card">
@@ -1215,7 +1235,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
               </div>
               <div class="home-side-item">
                 <div class="home-side-name">Análises</div>
-                <div class="home-side-note">Indicadores executivos de custo, prazo, maturidade e projeção.</div>
+                <div class="home-side-note">Indicadores de custo, prazo, maturidade e projeção.</div>
               </div>
               <div class="home-side-item">
                 <div class="home-side-name">Painel integrado</div>
