@@ -89,94 +89,210 @@ body.orcamento-wide main { max-width: 1280px; }
 .panel-body { padding: 18px; }
 .summary-count { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--text3); }
 
-/* ─── HOME MAP ───────────────────────────────── */
-.home-panel { background: #FFFFFF; border-radius: 0; box-shadow: var(--shadow); overflow: hidden; }
+/* ─── HOME EXECUTIVA ─────────────────────────── */
+body.home-wide { background: #EEF3F6; }
+.home-panel {
+  background: #F8FAFC;
+  border: 1px solid #D6E1E8;
+  border-radius: 8px;
+  box-shadow: 0 14px 36px rgba(15,47,58,0.12);
+  overflow: hidden;
+}
 .home-diagram {
-  position: relative;
-  min-height: 510px;
-  background: #FFFFFF;
-  border: 1px solid #D8DCE2;
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.98)),
+    #F8FAFC;
 }
 .home-title {
-  position: absolute;
-  top: 32px;
-  left: 48%;
-  right: 30px;
-  text-align: center;
-  color: #111111;
-  font-size: 1.05rem;
-  font-weight: 500;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+  padding: 20px 22px;
+  background: #0B2F3A;
+  color: #FFFFFF;
+  border-left: 5px solid #F47920;
+  border-radius: 8px;
+}
+.home-title-main { display: grid; gap: 4px; }
+.home-eyebrow {
+  color: rgba(255,255,255,0.68);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.home-title strong {
+  font-size: 1.32rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.home-title-sub {
+  color: rgba(255,255,255,0.78);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.home-status-pill {
+  align-self: start;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.08);
+  color: #FFFFFF;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 .home-modules {
-  position: absolute;
-  left: 24px;
-  top: 74px;
-  width: 190px;
   display: grid;
-  gap: 28px;
-  z-index: 2;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
 }
 .home-module {
-  width: 100%;
-  min-height: 36px;
-  padding: 7px 12px;
+  min-height: 138px;
+  padding: 14px;
   background: #FFFFFF;
-  border: 1px solid #222222;
-  color: #111111;
+  border: 1px solid #D4DEE6;
+  border-top: 4px solid #1D6B82;
+  border-radius: 8px;
+  color: #162D38;
   font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.18;
-  text-transform: uppercase;
-  text-align: center;
+  text-align: left;
   cursor: pointer;
+  display: grid;
+  align-content: start;
+  gap: 8px;
   transition: border-color 0.16s, box-shadow 0.16s, transform 0.16s;
 }
 .home-module:hover {
-  border-color: #0F5E7C;
-  box-shadow: 0 3px 0 rgba(15,94,124,0.18);
-  transform: translateY(-1px);
+  border-color: #9EB5C5;
+  box-shadow: 0 10px 24px rgba(15,47,58,0.11);
+  transform: translateY(-2px);
 }
-.home-module.is-pending { cursor: help; background: #FAFAFA; border-style: dashed; color: #333333; }
-.home-module.is-pending::after {
-  content: "EM DESENV.";
-  display: block;
-  margin-top: 3px;
-  color: #6E6E6E;
-  font-size: 0.58rem;
-  font-weight: 600;
-  line-height: 1;
-}
-.home-stage {
-  position: absolute;
-  left: 288px;
-  right: 22px;
-  top: 58px;
-  bottom: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid #082B3A;
-  border-radius: 82px;
-  padding: 48px;
-  z-index: 2;
-}
-.home-stage-text {
-  max-width: 640px;
-  color: #111111;
-  font-size: 1.05rem;
-  font-weight: 500;
-  line-height: 1.35;
-  text-align: center;
+.home-module:nth-child(1) { border-top-color: #2F7D5A; }
+.home-module:nth-child(2) { border-top-color: #8A5A16; }
+.home-module:nth-child(3) { border-top-color: #1D6B82; }
+.home-module:nth-child(4) { border-top-color: #7B5EA7; }
+.home-module:nth-child(5) { border-top-color: #A64D57; }
+.home-module-kicker {
+  color: #667985;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.home-flow-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
+.home-module-name {
+  color: #102A35;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.18;
+  text-transform: uppercase;
+}
+.home-module-sub {
+  color: #5D6F7A;
+  font-size: 0.74rem;
+  line-height: 1.38;
+}
+.home-module.is-pending { cursor: help; background: #FBFCFD; border-style: solid; }
+.home-module.is-pending .home-module-kicker { color: #8B768F; }
+.home-module.is-pending::after {
+  content: "EM DESENVOLVIMENTO";
+  align-self: end;
+  width: max-content;
+  max-width: 100%;
+  margin-top: 2px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #F1ECF6;
+  color: #695077;
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.05em;
+}
+.home-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+}
+.home-stage-main,
+.home-stage-side {
+  background: #FFFFFF;
+  border: 1px solid #D6E1E8;
+  border-radius: 8px;
+  padding: 18px;
+}
+.home-stage-text {
+  color: #102A35;
+  font-size: 1.02rem;
+  font-weight: 800;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+.home-stage-sub {
+  margin-top: 8px;
+  color: #5D6F7A;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+.home-data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+.home-data-card {
+  border: 1px solid #E0E7EC;
+  border-left: 4px solid #1D6B82;
+  border-radius: 8px;
+  padding: 12px;
+  background: #FBFCFD;
+}
+.home-data-card:nth-child(2) { border-left-color: #2F7D5A; }
+.home-data-card:nth-child(3) { border-left-color: #8A5A16; }
+.home-data-card:nth-child(4) { border-left-color: #A64D57; }
+.home-data-label {
+  color: #667985;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.home-data-text {
+  margin-top: 5px;
+  color: #203A46;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+.home-stage-side { display: grid; align-content: start; gap: 12px; }
+.home-side-title {
+  color: #667985;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.home-side-list { display: grid; gap: 8px; }
+.home-side-item {
+  display: grid;
+  gap: 2px;
+  padding: 10px 0;
+  border-bottom: 1px solid #E8EEF2;
+}
+.home-side-item:last-child { border-bottom: 0; }
+.home-side-name {
+  color: #102A35;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.home-side-note {
+  color: #667985;
+  font-size: 0.72rem;
+  line-height: 1.4;
 }
 .home-foot {
   font-size: 0.75rem;
@@ -893,6 +1009,24 @@ body.orcamento-wide .logo-app { font-size: 1.02rem; }
 .anim { animation: fadeIn2 0.25s ease both; }
 strong.hi { color: var(--accent); font-weight: 700; }
 
+@media (max-width: 1100px) {
+  .home-title,
+  .home-stage { grid-template-columns: 1fr; }
+  .home-modules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-stage-side { order: -1; }
+}
+
+@media (max-width: 640px) {
+  .home-diagram { padding: 16px; gap: 14px; }
+  .home-title { padding: 18px; }
+  .home-status-pill { width: max-content; }
+  .home-modules,
+  .home-data-grid { grid-template-columns: 1fr; }
+  .home-module { min-height: 0; }
+  .home-stage-main,
+  .home-stage-side { padding: 15px; }
+}
+
 /* ─── SCREEN MANAGER ─────────────────────────── */
 .screen { display: none; }
 .screen.active { display: block; }
@@ -905,15 +1039,6 @@ strong.hi { color: var(--accent); font-weight: 700; }
 @media (max-width: 900px) {
   .orcamento-layout, .orcamento-detail-grid, .orcamento-budget-grid { grid-template-columns: 1fr; }
   .orcamento-add-row { grid-template-columns: 1fr; }
-  .home-diagram { min-height: auto; padding: 22px; display: grid; gap: 18px; }
-  .home-title, .home-modules, .home-stage {
-    position: static;
-    width: auto;
-  }
-  .home-title { text-align: center; }
-  .home-modules { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .home-stage { min-height: 260px; border-radius: 34px; padding: 30px 20px; }
-  .home-flow-svg { display: none; }
 }
 
 @media (max-width: 480px) {
@@ -945,10 +1070,6 @@ strong.hi { color: var(--accent); font-weight: 700; }
   .confirm-table th, .confirm-table td { padding: 8px 6px; }
   body.home-wide main { padding: 16px 12px 70px; }
   .home-diagram { padding: 16px; }
-  .home-modules { grid-template-columns: 1fr; }
-  .home-module { font-size: 0.9rem; }
-  .home-stage { min-height: 220px; border-radius: 28px; padding: 24px 16px; }
-  .home-stage-text { font-size: 0.9rem; }
   .home-foot { align-items: flex-start; flex-direction: column; }
   .admin-grid { grid-template-columns: 1fr; }
   .admin-actions .btn { width: 100%; min-width: 0; }
@@ -1027,31 +1148,81 @@ strong.hi { color: var(--accent); font-weight: 700; }
   <div id="screenModulo" class="screen active">
     <div class="home-panel">
       <div class="home-diagram" aria-label="Mapa dos módulos de gestão de obras">
-        <div class="home-title">GESTÃO DE OBRAS</div>
-        <div class="home-modules">
-          <button type="button" class="home-module" onclick="abrirMetas()">METAS<br>SEMANAIS</button>
-          <button type="button" class="home-module" onclick="abrirCusto()">CUSTO<br>COMPROMETIDO</button>
-          <button type="button" class="home-module" onclick="abrirOrcamento()">ORÇAMENTO</button>
-          <button type="button" class="home-module is-pending" onclick="abrirModuloEmDesenvolvimento('Planejamento')" title="Módulo em desenvolvimento">PLANEJAMENTO</button>
-          <button type="button" class="home-module is-pending" onclick="abrirModuloEmDesenvolvimento('Análises')" title="Módulo em desenvolvimento">ANÁLISES</button>
+        <div class="home-title">
+          <div class="home-title-main">
+            <span class="home-eyebrow">Painel executivo</span>
+            <strong>Gestão de Obras</strong>
+            <span class="home-title-sub">Visão integrada para acompanhar avanço, custo, orçamento, planejamento e análises executivas por obra.</span>
+          </div>
+          <span class="home-status-pill">Operação integrada</span>
         </div>
-        <svg class="home-flow-svg" viewBox="0 0 1080 510" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-          <defs>
-            <marker id="homeArrow" markerWidth="18" markerHeight="18" refX="15" refY="9" orient="auto" markerUnits="userSpaceOnUse">
-              <path d="M0,0 L18,9 L0,18 Z" fill="#0F5E7C"></path>
-            </marker>
-            <marker id="homeArrowStart" markerWidth="18" markerHeight="18" refX="3" refY="9" orient="auto" markerUnits="userSpaceOnUse">
-              <path d="M18,0 L0,9 L18,18 Z" fill="#0F5E7C"></path>
-            </marker>
-          </defs>
-          <path d="M220 86 C294 105 292 378 222 436" fill="none" stroke="#0F5E7C" stroke-width="6" marker-end="url(#homeArrow)"></path>
-          <path d="M207 108 C273 130 270 360 207 418" fill="none" stroke="#0F5E7C" stroke-width="4" opacity="0.95" marker-end="url(#homeArrow)"></path>
-          <path d="M196 282 C268 306 266 394 200 426" fill="none" stroke="#0F5E7C" stroke-width="6" marker-end="url(#homeArrow)"></path>
-          <path d="M35 296 C4 309 2 390 35 410" fill="none" stroke="#0F5E7C" stroke-width="4" marker-end="url(#homeArrow)"></path>
-          <path d="M110 372 L110 432" fill="none" stroke="#0F5E7C" stroke-width="6" marker-start="url(#homeArrowStart)" marker-end="url(#homeArrow)"></path>
-        </svg>
+        <div class="home-modules">
+          <button type="button" class="home-module" onclick="abrirMetas()">
+            <span class="home-module-kicker">Produção</span>
+            <span class="home-module-name">Metas Semanais</span>
+            <span class="home-module-sub">Realizado da semana, saldo e status dos serviços.</span>
+          </button>
+          <button type="button" class="home-module" onclick="abrirCusto()">
+            <span class="home-module-kicker">Financeiro</span>
+            <span class="home-module-name">Custo Comprometido</span>
+            <span class="home-module-sub">Lançamentos mensais para acompanhamento gerencial.</span>
+          </button>
+          <button type="button" class="home-module" onclick="abrirOrcamento()">
+            <span class="home-module-kicker">Base econômica</span>
+            <span class="home-module-name">Orçamento</span>
+            <span class="home-module-sub">CPUs, planilhas congeladas e referência de custo.</span>
+          </button>
+          <button type="button" class="home-module is-pending" onclick="abrirModuloEmDesenvolvimento('Planejamento')" title="Módulo em desenvolvimento">
+            <span class="home-module-kicker">Cronograma</span>
+            <span class="home-module-name">Planejamento</span>
+            <span class="home-module-sub">DCMA, caminho crítico, higiene e riscos do MPP.</span>
+          </button>
+          <button type="button" class="home-module is-pending" onclick="abrirModuloEmDesenvolvimento('Análises')" title="Módulo em desenvolvimento">
+            <span class="home-module-kicker">Performance</span>
+            <span class="home-module-name">Análises</span>
+            <span class="home-module-sub">EVM, Earned Schedule, projeções e ofensores.</span>
+          </button>
+        </div>
         <div class="home-stage">
-          <div class="home-stage-text">Reprogramações da semana das obras e status dos serviços</div>
+          <div class="home-stage-main">
+            <div class="home-stage-text">Centro executivo de decisão</div>
+            <div class="home-stage-sub">A home organiza os módulos por função. A integração de dados será tratada dentro dos módulos de Planejamento e Análises, sem alterar as rotinas atuais de Metas, Custo, Orçamento ou atualizações automáticas.</div>
+            <div class="home-data-grid">
+              <div class="home-data-card">
+                <div class="home-data-label">Avanço físico</div>
+                <div class="home-data-text">Metas Semanais alimentam status, realizado e reprogramação operacional.</div>
+              </div>
+              <div class="home-data-card">
+                <div class="home-data-label">Base de custo</div>
+                <div class="home-data-text">Orçamento estrutura BAC, CPUs e referência para análises futuras.</div>
+              </div>
+              <div class="home-data-card">
+                <div class="home-data-label">Compromissos</div>
+                <div class="home-data-text">Custo Comprometido sustenta leituras financeiras sem mudar a rotina atual.</div>
+              </div>
+              <div class="home-data-card">
+                <div class="home-data-label">Prazo e tendência</div>
+                <div class="home-data-text">Planejamento e Análises consolidarão DCMA, EVM e Earned Schedule.</div>
+              </div>
+            </div>
+          </div>
+          <div class="home-stage-side">
+            <div class="home-side-title">Próximas entregas</div>
+            <div class="home-side-list">
+              <div class="home-side-item">
+                <div class="home-side-name">Planejamento</div>
+                <div class="home-side-note">Resultado vigente por obra, substituído a cada novo MPP.</div>
+              </div>
+              <div class="home-side-item">
+                <div class="home-side-name">Análises</div>
+                <div class="home-side-note">Indicadores executivos de custo, prazo, maturidade e projeção.</div>
+              </div>
+              <div class="home-side-item">
+                <div class="home-side-name">Painel integrado</div>
+                <div class="home-side-note">Leitura consolidada para decisão sem duplicar bases.</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
