@@ -398,6 +398,40 @@ body.orcamento-wide .logo-app { font-size: 1.02rem; }
   border-radius: 4px;
   background: #FFFFFF;
 }
+.orcamento-budget-actions { display: inline-flex; gap: 4px; align-items: center; }
+.orcamento-budget-actions .btn { min-width: 30px; padding: 5px 8px; }
+.orcamento-budget-edit {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(90px, 0.6fr) minmax(90px, 0.6fr) auto auto;
+  gap: 8px;
+  align-items: end;
+  padding-top: 8px;
+  border-top: 1px solid #E4ECF1;
+}
+.orcamento-budget-edit .field { margin-bottom: 0; }
+.orcamento-saved-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+.orcamento-saved-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid #D6E2EA;
+  border-radius: 4px;
+  background: #FFFFFF;
+}
+.orcamento-saved-name { font-size: 0.76rem; font-weight: 700; color: #163F57; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.orcamento-saved-sub { margin-top: 2px; font-size: 0.68rem; color: #6F8292; }
+@media (max-width: 900px) {
+  .orcamento-budget-edit,
+  .orcamento-saved-item { grid-template-columns: minmax(0, 1fr); }
+  .orcamento-budget-actions { flex-wrap: wrap; justify-content: flex-start; }
+}
 .orcamento-export-row {
   align-items: stretch;
   padding-top: 10px;
@@ -1475,6 +1509,12 @@ strong.hi { color: var(--accent); font-weight: 700; }
                         <button class="btn btn-sm btn-ghost" onclick="orcamentoExportarCSV('abc')">Curva ABC</button>
                       </div>
                       <div id="orcamentoSaveStatus" style="display:none; margin-top:10px; font-size:0.76rem; color:var(--text3); line-height:1.5;"></div>
+                      <div class="field" style="margin-top:14px;">
+                        <label>Orçamentos salvos neste navegador</label>
+                        <div id="orcamentoSalvosLocais" class="orcamento-saved-list">
+                          <div class="orcamento-empty" style="padding:10px 0;">Nenhum orçamento congelado salvo neste navegador.</div>
+                        </div>
+                      </div>
                     </div>
                     <div class="orcamento-add-box">
                       <div class="summary-label">Total do Orçamento</div>
@@ -1552,9 +1592,11 @@ let orcamentoServicos = [];
 let orcamentoServicoSelecionado = null;
 let orcamentoComposicaoSelecionada = null;
 let orcamentoItens = [];
+let orcamentoItemEditandoUid = null;
 let orcamentoBuscaTimer = null;
 let orcamentoFontesMap = {};
 let orcamentoFontesCarregadas = false;
+const ORCAMENTO_SALVOS_KEY = 'custoobra.orcamentosCongelados.v1';
 const ORCAMENTO_MACRO_ITENS_PADRAO = [
   'Fundação',
   'Impermeabilização',
@@ -1661,6 +1703,7 @@ function abrirOrcamento() {
   if (!currentUser) { abrirUser(); return; }
   mostrarTela('screenOrcamento');
   orcamentoAtualizarAcesso();
+  orcamentoRenderSalvosLocais();
 }
 
 function voltarModulo() {
@@ -1679,6 +1722,7 @@ function orcamentoAtualizarAcesso() {
   app.style.display = autenticado ? 'block' : 'none';
   if (status) status.textContent = autenticado ? 'Base online' : 'Acesso restrito';
   if (autenticado) {
+    orcamentoRenderSalvosLocais();
     orcamentoCarregarOpcoesFonte();
     if (!orcamentoServicos.length) orcamentoBuscarServicosOnline();
   }
@@ -2329,6 +2373,30 @@ function orcamentoAtualizarResumoItem() {
   if (el) el.textContent = orcamentoFmt(total);
 }
 
+function orcamentoValoresItemValidos(qtd, bdi, custoUnitario) {
+  const precoUnitario = custoUnitario * (1 + bdi / 100);
+  const total = precoUnitario * qtd;
+  return Number.isFinite(qtd) && qtd > 0 &&
+    Number.isFinite(bdi) && bdi >= 0 &&
+    Number.isFinite(custoUnitario) && Number.isFinite(precoUnitario) && Number.isFinite(total);
+}
+
+function orcamentoMontarItemOrcamento(macroItem, qtd, bdi, servico, composicao) {
+  const custoUnitario = orcamentoTotalComposicao(composicao);
+  const precoUnitario = custoUnitario * (1 + bdi / 100);
+  return {
+    uid: Date.now() + Math.floor(Math.random() * 1000),
+    macroItem,
+    servico: { ...servico },
+    composicao: JSON.parse(JSON.stringify(composicao)),
+    quantidade: qtd,
+    bdi,
+    custoUnitario,
+    precoUnitario,
+    total: precoUnitario * qtd
+  };
+}
+
 async function orcamentoAdicionarItem() {
   if (!orcamentoServicoSelecionado || !orcamentoComposicaoSelecionada) return;
   await orcamentoGarantirItensComposicao(orcamentoComposicaoSelecionada);
@@ -2350,28 +2418,82 @@ async function orcamentoAdicionarItem() {
     document.getElementById('orcamentoMacroItem')?.focus();
     return;
   }
-  if (qtd <= 0) {
-    alert('Informe uma quantidade maior que zero.');
+  if (!orcamentoValoresItemValidos(qtd, bdi, orcamentoTotalComposicao(orcamentoComposicaoSelecionada))) {
+    alert('Informe quantidade maior que zero e BDI igual ou maior que zero.');
     return;
   }
-  const custoUnitario = orcamentoTotalComposicao(orcamentoComposicaoSelecionada);
-  const precoUnitario = custoUnitario * (1 + bdi / 100);
-  orcamentoItens.push({
-    uid: Date.now() + Math.floor(Math.random() * 1000),
-    macroItem,
-    servico: { ...orcamentoServicoSelecionado },
-    composicao: JSON.parse(JSON.stringify(orcamentoComposicaoSelecionada)),
-    quantidade: qtd,
-    bdi,
-    custoUnitario,
-    precoUnitario,
-    total: precoUnitario * qtd
-  });
+  orcamentoItens.push(orcamentoMontarItemOrcamento(macroItem, qtd, bdi, orcamentoServicoSelecionado, orcamentoComposicaoSelecionada));
+  orcamentoRenderItens();
+}
+
+function orcamentoEditarItem(uid) {
+  orcamentoItemEditandoUid = uid;
+  orcamentoRenderItens();
+}
+
+function orcamentoCancelarEdicaoItem() {
+  orcamentoItemEditandoUid = null;
+  orcamentoRenderItens();
+}
+
+function orcamentoSalvarEdicaoItem(uid) {
+  const item = orcamentoItens.find(row => String(row.uid) === String(uid));
+  if (!item) return;
+  const macroItem = orcamentoMacroItemNormalizado(document.getElementById(`orcamentoEditMacro-${uid}`)?.value || '');
+  const qtd = Number(document.getElementById(`orcamentoEditQtd-${uid}`)?.value || 0);
+  const bdi = Number(document.getElementById(`orcamentoEditBdi-${uid}`)?.value || 0);
+  const custoUnitario = orcamentoTotalComposicao(item.composicao);
+  if (!macroItem) {
+    alert('Informe ou selecione um macro item.');
+    document.getElementById(`orcamentoEditMacro-${uid}`)?.focus();
+    return;
+  }
+  if (!orcamentoValoresItemValidos(qtd, bdi, custoUnitario)) {
+    alert('Informe quantidade maior que zero e BDI igual ou maior que zero.');
+    return;
+  }
+  item.macroItem = macroItem;
+  item.quantidade = qtd;
+  item.bdi = bdi;
+  item.custoUnitario = custoUnitario;
+  item.precoUnitario = item.custoUnitario * (1 + bdi / 100);
+  item.total = item.precoUnitario * qtd;
+  orcamentoItemEditandoUid = null;
+  orcamentoRenderItens();
+}
+
+function orcamentoMoverItem(uid, direcao) {
+  const item = orcamentoItens.find(row => String(row.uid) === String(uid));
+  if (!item) return;
+  const macroItem = item.macroItem || 'Sem macro item';
+  const itensGrupo = orcamentoItens.filter(row => (row.macroItem || 'Sem macro item') === macroItem);
+  const posGrupo = itensGrupo.findIndex(row => String(row.uid) === String(uid));
+  const destinoGrupo = posGrupo + direcao;
+  if (posGrupo < 0 || destinoGrupo < 0 || destinoGrupo >= itensGrupo.length) return;
+  const idx = orcamentoItens.findIndex(row => String(row.uid) === String(itensGrupo[posGrupo].uid));
+  const destino = orcamentoItens.findIndex(row => String(row.uid) === String(itensGrupo[destinoGrupo].uid));
+  if (idx < 0 || destino < 0) return;
+  const atual = orcamentoItens[idx];
+  orcamentoItens[idx] = orcamentoItens[destino];
+  orcamentoItens[destino] = atual;
+  orcamentoRenderItens();
+}
+
+function orcamentoMoverGrupo(macroItem, direcao) {
+  const ordem = orcamentoAgruparItensPorMacro().map(grupo => grupo.macroItem);
+  const idx = ordem.indexOf(macroItem);
+  const destino = idx + direcao;
+  if (idx < 0 || destino < 0 || destino >= ordem.length) return;
+  const atual = ordem[idx];
+  ordem[idx] = ordem[destino];
+  ordem[destino] = atual;
+  orcamentoItens = ordem.flatMap(nome => orcamentoItens.filter(item => (item.macroItem || 'Sem macro item') === nome));
   orcamentoRenderItens();
 }
 
 function orcamentoRemoverItem(uid) {
   orcamentoItens = orcamentoItens.filter(item => String(item.uid) !== String(uid));
+  if (String(orcamentoItemEditandoUid) === String(uid)) orcamentoItemEditandoUid = null;
   orcamentoRenderItens();
 }
 
@@ -2394,10 +2516,15 @@ function orcamentoRenderItens() {
     <div class="orcamento-budget-group">
       <div class="orcamento-budget-group-head">
         <div class="orcamento-budget-group-title">${orcamentoHtml(grupo.macroItem)}</div>
-        <div class="orcamento-budget-group-total">${orcamentoFmt(grupo.subtotal)}</div>
+        <div class="orcamento-budget-actions">
+          <button class="btn btn-sm btn-ghost" title="Mover macro item para cima" onclick='orcamentoMoverGrupo(${JSON.stringify(grupo.macroItem)}, -1)'>↑</button>
+          <button class="btn btn-sm btn-ghost" title="Mover macro item para baixo" onclick='orcamentoMoverGrupo(${JSON.stringify(grupo.macroItem)}, 1)'>↓</button>
+          <div class="orcamento-budget-group-total">${orcamentoFmt(grupo.subtotal)}</div>
+        </div>
       </div>
       ${grupo.itens.map(item => {
         const resumo = orcamentoResumoComposicao(item.composicao);
+        const editando = String(orcamentoItemEditandoUid) === String(item.uid);
         return `
           <div class="orcamento-budget-item">
             <div>
@@ -2405,7 +2532,33 @@ function orcamentoRenderItens() {
               <div class="orcamento-budget-sub">${orcamentoHtml(resumo.origem)} · ${orcamentoNumero(item.quantidade)} ${orcamentoHtml(item.servico.unidade)} · BDI ${orcamentoNumero(item.bdi)}%</div>
             </div>
             <div class="orcamento-budget-value">${orcamentoFmt(item.total)}</div>
-            <button class="btn btn-sm btn-remove" onclick='orcamentoRemoverItem(${JSON.stringify(item.uid)})'>✕</button>
+            <div class="orcamento-budget-actions">
+              <button class="btn btn-sm btn-ghost" title="Mover item para cima" onclick='orcamentoMoverItem(${JSON.stringify(item.uid)}, -1)'>↑</button>
+              <button class="btn btn-sm btn-ghost" title="Mover item para baixo" onclick='orcamentoMoverItem(${JSON.stringify(item.uid)}, 1)'>↓</button>
+              <button class="btn btn-sm btn-ghost" onclick='orcamentoEditarItem(${JSON.stringify(item.uid)})'>Editar</button>
+              <button class="btn btn-sm btn-remove" onclick='orcamentoRemoverItem(${JSON.stringify(item.uid)})'>✕</button>
+            </div>
+            ${editando ? `
+              <div class="orcamento-budget-edit">
+                <div class="field">
+                  <label>Macro item</label>
+                  <input type="text" id="orcamentoEditMacro-${orcamentoHtml(item.uid)}" list="orcamentoMacroItensListaEdicao" value="${orcamentoHtml(item.macroItem)}">
+                  <datalist id="orcamentoMacroItensListaEdicao">
+                    ${orcamentoMacroItensDisponiveis().map(nome => `<option value="${orcamentoHtml(nome)}"></option>`).join('')}
+                  </datalist>
+                </div>
+                <div class="field">
+                  <label>Quantidade</label>
+                  <input type="number" id="orcamentoEditQtd-${orcamentoHtml(item.uid)}" min="0" step="0.01" value="${orcamentoHtml(item.quantidade)}">
+                </div>
+                <div class="field">
+                  <label>BDI (%)</label>
+                  <input type="number" id="orcamentoEditBdi-${orcamentoHtml(item.uid)}" min="0" step="0.01" value="${orcamentoHtml(item.bdi)}">
+                </div>
+                <button class="btn btn-sm btn-primary" onclick='orcamentoSalvarEdicaoItem(${JSON.stringify(item.uid)})'>Salvar</button>
+                <button class="btn btn-sm btn-ghost" onclick="orcamentoCancelarEdicaoItem()">Cancelar</button>
+              </div>
+            ` : ''}
           </div>`;
       }).join('')}
     </div>
@@ -2439,6 +2592,94 @@ function orcamentoRenderAbc() {
       <span class="orcamento-abc-value">${orcamentoFmt(row.valor)}</span>
     </div>
   `).join('') || '<div class="orcamento-empty" style="padding:10px 0;">Sem itens.</div>';
+}
+
+function orcamentoLerSalvosLocais() {
+  try {
+    const salvos = JSON.parse(localStorage.getItem(ORCAMENTO_SALVOS_KEY) || '[]');
+    return Array.isArray(salvos) ? salvos : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function orcamentoGravarSalvosLocais(salvos) {
+  try {
+    localStorage.setItem(ORCAMENTO_SALVOS_KEY, JSON.stringify((salvos || []).slice(0, 12)));
+  } catch (_) {}
+}
+
+function orcamentoSnapshotLocal(status, onlineId, erro) {
+  const nome = (document.getElementById('orcamentoNome')?.value || '').trim() || 'Orçamento sem nome';
+  const totalPreco = orcamentoItens.reduce((total, item) => total + item.total, 0);
+  return {
+    id: `orc-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
+    onlineId: onlineId || null,
+    status: status || 'local',
+    erro: erro || '',
+    nome,
+    obra: currentObra || '',
+    salvoEm: new Date().toISOString(),
+    totalPreco,
+    itens: JSON.parse(JSON.stringify(orcamentoItens))
+  };
+}
+
+function orcamentoSalvarSnapshotLocal(status, onlineId, erro) {
+  if (!orcamentoItens.length) return null;
+  const snapshot = orcamentoSnapshotLocal(status, onlineId, erro);
+  const salvos = orcamentoLerSalvosLocais().filter(item => item && item.id !== snapshot.id);
+  salvos.unshift(snapshot);
+  orcamentoGravarSalvosLocais(salvos);
+  orcamentoRenderSalvosLocais();
+  return snapshot;
+}
+
+function orcamentoRenderSalvosLocais() {
+  const el = document.getElementById('orcamentoSalvosLocais');
+  if (!el) return;
+  const salvos = orcamentoLerSalvosLocais();
+  if (!salvos.length) {
+    el.innerHTML = '<div class="orcamento-empty" style="padding:10px 0;">Nenhum orçamento congelado salvo neste navegador.</div>';
+    return;
+  }
+  el.innerHTML = salvos.map(snapshot => {
+    const data = snapshot.salvoEm ? new Date(snapshot.salvoEm) : null;
+    const quando = data && !Number.isNaN(data.getTime()) ? data.toLocaleString('pt-BR') : 'data indisponível';
+    const status = snapshot.onlineId ? `online ${snapshot.onlineId}` : (snapshot.status === 'online' ? 'online' : 'local');
+    return `
+      <div class="orcamento-saved-item">
+        <div>
+          <div class="orcamento-saved-name">${orcamentoHtml(snapshot.nome || 'Orçamento sem nome')}</div>
+          <div class="orcamento-saved-sub">${orcamentoHtml(snapshot.obra || 'Obra não informada')} · ${quando} · ${orcamentoFmt(snapshot.totalPreco || 0)} · ${orcamentoHtml(status)}</div>
+        </div>
+        <div class="orcamento-budget-actions">
+          <button class="btn btn-sm btn-ghost" onclick='orcamentoCarregarSnapshotLocal(${JSON.stringify(snapshot.id)})'>Carregar</button>
+          <button class="btn btn-sm btn-remove" onclick='orcamentoRemoverSnapshotLocal(${JSON.stringify(snapshot.id)})'>✕</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function orcamentoCarregarSnapshotLocal(id) {
+  const snapshot = orcamentoLerSalvosLocais().find(item => item && item.id === id);
+  if (!snapshot || !Array.isArray(snapshot.itens)) return;
+  orcamentoItens = JSON.parse(JSON.stringify(snapshot.itens));
+  orcamentoItemEditandoUid = null;
+  const nome = document.getElementById('orcamentoNome');
+  if (nome) nome.value = snapshot.nome || 'Orçamento em elaboração';
+  orcamentoRenderItens();
+  const status = document.getElementById('orcamentoSaveStatus');
+  if (status) {
+    status.style.display = 'block';
+    status.textContent = `Orçamento carregado deste navegador: ${snapshot.nome || 'Orçamento sem nome'}.`;
+  }
+}
+
+function orcamentoRemoverSnapshotLocal(id) {
+  const salvos = orcamentoLerSalvosLocais().filter(item => item && item.id !== id);
+  orcamentoGravarSalvosLocais(salvos);
+  orcamentoRenderSalvosLocais();
 }
 
 async function orcamentoSalvarOnline() {
@@ -2538,9 +2779,11 @@ async function orcamentoSalvarOnline() {
         });
       }
     }
+    orcamentoSalvarSnapshotLocal('online', orcamentoId, '');
     status.textContent = `Orçamento salvo e congelado: ${nome}.`;
   } catch (err) {
-    status.textContent = `Erro ao salvar online: ${err.message}`;
+    orcamentoSalvarSnapshotLocal('local', null, err.message || '');
+    status.textContent = `Erro ao salvar online: ${err.message}. Uma cópia temporária ficou salva neste navegador.`;
   }
 }
 
