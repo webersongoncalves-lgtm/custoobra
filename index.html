@@ -78,6 +78,7 @@ header {
 
 /* ─── MAIN ──────────────────────────────────── */
 main { flex: 1; display: flex; flex-direction: column; max-width: 700px; width: 100%; margin: 0 auto; padding: 24px 16px 80px; gap: 16px; }
+body.home-wide main { max-width: 1120px; }
 body.metas-wide main { max-width: 1240px; }
 body.orcamento-wide main { max-width: 1280px; }
 
@@ -88,25 +89,116 @@ body.orcamento-wide main { max-width: 1280px; }
 .panel-body { padding: 18px; }
 .summary-count { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--text3); }
 
-/* ─── MODULE SELECTOR ────────────────────────── */
-.module-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px; }
-.module-card {
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  padding: 22px 18px;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.18s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+/* ─── HOME MAP ───────────────────────────────── */
+.home-panel { background: #FFFFFF; border-radius: 0; box-shadow: var(--shadow); overflow: hidden; }
+.home-diagram {
+  position: relative;
+  min-height: 510px;
+  background: #FFFFFF;
+  border: 1px solid #D8DCE2;
 }
-.module-card:hover { border-color: var(--accent); background: var(--accent-bg); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.module-card-icon { font-size: 2rem; }
-.module-card-title { font-size: 0.95rem; font-weight: 600; color: var(--text); }
-.module-card-sub { font-size: 0.75rem; color: var(--text3); line-height: 1.4; }
+.home-title {
+  position: absolute;
+  top: 32px;
+  left: 48%;
+  right: 30px;
+  text-align: center;
+  color: #111111;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+.home-modules {
+  position: absolute;
+  left: 24px;
+  top: 74px;
+  width: 190px;
+  display: grid;
+  gap: 28px;
+  z-index: 2;
+}
+.home-module {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 12px;
+  background: #FFFFFF;
+  border: 1px solid #222222;
+  color: #111111;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.18;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.16s, box-shadow 0.16s, transform 0.16s;
+}
+.home-module:hover {
+  border-color: #0F5E7C;
+  box-shadow: 0 3px 0 rgba(15,94,124,0.18);
+  transform: translateY(-1px);
+}
+.home-module.is-pending { cursor: help; background: #FAFAFA; border-style: dashed; color: #333333; }
+.home-module.is-pending::after {
+  content: "EM DESENV.";
+  display: block;
+  margin-top: 3px;
+  color: #6E6E6E;
+  font-size: 0.58rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.home-stage {
+  position: absolute;
+  left: 288px;
+  right: 22px;
+  top: 58px;
+  bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #082B3A;
+  border-radius: 82px;
+  padding: 48px;
+  z-index: 2;
+}
+.home-stage-text {
+  max-width: 640px;
+  color: #111111;
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+  text-transform: uppercase;
+}
+.home-flow-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.home-foot {
+  font-size: 0.75rem;
+  color: var(--text3);
+  padding: 10px 4px 0;
+  line-height: 1.6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.home-admin {
+  background: none;
+  border: none;
+  font-size: 0.72rem;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.home-admin:hover { color: var(--text2); background: rgba(28,58,110,0.06); }
 
 /* ─── ORÇAMENTO MODULE ───────────────────────── */
 .orcamento-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -813,10 +905,24 @@ strong.hi { color: var(--accent); font-weight: 700; }
 @media (max-width: 900px) {
   .orcamento-layout, .orcamento-detail-grid, .orcamento-budget-grid { grid-template-columns: 1fr; }
   .orcamento-add-row { grid-template-columns: 1fr; }
+  .home-diagram { min-height: auto; padding: 22px; display: grid; gap: 18px; }
+  .home-title, .home-modules, .home-stage {
+    position: static;
+    width: auto;
+  }
+  .home-title { text-align: center; }
+  .home-modules { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .home-stage { min-height: 260px; border-radius: 34px; padding: 30px 20px; }
+  .home-flow-svg { display: none; }
 }
 
 @media (max-width: 480px) {
   main { padding: 16px 12px 70px; }
+  body.home-wide header { padding: 0 12px; gap: 8px; }
+  body.home-wide .logo { min-width: 0; gap: 8px; overflow: hidden; }
+  body.home-wide .logo-app { overflow: hidden; text-overflow: ellipsis; }
+  body.home-wide .badge-month { display: none; }
+  body.home-wide .badge-user { max-width: 126px; }
   body.orcamento-wide main { padding: 0 0 32px; }
   body.orcamento-wide header { height: auto; min-height: 60px; align-items: center; padding: 10px 12px; }
   body.orcamento-wide .logo { min-width: 0; gap: 8px; overflow: hidden; }
@@ -837,7 +943,13 @@ strong.hi { color: var(--accent); font-weight: 700; }
   .modal { padding: 20px 14px; }
   .confirm-table { font-size: 0.78rem; }
   .confirm-table th, .confirm-table td { padding: 8px 6px; }
-  .module-selector { grid-template-columns: 1fr; }
+  body.home-wide main { padding: 16px 12px 70px; }
+  .home-diagram { padding: 16px; }
+  .home-modules { grid-template-columns: 1fr; }
+  .home-module { font-size: 0.9rem; }
+  .home-stage { min-height: 220px; border-radius: 28px; padding: 24px 16px; }
+  .home-stage-text { font-size: 0.9rem; }
+  .home-foot { align-items: flex-start; flex-direction: column; }
   .admin-grid { grid-template-columns: 1fr; }
   .admin-actions .btn { width: 100%; min-width: 0; }
   .meta-row { grid-template-columns: 1fr auto; }
@@ -854,7 +966,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
 }
 </style>
 </head>
-<body>
+<body class="home-wide">
 
 <!-- ─── USER MODAL ──────────────────────────────── -->
 <div class="user-overlay open" id="userOverlay">
@@ -913,31 +1025,39 @@ strong.hi { color: var(--accent); font-weight: 700; }
 
   <!-- TELA: SELEÇÃO DE MÓDULO -->
   <div id="screenModulo" class="screen active">
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">O que deseja registrar?</span>
-      </div>
-      <div class="module-selector">
-        <div class="module-card" onclick="abrirMetas()">
-          <div class="module-card-icon">📊</div>
-          <div class="module-card-title">Metas Semanais</div>
-          <div class="module-card-sub">Preencher realizado da semana por serviço</div>
+    <div class="home-panel">
+      <div class="home-diagram" aria-label="Mapa dos módulos de gestão de obras">
+        <div class="home-title">GESTÃO DE OBRAS</div>
+        <div class="home-modules">
+          <button type="button" class="home-module" onclick="abrirMetas()">METAS<br>SEMANAIS</button>
+          <button type="button" class="home-module" onclick="abrirCusto()">CUSTO<br>COMPROMETIDO</button>
+          <button type="button" class="home-module" onclick="abrirOrcamento()">ORÇAMENTO</button>
+          <button type="button" class="home-module is-pending" onclick="abrirModuloEmDesenvolvimento('Planejamento')" title="Módulo em desenvolvimento">PLANEJAMENTO</button>
+          <button type="button" class="home-module is-pending" onclick="abrirModuloEmDesenvolvimento('Análises')" title="Módulo em desenvolvimento">ANÁLISES</button>
         </div>
-        <div class="module-card" onclick="abrirCusto()">
-          <div class="module-card-icon">💰</div>
-          <div class="module-card-title">Custo Comprometido</div>
-          <div class="module-card-sub">Lançar valores comprometidos do mês</div>
-        </div>
-        <div class="module-card" onclick="abrirOrcamento()">
-          <div class="module-card-icon">📐</div>
-          <div class="module-card-title">Orçamento</div>
-          <div class="module-card-sub">Consultar CPUs e montar planilhas orçamentárias</div>
+        <svg class="home-flow-svg" viewBox="0 0 1080 510" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <defs>
+            <marker id="homeArrow" markerWidth="18" markerHeight="18" refX="15" refY="9" orient="auto" markerUnits="userSpaceOnUse">
+              <path d="M0,0 L18,9 L0,18 Z" fill="#0F5E7C"></path>
+            </marker>
+            <marker id="homeArrowStart" markerWidth="18" markerHeight="18" refX="3" refY="9" orient="auto" markerUnits="userSpaceOnUse">
+              <path d="M18,0 L0,9 L18,18 Z" fill="#0F5E7C"></path>
+            </marker>
+          </defs>
+          <path d="M220 86 C294 105 292 378 222 436" fill="none" stroke="#0F5E7C" stroke-width="6" marker-end="url(#homeArrow)"></path>
+          <path d="M207 108 C273 130 270 360 207 418" fill="none" stroke="#0F5E7C" stroke-width="4" opacity="0.95" marker-end="url(#homeArrow)"></path>
+          <path d="M196 282 C268 306 266 394 200 426" fill="none" stroke="#0F5E7C" stroke-width="6" marker-end="url(#homeArrow)"></path>
+          <path d="M35 296 C4 309 2 390 35 410" fill="none" stroke="#0F5E7C" stroke-width="4" marker-end="url(#homeArrow)"></path>
+          <path d="M110 372 L110 432" fill="none" stroke="#0F5E7C" stroke-width="6" marker-start="url(#homeArrowStart)" marker-end="url(#homeArrow)"></path>
+        </svg>
+        <div class="home-stage">
+          <div class="home-stage-text">Reprogramações da semana das obras e status dos serviços</div>
         </div>
       </div>
     </div>
-    <div style="font-size:0.75rem; color:var(--text3); padding:0 4px; line-height:1.6; display:flex; justify-content:space-between; align-items:center;">
+    <div class="home-foot">
       <span><strong style="color:var(--text2);">Integração ativa:</strong> Os dados são enviados ao Google Sheets e disponibilizados no Power BI.</span>
-      <button onclick="abrirAdmin()" style="background:none;border:none;font-size:0.72rem;color:var(--text3);cursor:pointer;padding:4px 8px;border-radius:6px;white-space:nowrap;" title="Área administrativa">⚙️ Admin</button>
+      <button class="home-admin" onclick="abrirAdmin()" title="Área administrativa">⚙️ Admin</button>
     </div>
   </div>
 
@@ -1683,6 +1803,7 @@ function salvarUser() {
 function mostrarTela(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  document.body.classList.toggle('home-wide', id === 'screenModulo');
   document.body.classList.toggle('metas-wide', id === 'screenMetas' || id === 'screenAdmin');
   document.body.classList.toggle('orcamento-wide', id === 'screenOrcamento');
 }
@@ -1704,6 +1825,10 @@ function abrirOrcamento() {
   mostrarTela('screenOrcamento');
   orcamentoAtualizarAcesso();
   orcamentoRenderSalvosLocais();
+}
+
+function abrirModuloEmDesenvolvimento(nome) {
+  alert(`${nome} será desenvolvido na próxima etapa.`);
 }
 
 function voltarModulo() {
