@@ -81,6 +81,7 @@ main { flex: 1; display: flex; flex-direction: column; max-width: 700px; width: 
 body.home-wide main { max-width: 1120px; }
 body.metas-wide main { max-width: 1240px; }
 body.orcamento-wide main { max-width: 1280px; }
+body.analises-wide main { max-width: 1180px; }
 
 /* ─── PANEL ─────────────────────────────────── */
 .panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
@@ -585,6 +586,255 @@ body.planejamento-wide main {
   color: #A64D57;
 }
 .planejamento-empty {
+  padding: 28px 18px;
+  text-align: center;
+  color: #667C88;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+/* ─── ANÁLISES MODULE ───────────────────────── */
+body.analises-wide {
+  background: #E8EEF3;
+}
+.analises-shell {
+  background: #F7FAFC;
+  border: 1px solid #D3E0E8;
+  border-radius: 10px;
+  box-shadow: 0 16px 38px rgba(14,40,54,0.12);
+  overflow: hidden;
+}
+.analises-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #13283A;
+  color: #fff;
+  border-bottom: 3px solid #2F7D5A;
+  flex-wrap: wrap;
+}
+.analises-head-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.analises-title-block {
+  display: grid;
+  gap: 2px;
+}
+.analises-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.analises-subtitle {
+  color: rgba(255,255,255,0.72);
+  font-size: 0.74rem;
+}
+.analises-head .btn-back {
+  color: #fff;
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.06);
+}
+.analises-head .btn-back:hover {
+  background: rgba(255,255,255,0.14);
+}
+.analises-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.analises-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.86);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.analises-body {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+.analises-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 14px;
+  align-items: stretch;
+}
+.analises-status-card,
+.analises-card {
+  background: #FFFFFF;
+  border: 1px solid #D6E2EA;
+  border-radius: 8px;
+  padding: 16px;
+}
+.analises-section-label {
+  color: #667C88;
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.analises-status-title {
+  margin-top: 7px;
+  color: #102A35;
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+.analises-status-text {
+  margin-top: 7px;
+  color: #5B6F7A;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+.analises-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.analises-kpi {
+  border: 1px solid #E0E8EE;
+  border-radius: 8px;
+  padding: 11px;
+  background: #F9FBFC;
+}
+.analises-kpi-value {
+  color: #102A35;
+  font-size: 1rem;
+  font-weight: 800;
+}
+.analises-kpi-label {
+  margin-top: 3px;
+  color: #667C88;
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+.analises-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-bottom: 1px solid #D6E2EA;
+  padding-bottom: 10px;
+}
+.analises-tab {
+  border: 1px solid #C9D8E1;
+  background: #FFFFFF;
+  color: #405A68;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.analises-tab.active {
+  background: #13283A;
+  border-color: #13283A;
+  color: #FFFFFF;
+}
+.analises-tab-panel {
+  display: none;
+}
+.analises-tab-panel.active {
+  display: block;
+}
+.analises-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 12px;
+}
+.analises-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.analises-method {
+  border: 1px solid #E0E8EE;
+  border-left: 4px solid #2F7D5A;
+  border-radius: 8px;
+  padding: 12px;
+  background: #FFFFFF;
+}
+.analises-method:nth-child(2) { border-left-color: #1D6B82; }
+.analises-method:nth-child(3) { border-left-color: #A64D57; }
+.analises-method-title {
+  color: #102A35;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+.analises-method-note {
+  margin-top: 5px;
+  color: #667C88;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+.analises-list {
+  display: grid;
+  gap: 8px;
+}
+.analises-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #E8EEF2;
+}
+.analises-row:last-child {
+  border-bottom: 0;
+}
+.analises-row-title {
+  color: #102A35;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.analises-row-note {
+  margin-top: 2px;
+  color: #667C88;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+.analises-status-pill {
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.analises-status-pill.ok {
+  background: #E6F4EE;
+  color: #2F7D5A;
+}
+.analises-status-pill.warn {
+  background: #FFF2D8;
+  color: #8A5A16;
+}
+.analises-formula {
+  margin-top: 10px;
+  padding: 10px 11px;
+  border-radius: 7px;
+  background: #EEF4F8;
+  color: #355160;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+.analises-empty {
   padding: 28px 18px;
   text-align: center;
   color: #667C88;
@@ -1300,10 +1550,14 @@ strong.hi { color: var(--accent); font-weight: 700; }
 
 @media (max-width: 980px) {
   .planejamento-hero,
-  .planejamento-grid {
+  .planejamento-grid,
+  .analises-hero,
+  .analises-grid,
+  .analises-method-grid {
     grid-template-columns: 1fr;
   }
-  .planejamento-kpis {
+  .planejamento-kpis,
+  .analises-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -1318,10 +1572,15 @@ strong.hi { color: var(--accent); font-weight: 700; }
   .home-stage-main,
   .home-stage-side { padding: 15px; }
   .planejamento-head { align-items: flex-start; }
+  .analises-head { align-items: flex-start; }
   .planejamento-head-left { align-items: flex-start; flex-direction: column; }
-  .planejamento-body { padding: 14px; }
-  .planejamento-kpis { grid-template-columns: 1fr; }
-  .planejamento-row { grid-template-columns: 1fr; }
+  .analises-head-left { align-items: flex-start; flex-direction: column; }
+  .planejamento-body,
+  .analises-body { padding: 14px; }
+  .planejamento-kpis,
+  .analises-kpis { grid-template-columns: 1fr; }
+  .planejamento-row,
+  .analises-row { grid-template-columns: 1fr; }
 }
 
 /* ─── SCREEN MANAGER ─────────────────────────── */
@@ -1342,14 +1601,19 @@ strong.hi { color: var(--accent); font-weight: 700; }
   main { padding: 16px 12px 70px; }
   body.home-wide header { padding: 0 12px; gap: 8px; }
   body.planejamento-wide header { padding: 0 12px; gap: 8px; }
+  body.analises-wide header { padding: 0 12px; gap: 8px; }
   body.home-wide .logo { min-width: 0; gap: 8px; overflow: hidden; }
   body.planejamento-wide .logo { min-width: 0; gap: 8px; overflow: hidden; }
+  body.analises-wide .logo { min-width: 0; gap: 8px; overflow: hidden; }
   body.home-wide .logo-app { overflow: hidden; text-overflow: ellipsis; }
   body.planejamento-wide .logo-app { overflow: hidden; text-overflow: ellipsis; }
+  body.analises-wide .logo-app { overflow: hidden; text-overflow: ellipsis; }
   body.home-wide .badge-month { display: none; }
   body.planejamento-wide .badge-month { display: none; }
+  body.analises-wide .badge-month { display: none; }
   body.home-wide .badge-user { max-width: 126px; }
   body.planejamento-wide .badge-user { max-width: 126px; }
+  body.analises-wide .badge-user { max-width: 126px; }
   body.orcamento-wide main { padding: 0 0 32px; }
   body.orcamento-wide header { height: auto; min-height: 60px; align-items: center; padding: 10px 12px; }
   body.orcamento-wide .logo { min-width: 0; gap: 8px; overflow: hidden; }
@@ -1479,7 +1743,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
             <span class="home-module-name">Planejamento</span>
             <span class="home-module-sub">DCMA, caminho crítico, higiene e riscos do MPP.</span>
           </button>
-          <button type="button" class="home-module is-pending" onclick="abrirModuloEmDesenvolvimento('Análises')" title="Módulo em desenvolvimento">
+          <button type="button" class="home-module" onclick="abrirAnalises()">
             <span class="home-module-kicker">Performance</span>
             <span class="home-module-name">Análises</span>
             <span class="home-module-sub">EVM, Earned Schedule, projeções e ofensores.</span>
@@ -1641,6 +1905,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
               <div class="planejamento-row"><div><div class="planejamento-row-title">Sem predecessoras / sem sucessoras</div><div class="planejamento-row-note">Percentuais contra limites de referência DCMA.</div></div><span class="planejamento-status-pill warn">Pendente</span></div>
               <div class="planejamento-row"><div><div class="planejamento-row-title">Lags, leads e relações incomuns</div><div class="planejamento-row-note">Distribuição FS, SS, FF, SF e vínculos com defasagens relevantes.</div></div><span class="planejamento-status-pill warn">Pendente</span></div>
               <div class="planejamento-row"><div><div class="planejamento-row-title">Restrições rígidas e folga total</div><div class="planejamento-row-note">Identificação de TF negativo, alta folga e hard constraints.</div></div><span class="planejamento-status-pill warn">Pendente</span></div>
+              <div class="planejamento-row"><div><div class="planejamento-row-title">Duração, datas e baseline</div><div class="planejamento-row-note">Duração alta ou zero, datas inválidas, BEI e CPLI.</div></div><span class="planejamento-status-pill ok">Método pronto</span></div>
             </div>
           </div>
         </div>
@@ -1662,6 +1927,156 @@ strong.hi { color: var(--accent); font-weight: 700; }
         </div>
         <div id="planejamentoTab-veredito" class="planejamento-tab-panel">
           <div class="planejamento-card"><div class="planejamento-section-label">Veredito</div><div class="planejamento-empty">Vai concluir se o cronograma é executável, parcialmente executável ou crítico.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA: ANÁLISES -->
+  <div id="screenAnalises" class="screen">
+    <div class="analises-shell">
+      <div class="analises-head">
+        <div class="analises-head-left">
+          <button class="btn-back" onclick="voltarModulo()">← Voltar</button>
+          <div class="analises-title-block">
+            <div class="analises-title">Análises</div>
+            <div class="analises-subtitle">EVM, Earned Schedule, tendência e confiabilidade por obra</div>
+          </div>
+        </div>
+        <div class="analises-head-actions">
+          <span class="analises-chip">Métodos carregados</span>
+          <span class="analises-chip">Aguardando fontes</span>
+        </div>
+      </div>
+
+      <div class="analises-body">
+        <div class="analises-hero">
+          <div class="analises-status-card">
+            <div class="analises-section-label">Visão do módulo</div>
+            <div class="analises-status-title">Central de desempenho e projeção</div>
+            <div class="analises-status-text">
+              O módulo consolida orçamento, custo comprometido, avanço físico e planejamento para calcular valor agregado, prazo agregado, projeções e ofensores. Os métodos já ficam disponíveis para rodar quando as fontes forem conectadas.
+            </div>
+            <div class="analises-kpis">
+              <div class="analises-kpi">
+                <div class="analises-kpi-value" id="analisesKpiObra">—</div>
+                <div class="analises-kpi-label">Obra selecionada</div>
+              </div>
+              <div class="analises-kpi">
+                <div class="analises-kpi-value">EVM</div>
+                <div class="analises-kpi-label">Custo e valor agregado</div>
+              </div>
+              <div class="analises-kpi">
+                <div class="analises-kpi-value">ES</div>
+                <div class="analises-kpi-label">Earned Schedule</div>
+              </div>
+              <div class="analises-kpi">
+                <div class="analises-kpi-value">Gates</div>
+                <div class="analises-kpi-label">Maturidade de leitura</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="analises-card">
+            <div class="analises-section-label">Contrato de entrada</div>
+            <div class="analises-list">
+              <div class="analises-row">
+                <div>
+                  <div class="analises-row-title">Orçamento</div>
+                  <div class="analises-row-note">BAC, curva planejada e estrutura de macro itens.</div>
+                </div>
+                <span class="analises-status-pill warn">A conectar</span>
+              </div>
+              <div class="analises-row">
+                <div>
+                  <div class="analises-row-title">Produção</div>
+                  <div class="analises-row-note">EV por período a partir do avanço físico validado.</div>
+                </div>
+                <span class="analises-status-pill warn">A conectar</span>
+              </div>
+              <div class="analises-row">
+                <div>
+                  <div class="analises-row-title">Financeiro</div>
+                  <div class="analises-row-note">AC com ajuste de estoque para leitura EVM.</div>
+                </div>
+                <span class="analises-status-pill warn">A conectar</span>
+              </div>
+              <div class="analises-row">
+                <div>
+                  <div class="analises-row-title">Planejamento</div>
+                  <div class="analises-row-note">Curva PV, data status e duração planejada.</div>
+                </div>
+                <span class="analises-status-pill warn">A conectar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analises-tabs" role="tablist" aria-label="Abas do módulo de análises">
+          <button class="analises-tab active" onclick="abrirAbaAnalises('resumo')">Resumo</button>
+          <button class="analises-tab" onclick="abrirAbaAnalises('evm')">EVM</button>
+          <button class="analises-tab" onclick="abrirAbaAnalises('earned')">Earned Schedule</button>
+          <button class="analises-tab" onclick="abrirAbaAnalises('projecoes')">Projeções</button>
+          <button class="analises-tab" onclick="abrirAbaAnalises('ofensores')">Ofensores</button>
+          <button class="analises-tab" onclick="abrirAbaAnalises('confiabilidade')">Confiabilidade</button>
+        </div>
+
+        <div id="analisesTab-resumo" class="analises-tab-panel active">
+          <div class="analises-method-grid">
+            <div class="analises-method">
+              <div class="analises-method-title">EVM</div>
+              <div class="analises-method-note">Calcula PV, EV, AC ajustado, CPI, SPI, CV, SV, EAC, VAC e TCPI.</div>
+              <div class="analises-formula">CPI = EV / AC | SPI = EV / PV | EAC = BAC / CPI</div>
+            </div>
+            <div class="analises-method">
+              <div class="analises-method-title">Earned Schedule</div>
+              <div class="analises-method-note">Converte EV em tempo ganho na curva PV e mede SPI(t), atraso e prazo estimado.</div>
+              <div class="analises-formula">ES = tempo onde PV acumulado = EV | SPI(t) = ES / AT</div>
+            </div>
+            <div class="analises-method">
+              <div class="analises-method-title">Confiabilidade</div>
+              <div class="analises-method-note">Aplica gates mínimos para evitar projeção com pouca maturidade de série.</div>
+              <div class="analises-formula">mín. 4 períodos | avanço físico mín. 5% | variação CPI/SPI controlada</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="analisesTab-evm" class="analises-tab-panel">
+          <div class="analises-grid">
+            <div class="analises-card">
+              <div class="analises-section-label">Indicadores calculados</div>
+              <div class="analises-list">
+                <div class="analises-row"><div><div class="analises-row-title">CPI e SPI</div><div class="analises-row-note">Eficiência de custo e de avanço físico contra a curva planejada.</div></div><span class="analises-status-pill ok">Pronto</span></div>
+                <div class="analises-row"><div><div class="analises-row-title">CV, SV e variações percentuais</div><div class="analises-row-note">Desvio absoluto e relativo de custo e prazo.</div></div><span class="analises-status-pill ok">Pronto</span></div>
+                <div class="analises-row"><div><div class="analises-row-title">EAC, VAC e TCPI</div><div class="analises-row-note">Projeção de custo final, variação contra BAC e desempenho requerido.</div></div><span class="analises-status-pill ok">Pronto</span></div>
+              </div>
+            </div>
+            <div class="analises-card">
+              <div class="analises-section-label">Tratamento de custo</div>
+              <div class="analises-empty">AC pode ser abatido por estoque informado, mantendo a leitura de custo consumido pela obra.</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="analisesTab-earned" class="analises-tab-panel">
+          <div class="analises-card">
+            <div class="analises-section-label">Earned Schedule</div>
+            <div class="analises-list">
+              <div class="analises-row"><div><div class="analises-row-title">ES e AT</div><div class="analises-row-note">Tempo ganho interpolado na curva PV e tempo real decorrido.</div></div><span class="analises-status-pill ok">Pronto</span></div>
+              <div class="analises-row"><div><div class="analises-row-title">SPI(t) e atraso em períodos</div><div class="analises-row-note">Eficiência de prazo em unidade de tempo, não em valor monetário.</div></div><span class="analises-status-pill ok">Pronto</span></div>
+              <div class="analises-row"><div><div class="analises-row-title">IEAC(t)</div><div class="analises-row-note">Duração estimada no término com base no desempenho temporal.</div></div><span class="analises-status-pill ok">Pronto</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="analisesTab-projecoes" class="analises-tab-panel">
+          <div class="analises-card"><div class="analises-section-label">Projeções</div><div class="analises-empty">Vai comparar cenários EAC por CPI, CPI/SPI e desempenho requerido TCPI.</div></div>
+        </div>
+        <div id="analisesTab-ofensores" class="analises-tab-panel">
+          <div class="analises-card"><div class="analises-section-label">Ofensores</div><div class="analises-empty">Vai listar pacotes e macro itens que mais explicam desvios de custo, prazo e produção.</div></div>
+        </div>
+        <div id="analisesTab-confiabilidade" class="analises-tab-panel">
+          <div class="analises-card"><div class="analises-section-label">Confiabilidade</div><div class="analises-empty">Vai mostrar maturidade da série, estabilidade dos índices e alertas antes de aceitar projeções.</div></div>
         </div>
       </div>
     </div>
@@ -2411,6 +2826,7 @@ function mostrarTela(id) {
   document.getElementById(id).classList.add('active');
   document.body.classList.toggle('home-wide', id === 'screenModulo');
   document.body.classList.toggle('planejamento-wide', id === 'screenPlanejamento');
+  document.body.classList.toggle('analises-wide', id === 'screenAnalises');
   document.body.classList.toggle('metas-wide', id === 'screenMetas' || id === 'screenAdmin');
   document.body.classList.toggle('orcamento-wide', id === 'screenOrcamento');
 }
@@ -2439,6 +2855,13 @@ function abrirPlanejamento() {
   mostrarTela('screenPlanejamento');
   planejamentoAtualizarContexto();
   abrirAbaPlanejamento('scorecard');
+}
+
+function abrirAnalises() {
+  if (!currentUser) { abrirUser(); return; }
+  mostrarTela('screenAnalises');
+  analisesAtualizarContexto();
+  abrirAbaAnalises('resumo');
 }
 
 function abrirModuloEmDesenvolvimento(nome) {
@@ -2473,6 +2896,368 @@ function planejamentoSelecionarArquivo(event) {
   }
   const mb = file.size ? (file.size / (1024 * 1024)).toFixed(1).replace('.', ',') : '0,0';
   state.textContent = `${file.name} selecionado (${mb} MB). Pipeline de leitura e auditoria ainda será conectado.`;
+}
+
+function analisesAtualizarContexto() {
+  const obraEl = document.getElementById('analisesKpiObra');
+  if (obraEl) obraEl.textContent = currentObra || '—';
+}
+
+function abrirAbaAnalises(tab) {
+  document.querySelectorAll('.analises-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick') === `abrirAbaAnalises('${tab}')`);
+  });
+  document.querySelectorAll('.analises-tab-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === `analisesTab-${tab}`);
+  });
+}
+
+const PLANEJAMENTO_DCMA_LIMITES = Object.freeze({
+  semPredecessoras: 0.05,
+  semSucessoras: 0.05,
+  leads: 0,
+  lagsLongos: 0.05,
+  restricoesRigidas: 0.05,
+  folgaNegativa: 0,
+  folgaAlta: 0.05,
+  duracaoAlta: 0.05,
+  duracaoZero: 0,
+  datasInvalidas: 0,
+  recursosAusentes: 0.05,
+  tarefasVencidasBaseline: 0.05,
+  fsViolacoes: 0,
+  beiMinimo: 0.95,
+  cpliMinimo: 0.95
+});
+
+function analiseNumero(valor) {
+  if (valor === null || valor === undefined || valor === '') return null;
+  if (typeof valor === 'number') return Number.isFinite(valor) ? valor : null;
+  let texto = String(valor).trim().replace('%', '').replace(/\s+/g, '');
+  if (!texto) return null;
+  if (texto.includes(',')) texto = texto.replace(/\./g, '').replace(',', '.');
+  const numero = Number(texto);
+  return Number.isFinite(numero) ? numero : null;
+}
+
+function analiseData(valor) {
+  if (!valor) return null;
+  if (valor instanceof Date) return Number.isNaN(valor.getTime()) ? null : valor;
+  const dataValida = (ano, mes, dia) => {
+    const data = new Date(ano, mes - 1, dia);
+    if (Number.isNaN(data.getTime())) return null;
+    if (data.getFullYear() !== ano || data.getMonth() !== mes - 1 || data.getDate() !== dia) return null;
+    return data;
+  };
+  const texto = String(valor).trim();
+  const br = texto.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (br) {
+    return dataValida(Number(br[3]), Number(br[2]), Number(br[1]));
+  }
+  const iso = texto.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (iso) {
+    return dataValida(Number(iso[1]), Number(iso[2]), Number(iso[3]));
+  }
+  return null;
+}
+
+function analiseProgressoPercentual(valor, escala) {
+  const numero = analiseNumero(valor);
+  if (numero === null) return 0;
+  if (escala === 'fracao' || escala === 'fraction' || escala === '0..1') return numero * 100;
+  return numero;
+}
+
+function analiseDias(valor) {
+  return analiseNumero(valor);
+}
+
+function analiseDividir(numerador, denominador) {
+  return denominador ? numerador / denominador : null;
+}
+
+function analiseDiasEntre(inicio, fim) {
+  const a = analiseData(inicio);
+  const b = analiseData(fim);
+  if (!a || !b) return null;
+  return Math.round((b.getTime() - a.getTime()) / 86400000);
+}
+
+function planejamentoEhMarco(tarefa) {
+  return !!(tarefa && (tarefa.marco || tarefa.milestone || tarefa.isMilestone));
+}
+
+function planejamentoIdTarefa(tarefa) {
+  return String(tarefa?.id ?? tarefa?.uid ?? tarefa?.codigo ?? tarefa?.code ?? tarefa?.nome ?? tarefa?.name ?? '');
+}
+
+function planejamentoMetricaPercentual(contagem, total, limite, direcao = 'max') {
+  const percent = total ? contagem / total : 0;
+  let status = 'ok';
+  if (direcao === 'min') {
+    status = percent >= limite ? 'ok' : percent >= limite * 0.85 ? 'warn' : 'crit';
+  } else if (limite === 0) {
+    status = contagem === 0 ? 'ok' : 'crit';
+  } else {
+    status = percent <= limite ? 'ok' : percent <= limite * 1.5 ? 'warn' : 'crit';
+  }
+  return { count: contagem, total, percent, limite, status };
+}
+
+function planejamentoMetricaIndice(valor, minimo) {
+  if (valor === null || valor === undefined) return { value: null, minimo, status: 'warn' };
+  const status = valor >= minimo ? 'ok' : valor >= minimo * 0.85 ? 'warn' : 'crit';
+  return { value: valor, minimo, status };
+}
+
+function planejamentoCalcularDCMA(entrada = {}) {
+  const tarefasEntrada = Array.isArray(entrada.tarefas) ? entrada.tarefas : [];
+  const relacoesEntrada = Array.isArray(entrada.relacoes) ? entrada.relacoes : (Array.isArray(entrada.links) ? entrada.links : []);
+  const tarefas = tarefasEntrada.filter(t => !t?.resumo && !t?.summary && !t?.isSummary && !t?.inativo && !t?.inactive);
+  const tarefasMedidas = tarefas.filter(t => !planejamentoEhMarco(t));
+  const idsMedidos = new Set(tarefasMedidas.map(planejamentoIdTarefa).filter(Boolean));
+  const porId = new Map(tarefas.map(t => [planejamentoIdTarefa(t), t]).filter(([id]) => id));
+  const predecessoras = new Set();
+  const sucessoras = new Set();
+  const relacoes = relacoesEntrada.map(r => ({
+    pred: String(r.predecessoraId ?? r.predecessorId ?? r.pred ?? r.from ?? ''),
+    succ: String(r.sucessoraId ?? r.successorId ?? r.succ ?? r.to ?? ''),
+    tipo: String(r.tipo ?? r.type ?? 'FS').toUpperCase(),
+    lagDias: analiseNumero(r.lagDias ?? r.lagDays ?? r.lag ?? 0) ?? 0
+  })).filter(r => r.pred && r.succ);
+
+  relacoes.forEach(r => {
+    predecessoras.add(r.succ);
+    sucessoras.add(r.pred);
+  });
+
+  const semPredecessoras = tarefasMedidas.filter(t => !predecessoras.has(planejamentoIdTarefa(t)));
+  const semSucessoras = tarefasMedidas.filter(t => !sucessoras.has(planejamentoIdTarefa(t)));
+  const leads = relacoes.filter(r => r.lagDias < 0);
+  const lagsLongos = relacoes.filter(r => r.lagDias > 30);
+  const tiposRelacao = relacoes.reduce((acc, r) => {
+    acc[r.tipo] = (acc[r.tipo] || 0) + 1;
+    return acc;
+  }, {});
+
+  const hardConstraints = new Set(['MSO', 'MFO', 'SNLT', 'FNLT', 'MUSTSTARTON', 'MUSTFINISHON', 'STARTNOLATERTHAN', 'FINISHNOLATERTHAN']);
+  const restricoesRigidas = tarefasMedidas.filter(t => hardConstraints.has(String(t.constraintType ?? t.restricaoTipo ?? t.constraint ?? '').replace(/\s+/g, '').toUpperCase()));
+  const folgaNegativa = tarefasMedidas.filter(t => (analiseNumero(t.totalFloat ?? t.tf ?? t.folgaTotal) ?? 0) < 0);
+  const folgaAlta = tarefasMedidas.filter(t => (analiseNumero(t.totalFloat ?? t.tf ?? t.folgaTotal) ?? 0) > 200);
+  const duracaoAlta = tarefasMedidas.filter(t => {
+    const dias = analiseDias(t.duracaoDias ?? t.durationDays ?? t.duracao);
+    return dias !== null && dias > 44;
+  });
+  const duracaoZero = tarefasMedidas.filter(t => {
+    const dias = analiseDias(t.duracaoDias ?? t.durationDays ?? t.duracao);
+    return dias !== null && dias === 0;
+  });
+  const datasInvalidas = tarefasMedidas.filter(t => {
+    const inicio = analiseData(t.inicio ?? t.start);
+    const termino = analiseData(t.termino ?? t.finish);
+    return !inicio || !termino || inicio.getTime() > termino.getTime();
+  });
+  const recursosAusentes = tarefasMedidas.filter(t => {
+    const recursos = t.recursos ?? t.resources ?? t.recurso;
+    return !recursos || (Array.isArray(recursos) && recursos.length === 0) || String(recursos).trim() === '';
+  });
+  const dataStatus = analiseData(entrada.dataStatus ?? entrada.statusDate);
+  const tarefasVencidasBaseline = dataStatus ? tarefasMedidas.filter(t => {
+    const baselineFinish = analiseData(t.baselineTermino ?? t.baselineFinish);
+    const progresso = analiseProgressoPercentual(t.progresso ?? t.percentComplete ?? t.percentualConcluido, t.progressoEscala ?? t.progressScale);
+    return baselineFinish && baselineFinish < dataStatus && progresso < 100;
+  }) : [];
+  const fsViolacoes = relacoes.filter(r => {
+    if (r.tipo !== 'FS') return false;
+    const pred = porId.get(r.pred);
+    const succ = porId.get(r.succ);
+    const predFim = analiseData(pred?.termino ?? pred?.finish);
+    const succInicio = analiseData(succ?.inicio ?? succ?.start);
+    if (!predFim || !succInicio) return false;
+    const minimoInicio = new Date(predFim.getTime() + r.lagDias * 86400000);
+    return succInicio < minimoInicio;
+  });
+  const baselineVencidas = dataStatus ? tarefasMedidas.filter(t => {
+    const baselineFinish = analiseData(t.baselineTermino ?? t.baselineFinish);
+    return baselineFinish && baselineFinish < dataStatus;
+  }) : [];
+  const baselineConcluidas = baselineVencidas.filter(t => analiseProgressoPercentual(t.progresso ?? t.percentComplete ?? t.percentualConcluido, t.progressoEscala ?? t.progressScale) >= 100);
+  const bei = baselineVencidas.length ? baselineConcluidas.length / baselineVencidas.length : null;
+  const terminoCritico = entrada.terminoCritico ?? entrada.criticalFinish ?? entrada.terminoPlanejado;
+  const prazoContratual = entrada.prazoContratual ?? entrada.contractFinish;
+  const duracaoRestanteCritica = dataStatus && terminoCritico ? Math.max(analiseDiasEntre(dataStatus, terminoCritico) ?? 0, 0) : null;
+  const margemContratual = terminoCritico && prazoContratual ? analiseDiasEntre(terminoCritico, prazoContratual) : null;
+  const cpli = duracaoRestanteCritica ? (duracaoRestanteCritica + (margemContratual ?? 0)) / duracaoRestanteCritica : null;
+
+  return {
+    limites: PLANEJAMENTO_DCMA_LIMITES,
+    totalTarefas: tarefasMedidas.length,
+    totalRelacoes: relacoes.length,
+    dataStatus: dataStatus ? dataStatus.toISOString() : null,
+    metricas: {
+      semPredecessoras: planejamentoMetricaPercentual(semPredecessoras.length, idsMedidos.size, PLANEJAMENTO_DCMA_LIMITES.semPredecessoras),
+      semSucessoras: planejamentoMetricaPercentual(semSucessoras.length, idsMedidos.size, PLANEJAMENTO_DCMA_LIMITES.semSucessoras),
+      leads: planejamentoMetricaPercentual(leads.length, relacoes.length, PLANEJAMENTO_DCMA_LIMITES.leads),
+      lagsLongos: planejamentoMetricaPercentual(lagsLongos.length, relacoes.length, PLANEJAMENTO_DCMA_LIMITES.lagsLongos),
+      tiposRelacao,
+      restricoesRigidas: planejamentoMetricaPercentual(restricoesRigidas.length, idsMedidos.size, PLANEJAMENTO_DCMA_LIMITES.restricoesRigidas),
+      folgaNegativa: planejamentoMetricaPercentual(folgaNegativa.length, idsMedidos.size, PLANEJAMENTO_DCMA_LIMITES.folgaNegativa),
+      folgaAlta: planejamentoMetricaPercentual(folgaAlta.length, idsMedidos.size, PLANEJAMENTO_DCMA_LIMITES.folgaAlta),
+      duracaoAlta: planejamentoMetricaPercentual(duracaoAlta.length, idsMedidos.size, PLANEJAMENTO_DCMA_LIMITES.duracaoAlta),
+      duracaoZero: planejamentoMetricaPercentual(duracaoZero.length, idsMedidos.size, PLANEJAMENTO_DCMA_LIMITES.duracaoZero),
+      datasInvalidas: planejamentoMetricaPercentual(datasInvalidas.length, idsMedidos.size, PLANEJAMENTO_DCMA_LIMITES.datasInvalidas),
+      recursosAusentes: planejamentoMetricaPercentual(recursosAusentes.length, idsMedidos.size, PLANEJAMENTO_DCMA_LIMITES.recursosAusentes),
+      tarefasVencidasBaseline: planejamentoMetricaPercentual(tarefasVencidasBaseline.length, idsMedidos.size, PLANEJAMENTO_DCMA_LIMITES.tarefasVencidasBaseline),
+      fsViolacoes: planejamentoMetricaPercentual(fsViolacoes.length, relacoes.length, PLANEJAMENTO_DCMA_LIMITES.fsViolacoes),
+      bei: planejamentoMetricaIndice(bei, PLANEJAMENTO_DCMA_LIMITES.beiMinimo),
+      cpli: planejamentoMetricaIndice(cpli, PLANEJAMENTO_DCMA_LIMITES.cpliMinimo)
+    },
+    listas: {
+      semPredecessoras,
+      semSucessoras,
+      leads,
+      lagsLongos,
+      restricoesRigidas,
+      folgaNegativa,
+      folgaAlta,
+      duracaoAlta,
+      duracaoZero,
+      datasInvalidas,
+      recursosAusentes,
+      tarefasVencidasBaseline,
+      fsViolacoes
+    }
+  };
+}
+
+function analisesNormalizarSerie(entrada = {}) {
+  const serie = Array.isArray(entrada.serie) ? entrada.serie : (Array.isArray(entrada.series) ? entrada.series : []);
+  return serie.map((ponto, index) => ({
+    periodo: ponto.periodo ?? ponto.mes ?? ponto.data ?? `P${index + 1}`,
+    tempo: analiseNumero(ponto.tempo ?? ponto.periodoNumero ?? ponto.periodIndex) ?? index + 1,
+    pv: analiseNumero(ponto.pv ?? ponto.valorPlanejado ?? ponto.plannedValue) ?? 0,
+    pvPeriodo: analiseNumero(ponto.pvPeriodo ?? ponto.periodPv ?? ponto.valorPlanejadoPeriodo ?? ponto.plannedValuePeriod),
+    ev: analiseNumero(ponto.ev ?? ponto.valorAgregado ?? ponto.earnedValue) ?? 0,
+    ac: analiseNumero(ponto.ac ?? ponto.custoReal ?? ponto.actualCost) ?? 0,
+    estoque: analiseNumero(ponto.estoque ?? ponto.stock) ?? null,
+    bac: analiseNumero(ponto.bac) ?? null
+  })).sort((a, b) => a.tempo - b.tempo);
+}
+
+function analisesCalcularEVM(entrada = {}) {
+  const serie = analisesNormalizarSerie(entrada);
+  const ultimo = [...serie].reverse().find(p => p.pv || p.ev || p.ac);
+  if (!ultimo) return { ok: false, motivo: 'Serie EVM vazia ou sem valores validos.', serie: [] };
+  const bacInformado = analiseNumero(entrada.bac) ?? ultimo.bac;
+  const bac = bacInformado ?? Math.max(...serie.map(p => p.pv), ultimo.ev, 0);
+  const estoque = ultimo.estoque ?? analiseNumero(entrada.estoque) ?? 0;
+  const acEvm = Math.max(0, ultimo.ac - estoque);
+  const cpi = analiseDividir(ultimo.ev, acEvm);
+  const spi = analiseDividir(ultimo.ev, ultimo.pv);
+  const cv = ultimo.ev - acEvm;
+  const sv = ultimo.ev - ultimo.pv;
+  const eacLinear = acEvm + Math.max(bac - ultimo.ev, 0);
+  const eacCpi = cpi ? bac / cpi : null;
+  const eacCpiSpi = cpi && spi ? acEvm + Math.max(bac - ultimo.ev, 0) / (cpi * spi) : null;
+  const vac = eacCpi !== null ? bac - eacCpi : null;
+  const tcpiBac = analiseDividir(bac - ultimo.ev, bac - acEvm);
+  const tcpiEac = eacCpi ? analiseDividir(bac - ultimo.ev, eacCpi - acEvm) : null;
+  return {
+    ok: true,
+    periodo: ultimo.periodo,
+    bac,
+    pv: ultimo.pv,
+    ev: ultimo.ev,
+    acBruto: ultimo.ac,
+    estoque,
+    acEvm,
+    cpi,
+    spi,
+    cv,
+    sv,
+    cvPercent: analiseDividir(cv, ultimo.ev),
+    svPercent: analiseDividir(sv, ultimo.pv),
+    eacLinear,
+    eacCpi,
+    eacCpiSpi,
+    vac,
+    tcpiBac,
+    tcpiEac,
+    serie
+  };
+}
+
+function analisesCalcularEarnedSchedule(entrada = {}) {
+  const serie = analisesNormalizarSerie(entrada);
+  const ultimo = [...serie].reverse().find(p => p.ev || p.pv);
+  if (!ultimo) return { ok: false, motivo: 'Serie PV/EV vazia ou sem valores validos.', serie: [] };
+  const temPvPeriodo = serie.some(p => p.pvPeriodo !== null);
+  const pvAcumuladoInformado = !temPvPeriodo && entrada.pvAcumulado !== false && entrada.pvCumulativo !== false && entrada.pvIsCumulative !== false;
+  let acumulado = 0;
+  const pontosPv = serie.map((p, index) => {
+    const anterior = index > 0 ? serie[index - 1].pv : 0;
+    const valorPv = temPvPeriodo ? p.pvPeriodo : p.pv;
+    const pareceIncremental = !pvAcumuladoInformado || (index > 0 && p.pv < anterior);
+    acumulado = pareceIncremental ? acumulado + valorPv : valorPv;
+    return { tempo: p.tempo, pv: acumulado };
+  });
+  const curva = [{ tempo: 0, pv: 0 }, ...pontosPv].sort((a, b) => a.tempo - b.tempo);
+  const ev = ultimo.ev;
+  let earnedSchedule = curva[curva.length - 1].tempo;
+  for (let i = 0; i < curva.length - 1; i++) {
+    const a = curva[i];
+    const b = curva[i + 1];
+    if (ev >= a.pv && ev <= b.pv) {
+      const intervaloPv = b.pv - a.pv;
+      const fracao = intervaloPv ? (ev - a.pv) / intervaloPv : 0;
+      earnedSchedule = a.tempo + fracao * (b.tempo - a.tempo);
+      break;
+    }
+  }
+  const at = analiseNumero(entrada.at ?? entrada.actualTime) ?? ultimo.tempo;
+  const duracaoPlanejada = analiseNumero(entrada.duracaoPlanejada ?? entrada.plannedDuration) ?? curva[curva.length - 1].tempo;
+  const spiTempo = analiseDividir(earnedSchedule, at);
+  const atrasoPeriodos = at - earnedSchedule;
+  const ieacTempo = spiTempo ? duracaoPlanejada / spiTempo : null;
+  return {
+    ok: true,
+    periodo: ultimo.periodo,
+    ev,
+    earnedSchedule,
+    actualTime: at,
+    spiTempo,
+    atrasoPeriodos,
+    duracaoPlanejada,
+    ieacTempo,
+    serie
+  };
+}
+
+function analisesCoeficienteVariacao(valores) {
+  const validos = valores.filter(v => Number.isFinite(v) && v > 0);
+  if (validos.length < 2) return null;
+  const media = validos.reduce((a, b) => a + b, 0) / validos.length;
+  const variancia = validos.reduce((acc, v) => acc + Math.pow(v - media, 2), 0) / validos.length;
+  return media ? Math.sqrt(variancia) / media : null;
+}
+
+function analisesAvaliarGatesEVM(entrada = {}) {
+  const evm = entrada.evm || analisesCalcularEVM(entrada);
+  if (!evm.ok) return { pronto: false, gates: [{ nome: 'dados', ok: false, detalhe: evm.motivo }] };
+  const serie = evm.serie || [];
+  const cpis = serie.map(p => analiseDividir(p.ev, Math.max(0, p.ac - (p.estoque ?? 0)))).filter(v => v !== null);
+  const spis = serie.map(p => analiseDividir(p.ev, p.pv)).filter(v => v !== null);
+  const cvCpi = analisesCoeficienteVariacao(cpis.slice(-3));
+  const cvSpi = analisesCoeficienteVariacao(spis.slice(-3));
+  const avanco = analiseDividir(evm.ev, evm.bac) ?? 0;
+  const gates = [
+    { nome: 'minimoPeriodos', ok: serie.length >= 4, detalhe: `${serie.length} periodos carregados` },
+    { nome: 'avancoFisico', ok: avanco >= 0.05, detalhe: avanco },
+    { nome: 'indicesValidos', ok: evm.cpi !== null && evm.spi !== null, detalhe: { cpi: evm.cpi, spi: evm.spi } },
+    { nome: 'estabilidadeCPI', ok: cvCpi === null || cvCpi <= 0.15, detalhe: cvCpi },
+    { nome: 'estabilidadeSPI', ok: cvSpi === null || cvSpi <= 0.15, detalhe: cvSpi }
+  ];
+  return { pronto: gates.every(g => g.ok), gates, evm };
 }
 
 // ─── MÓDULO ORÇAMENTO: SUPABASE E CONSULTA DE CPUs ───────────────────────────
