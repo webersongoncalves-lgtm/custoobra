@@ -330,6 +330,268 @@ body.home-wide main { max-width: 1180px; }
 }
 .home-admin:hover { color: var(--text2); background: rgba(28,58,110,0.06); }
 
+/* ─── PLANEJAMENTO MODULE ───────────────────── */
+body.planejamento-wide {
+  background: #E8EEF3;
+}
+body.planejamento-wide main {
+  max-width: 1180px;
+}
+.planejamento-shell {
+  background: #F7FAFC;
+  border: 1px solid #D3E0E8;
+  border-radius: 10px;
+  box-shadow: 0 16px 38px rgba(14,40,54,0.12);
+  overflow: hidden;
+}
+.planejamento-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #0B2F3A;
+  color: #fff;
+  border-bottom: 3px solid #C59645;
+  flex-wrap: wrap;
+}
+.planejamento-head-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.planejamento-title-block {
+  display: grid;
+  gap: 2px;
+}
+.planejamento-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.planejamento-subtitle {
+  color: rgba(255,255,255,0.72);
+  font-size: 0.74rem;
+}
+.planejamento-head .btn-back {
+  color: #fff;
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.06);
+}
+.planejamento-head .btn-back:hover {
+  background: rgba(255,255,255,0.14);
+}
+.planejamento-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.planejamento-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.86);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.planejamento-body {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+.planejamento-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 14px;
+  align-items: stretch;
+}
+.planejamento-status-card,
+.planejamento-upload-card,
+.planejamento-card {
+  background: #FFFFFF;
+  border: 1px solid #D6E2EA;
+  border-radius: 8px;
+  padding: 16px;
+}
+.planejamento-section-label {
+  color: #667C88;
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.planejamento-status-title {
+  margin-top: 7px;
+  color: #102A35;
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+.planejamento-status-text {
+  margin-top: 7px;
+  color: #5B6F7A;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+.planejamento-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.planejamento-kpi {
+  border: 1px solid #E0E8EE;
+  border-radius: 8px;
+  padding: 11px;
+  background: #F9FBFC;
+}
+.planejamento-kpi-value {
+  color: #102A35;
+  font-size: 1rem;
+  font-weight: 800;
+}
+.planejamento-kpi-label {
+  margin-top: 3px;
+  color: #667C88;
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+.planejamento-upload-card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+.planejamento-upload-box {
+  border: 1.5px dashed #AFC0CA;
+  border-radius: 8px;
+  background: #F7FAFC;
+  padding: 18px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.planejamento-upload-box:hover {
+  border-color: #C59645;
+  background: #FFFBF3;
+}
+.planejamento-upload-title {
+  color: #102A35;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+.planejamento-upload-sub {
+  margin-top: 4px;
+  color: #667C88;
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+.planejamento-upload-box input {
+  display: none;
+}
+.planejamento-file-state {
+  min-height: 36px;
+  border-radius: 7px;
+  background: #EEF4F8;
+  color: #355160;
+  padding: 9px 10px;
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+.planejamento-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-bottom: 1px solid #D6E2EA;
+  padding-bottom: 10px;
+}
+.planejamento-tab {
+  border: 1px solid #C9D8E1;
+  background: #FFFFFF;
+  color: #405A68;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.planejamento-tab.active {
+  background: #0B2F3A;
+  border-color: #0B2F3A;
+  color: #FFFFFF;
+}
+.planejamento-tab-panel {
+  display: none;
+}
+.planejamento-tab-panel.active {
+  display: block;
+}
+.planejamento-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 12px;
+}
+.planejamento-list {
+  display: grid;
+  gap: 8px;
+}
+.planejamento-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #E8EEF2;
+}
+.planejamento-row:last-child {
+  border-bottom: 0;
+}
+.planejamento-row-title {
+  color: #102A35;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.planejamento-row-note {
+  margin-top: 2px;
+  color: #667C88;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+.planejamento-status-pill {
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.planejamento-status-pill.ok {
+  background: #E6F4EE;
+  color: #2F7D5A;
+}
+.planejamento-status-pill.warn {
+  background: #FFF2D8;
+  color: #8A5A16;
+}
+.planejamento-status-pill.crit {
+  background: #FBE7E9;
+  color: #A64D57;
+}
+.planejamento-empty {
+  padding: 28px 18px;
+  text-align: center;
+  color: #667C88;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
 /* ─── ORÇAMENTO MODULE ───────────────────────── */
 .orcamento-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .orcamento-head-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -1036,6 +1298,16 @@ strong.hi { color: var(--accent); font-weight: 700; }
   .home-modules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+@media (max-width: 980px) {
+  .planejamento-hero,
+  .planejamento-grid {
+    grid-template-columns: 1fr;
+  }
+  .planejamento-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 640px) {
   .home-diagram { padding: 16px; gap: 14px; }
   .home-title { padding: 18px; }
@@ -1045,6 +1317,11 @@ strong.hi { color: var(--accent); font-weight: 700; }
   .home-module { min-height: 0; }
   .home-stage-main,
   .home-stage-side { padding: 15px; }
+  .planejamento-head { align-items: flex-start; }
+  .planejamento-head-left { align-items: flex-start; flex-direction: column; }
+  .planejamento-body { padding: 14px; }
+  .planejamento-kpis { grid-template-columns: 1fr; }
+  .planejamento-row { grid-template-columns: 1fr; }
 }
 
 /* ─── SCREEN MANAGER ─────────────────────────── */
@@ -1064,10 +1341,15 @@ strong.hi { color: var(--accent); font-weight: 700; }
 @media (max-width: 480px) {
   main { padding: 16px 12px 70px; }
   body.home-wide header { padding: 0 12px; gap: 8px; }
+  body.planejamento-wide header { padding: 0 12px; gap: 8px; }
   body.home-wide .logo { min-width: 0; gap: 8px; overflow: hidden; }
+  body.planejamento-wide .logo { min-width: 0; gap: 8px; overflow: hidden; }
   body.home-wide .logo-app { overflow: hidden; text-overflow: ellipsis; }
+  body.planejamento-wide .logo-app { overflow: hidden; text-overflow: ellipsis; }
   body.home-wide .badge-month { display: none; }
+  body.planejamento-wide .badge-month { display: none; }
   body.home-wide .badge-user { max-width: 126px; }
+  body.planejamento-wide .badge-user { max-width: 126px; }
   body.orcamento-wide main { padding: 0 0 32px; }
   body.orcamento-wide header { height: auto; min-height: 60px; align-items: center; padding: 10px 12px; }
   body.orcamento-wide .logo { min-width: 0; gap: 8px; overflow: hidden; }
@@ -1192,7 +1474,7 @@ strong.hi { color: var(--accent); font-weight: 700; }
             <span class="home-module-name">Orçamento</span>
             <span class="home-module-sub">CPUs, planilhas congeladas e referência de custo.</span>
           </button>
-          <button type="button" class="home-module is-pending" onclick="abrirModuloEmDesenvolvimento('Planejamento')" title="Módulo em desenvolvimento">
+          <button type="button" class="home-module" onclick="abrirPlanejamento()">
             <span class="home-module-kicker">Cronograma</span>
             <span class="home-module-name">Planejamento</span>
             <span class="home-module-sub">DCMA, caminho crítico, higiene e riscos do MPP.</span>
@@ -1249,6 +1531,139 @@ strong.hi { color: var(--accent); font-weight: 700; }
     <div class="home-foot">
       <span><strong style="color:var(--text2);">Integração ativa:</strong> Os dados são enviados ao Google Sheets e disponibilizados no Power BI.</span>
       <button class="home-admin" onclick="abrirAdmin()" title="Área administrativa">⚙️ Admin</button>
+    </div>
+  </div>
+
+  <!-- TELA: PLANEJAMENTO -->
+  <div id="screenPlanejamento" class="screen">
+    <div class="planejamento-shell">
+      <div class="planejamento-head">
+        <div class="planejamento-head-left">
+          <button class="btn-back" onclick="voltarModulo()">← Voltar</button>
+          <div class="planejamento-title-block">
+            <div class="planejamento-title">Planejamento</div>
+            <div class="planejamento-subtitle">Auditoria DCMA e leitura de cronogramas MPP por obra</div>
+          </div>
+        </div>
+        <div class="planejamento-head-actions">
+          <span class="planejamento-chip">Fase 1</span>
+          <span class="planejamento-chip">Resultado vigente por obra</span>
+        </div>
+      </div>
+      <div class="planejamento-body">
+        <div class="planejamento-hero">
+          <div class="planejamento-status-card">
+            <div class="planejamento-section-label">Visão do módulo</div>
+            <div class="planejamento-status-title">Central de auditoria do cronograma</div>
+            <div class="planejamento-status-text">
+              O módulo vai manter o último planejamento processado por obra. Ao subir um novo MPP, o resultado anterior será marcado como obsoleto e substituído pelo novo resultado vigente.
+            </div>
+            <div class="planejamento-kpis">
+              <div class="planejamento-kpi">
+                <div class="planejamento-kpi-value" id="planejamentoKpiObra">—</div>
+                <div class="planejamento-kpi-label">Obra selecionada</div>
+              </div>
+              <div class="planejamento-kpi">
+                <div class="planejamento-kpi-value">DCMA</div>
+                <div class="planejamento-kpi-label">Método de auditoria</div>
+              </div>
+              <div class="planejamento-kpi">
+                <div class="planejamento-kpi-value">MPP</div>
+                <div class="planejamento-kpi-label">Formato previsto</div>
+              </div>
+              <div class="planejamento-kpi">
+                <div class="planejamento-kpi-value">1 ativo</div>
+                <div class="planejamento-kpi-label">Resultado vigente por obra</div>
+              </div>
+            </div>
+          </div>
+          <div class="planejamento-upload-card">
+            <div class="planejamento-section-label">Novo planejamento</div>
+            <label class="planejamento-upload-box">
+              <input type="file" id="planejamentoFileInput" accept=".mpp,.xml,.xer" onchange="planejamentoSelecionarArquivo(event)">
+              <div class="planejamento-upload-title">Selecionar arquivo de cronograma</div>
+              <div class="planejamento-upload-sub">Aceita MPP. XML/XER ficam previstos para compatibilidade futura.</div>
+            </label>
+            <div class="planejamento-file-state" id="planejamentoFileState">Nenhum arquivo selecionado. O processamento automático será conectado na próxima etapa.</div>
+          </div>
+        </div>
+
+        <div class="planejamento-tabs" role="tablist" aria-label="Abas de auditoria do planejamento">
+          <button class="planejamento-tab active" onclick="abrirAbaPlanejamento('scorecard')">Scorecard</button>
+          <button class="planejamento-tab" onclick="abrirAbaPlanejamento('dcma')">DCMA</button>
+          <button class="planejamento-tab" onclick="abrirAbaPlanejamento('critico')">Caminho Crítico</button>
+          <button class="planejamento-tab" onclick="abrirAbaPlanejamento('logica')">Lógica</button>
+          <button class="planejamento-tab" onclick="abrirAbaPlanejamento('higiene')">Higiene</button>
+          <button class="planejamento-tab" onclick="abrirAbaPlanejamento('gargalos')">Gargalos</button>
+          <button class="planejamento-tab" onclick="abrirAbaPlanejamento('pontos')">Pontos Cegos</button>
+          <button class="planejamento-tab" onclick="abrirAbaPlanejamento('veredito')">Veredito</button>
+        </div>
+
+        <div id="planejamentoTab-scorecard" class="planejamento-tab-panel active">
+          <div class="planejamento-grid">
+            <div class="planejamento-card">
+              <div class="planejamento-section-label">Scorecard previsto</div>
+              <div class="planejamento-list">
+                <div class="planejamento-row">
+                  <div>
+                    <div class="planejamento-row-title">Confiabilidade global</div>
+                    <div class="planejamento-row-note">Nota de 0 a 10 baseada em lógica, folgas, restrições e higiene.</div>
+                  </div>
+                  <span class="planejamento-status-pill warn">A conectar</span>
+                </div>
+                <div class="planejamento-row">
+                  <div>
+                    <div class="planejamento-row-title">Margem ao prazo contratual</div>
+                    <div class="planejamento-row-note">Comparação entre término vigente, caminho crítico e marco contratual.</div>
+                  </div>
+                  <span class="planejamento-status-pill warn">A conectar</span>
+                </div>
+                <div class="planejamento-row">
+                  <div>
+                    <div class="planejamento-row-title">Resultado vigente</div>
+                    <div class="planejamento-row-note">Somente o último MPP processado fica ativo para a obra.</div>
+                  </div>
+                  <span class="planejamento-status-pill ok">Definido</span>
+                </div>
+              </div>
+            </div>
+            <div class="planejamento-card">
+              <div class="planejamento-section-label">Contrato de dados</div>
+              <div class="planejamento-empty">Esta primeira entrega prepara a tela. A próxima etapa liga upload, processamento do MPP e persistência do resultado por obra.</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="planejamentoTab-dcma" class="planejamento-tab-panel">
+          <div class="planejamento-card">
+            <div class="planejamento-section-label">DCMA 14 pontos</div>
+            <div class="planejamento-list">
+              <div class="planejamento-row"><div><div class="planejamento-row-title">Sem predecessoras / sem sucessoras</div><div class="planejamento-row-note">Percentuais contra limites de referência DCMA.</div></div><span class="planejamento-status-pill warn">Pendente</span></div>
+              <div class="planejamento-row"><div><div class="planejamento-row-title">Lags, leads e relações incomuns</div><div class="planejamento-row-note">Distribuição FS, SS, FF, SF e vínculos com defasagens relevantes.</div></div><span class="planejamento-status-pill warn">Pendente</span></div>
+              <div class="planejamento-row"><div><div class="planejamento-row-title">Restrições rígidas e folga total</div><div class="planejamento-row-note">Identificação de TF negativo, alta folga e hard constraints.</div></div><span class="planejamento-status-pill warn">Pendente</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="planejamentoTab-critico" class="planejamento-tab-panel">
+          <div class="planejamento-card"><div class="planejamento-section-label">Caminho crítico</div><div class="planejamento-empty">Vai listar tarefas TF=0, near-critical e impacto no prazo contratual.</div></div>
+        </div>
+        <div id="planejamentoTab-logica" class="planejamento-tab-panel">
+          <div class="planejamento-card"><div class="planejamento-section-label">Lógica de rede</div><div class="planejamento-empty">Vai destacar violações FS, tarefas soltas, vínculos frágeis e recomendações de correção.</div></div>
+        </div>
+        <div id="planejamentoTab-higiene" class="planejamento-tab-panel">
+          <div class="planejamento-card"><div class="planejamento-section-label">Higiene do arquivo</div><div class="planejamento-empty">Vai apontar restrições vencidas, datas históricas, tarefas obsoletas e dados inconsistentes.</div></div>
+        </div>
+        <div id="planejamentoTab-gargalos" class="planejamento-tab-panel">
+          <div class="planejamento-card"><div class="planejamento-section-label">Gargalos</div><div class="planejamento-empty">Vai consolidar concentração de atividades, conflitos físicos, clima e janelas críticas.</div></div>
+        </div>
+        <div id="planejamentoTab-pontos" class="planejamento-tab-panel">
+          <div class="planejamento-card"><div class="planejamento-section-label">Pontos cegos</div><div class="planejamento-empty">Vai listar riscos não modelados, concessionárias, CEF, aprovações e lead times.</div></div>
+        </div>
+        <div id="planejamentoTab-veredito" class="planejamento-tab-panel">
+          <div class="planejamento-card"><div class="planejamento-section-label">Veredito</div><div class="planejamento-empty">Vai concluir se o cronograma é executável, parcialmente executável ou crítico.</div></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1995,6 +2410,7 @@ function mostrarTela(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.body.classList.toggle('home-wide', id === 'screenModulo');
+  document.body.classList.toggle('planejamento-wide', id === 'screenPlanejamento');
   document.body.classList.toggle('metas-wide', id === 'screenMetas' || id === 'screenAdmin');
   document.body.classList.toggle('orcamento-wide', id === 'screenOrcamento');
 }
@@ -2018,12 +2434,45 @@ function abrirOrcamento() {
   orcamentoRenderSalvosLocais();
 }
 
+function abrirPlanejamento() {
+  if (!currentUser) { abrirUser(); return; }
+  mostrarTela('screenPlanejamento');
+  planejamentoAtualizarContexto();
+  abrirAbaPlanejamento('scorecard');
+}
+
 function abrirModuloEmDesenvolvimento(nome) {
   alert(`${nome} será desenvolvido na próxima etapa.`);
 }
 
 function voltarModulo() {
   mostrarTela('screenModulo');
+}
+
+function planejamentoAtualizarContexto() {
+  const obraEl = document.getElementById('planejamentoKpiObra');
+  if (obraEl) obraEl.textContent = currentObra || '—';
+}
+
+function abrirAbaPlanejamento(tab) {
+  document.querySelectorAll('.planejamento-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick') === `abrirAbaPlanejamento('${tab}')`);
+  });
+  document.querySelectorAll('.planejamento-tab-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === `planejamentoTab-${tab}`);
+  });
+}
+
+function planejamentoSelecionarArquivo(event) {
+  const file = event.target.files && event.target.files[0];
+  const state = document.getElementById('planejamentoFileState');
+  if (!state) return;
+  if (!file) {
+    state.textContent = 'Nenhum arquivo selecionado. O processamento automático será conectado na próxima etapa.';
+    return;
+  }
+  const mb = file.size ? (file.size / (1024 * 1024)).toFixed(1).replace('.', ',') : '0,0';
+  state.textContent = `${file.name} selecionado (${mb} MB). Pipeline de leitura e auditoria ainda será conectado.`;
 }
 
 // ─── MÓDULO ORÇAMENTO: SUPABASE E CONSULTA DE CPUs ───────────────────────────
